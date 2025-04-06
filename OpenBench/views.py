@@ -56,7 +56,7 @@ from wsgiref.util import FileWrapper
 
 ERROR_MESSAGES = {
     'disabled'            : 'Account has not been enabled. Contact an Administrator',
-    'fakeuser'            : 'This is not a real OpenBench User. Create an OpenBench account',
+    'fakeuser'            : 'This is not a real Verdict User. Create an Verdict account',
     'requires_login'      : 'All pages require a user login to access',
     'manual_registration' : 'Registration can only be done via an Administrator',
 }
@@ -921,10 +921,3 @@ def api_pgns(request, pgn_id):
     response['Content-Length'] = os.path.getsize(pgn_path)
     response['Content-Disposition'] = 'attachment; filename=%d.pgn.tar' % (pgn_id)
     return response
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#                                BUSINESS VIEWS                               #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-def buyEthereal(request):
-    return render(request, 'buyEthereal.html')
