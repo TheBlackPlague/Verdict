@@ -80,8 +80,5 @@ urlpatterns = [
     django.urls.path(r'api/pgns/<int:pgn_id>/', OpenBench.views.api_pgns),
 
     # Redirect anything else to the Index
-    django.urls.path(r'', OpenBench.views.index),
-
-    # Link for Ethereal Sales
-    django.urls.path(r'Ethereal/', OpenBench.views.buyEthereal),
+    django.urls.path(r'', OpenBench.views.index)
 ]
