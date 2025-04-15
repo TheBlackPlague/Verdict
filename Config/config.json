@@ -9,7 +9,7 @@
     "balance_engine_throughputs"  : false,
 
     "books" : [
-        "UHO_2024_8_LT1.epd"
+        "UHO_Lichess_4852_v1.epd"
     ],
 
     "engines" : [
