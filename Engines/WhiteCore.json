@@ -1,0 +1,207 @@
+{
+    "source": "https://github.com/SzilBalazs/WhiteCore",
+    "private": false,
+    "nps": 2000000,
+
+    "build": {
+        "path": "",
+        "compilers": ["clang>=20.0.0"],
+        "cpuflags": ["POPCNT"],
+        "systems": ["Linux", "Windows", "Darwin"]
+    },
+
+    "test_presets": {
+        "default": {
+            "base_branch": "master",
+            "book_name": "UHO_Lichess_4852_v1.epd",
+            "test_bounds": "[0.00, 5.00]",
+            "test_confidence": "[0.05, 0.05]",
+            "win_adj": "movecount=3 score=400",
+            "draw_adj": "movenumber=40 movecount=8 score=10"
+        },
+
+        "STC ELO-GAIN": {
+            "both_options": "Threads=1 Hash=16",
+            "both_time_control": "10+0.1",
+            "workload_size": 32
+        },
+
+        "LTC ELO-GAIN": {
+            "both_options": "Threads=1 Hash=128",
+            "both_time_control": "60+0.6",
+            "workload_size": 8
+        },
+
+        "VLTC ELO-GAIN": {
+            "both_options": "Threads=1 Hash=256",
+            "both_time_control": "120+1.2",
+            "workload_size": 8
+        },
+
+        "STC ELO-EQUAL": {
+            "both_options": "Threads=1 Hash=16",
+            "both_time_control": "10+0.1",
+            "workload_size": 32,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "LTC ELO-EQUAL": {
+            "both_options": "Threads=1 Hash=128",
+            "both_time_control": "60+0.6",
+            "workload_size": 8,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "VLTC ELO-EQUAL": {
+            "both_options": "Threads=1 Hash=256",
+            "both_time_control": "120+1.2",
+            "workload_size": 8,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "STC ELO-PROGRESS": {
+            "both_options": "Threads=1 Hash=16",
+            "both_time_control": "10+0.1",
+            "workload_size": 32,
+            "test_max_games": 20000
+        },
+
+        "LTC ELO-PROGRESS": {
+            "both_options": "Threads=1 Hash=128",
+            "both_time_control": "60+0.6",
+            "workload_size": 8,
+            "test_max_games": 20000
+        },
+
+        "VLTC ELO-PROGRESS": {
+            "both_options": "Threads=1 Hash=256",
+            "both_time_control": "120+1.2",
+            "workload_size": 8,
+            "test_max_games": 20000
+        },
+
+        "STC ELO-GAIN [SMP 2T]": {
+            "both_options": "Threads=2 Hash=32",
+            "both_time_control": "10+0.1",
+            "workload_size": 32
+        },
+
+        "LTC ELO-GAIN [SMP 2T]": {
+            "both_options": "Threads=2 Hash=256",
+            "both_time_control": "60+0.6",
+            "workload_size": 8
+        },
+
+        "VLTC ELO-GAIN [SMP 2T]": {
+            "both_options": "Threads=2 Hash=512",
+            "both_time_control": "120+1.2",
+            "workload_size": 8
+        },
+
+        "STC ELO-EQUAL [SMP 2T]": {
+            "both_options": "Threads=2 Hash=32",
+            "both_time_control": "10+0.1",
+            "workload_size": 32,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "LTC ELO-EQUAL [SMP 2T]": {
+            "both_options": "Threads=2 Hash=256",
+            "both_time_control": "60+0.6",
+            "workload_size": 8,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "VLTC ELO-EQUAL [SMP 2T]": {
+            "both_options": "Threads=2 Hash=512",
+            "both_time_control": "120+1.2",
+            "workload_size": 8,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "STC ELO-PROGRESS [SMP 2T]": {
+            "both_options": "Threads=2 Hash=32",
+            "both_time_control": "10+0.1",
+            "workload_size": 32,
+            "test_max_games": 20000
+        },
+
+        "LTC ELO-PROGRESS [SMP 2T]": {
+            "both_options": "Threads=2 Hash=256",
+            "both_time_control": "60+0.6",
+            "workload_size": 8,
+            "test_max_games": 20000
+        },
+
+        "VLTC ELO-PROGRESS [SMP 2T]": {
+            "both_options": "Threads=2 Hash=512",
+            "both_time_control": "120+1.2",
+            "workload_size": 8,
+            "test_max_games": 20000
+        },
+
+        "STC ELO-GAIN [SMP 4T]": {
+            "both_options": "Threads=4 Hash=64",
+            "both_time_control": "10+0.1",
+            "workload_size": 32
+        },
+
+        "LTC ELO-GAIN [SMP 4T]": {
+            "both_options": "Threads=4 Hash=512",
+            "both_time_control": "60+0.6",
+            "workload_size": 8
+        },
+
+        "VLTC ELO-GAIN [SMP 4T]": {
+            "both_options": "Threads=4 Hash=1024",
+            "both_time_control": "120+1.2",
+            "workload_size": 8
+        },
+
+        "STC ELO-EQUAL [SMP 4T]": {
+            "both_options": "Threads=4 Hash=64",
+            "both_time_control": "10+0.1",
+            "workload_size": 32,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "LTC ELO-EQUAL [SMP 4T]": {
+            "both_options": "Threads=4 Hash=512",
+            "both_time_control": "60+0.6",
+            "workload_size": 8,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "VLTC ELO-EQUAL [SMP 4T]": {
+            "both_options": "Threads=4 Hash=1024",
+            "both_time_control": "120+1.2",
+            "workload_size": 8,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "STC ELO-PROGRESS [SMP 4T]": {
+            "both_options": "Threads=4 Hash=64",
+            "both_time_control": "10+0.1",
+            "workload_size": 32,
+            "test_max_games": 20000
+        },
+
+        "LTC ELO-PROGRESS [SMP 4T]": {
+            "both_options": "Threads=4 Hash=512",
+            "both_time_control": "60+0.6",
+            "workload_size": 8,
+            "test_max_games": 20000
+        },
+
+        "VLTC ELO-PROGRESS [SMP 4T]": {
+            "both_options": "Threads=4 Hash=1024",
+            "both_time_control": "120+1.2",
+            "workload_size": 8,
+            "test_max_games": 20000
+        }
+    },
+
+    "tune_presets": {},
+
+    "datagen_presets": {}
+}
