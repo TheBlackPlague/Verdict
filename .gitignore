@@ -22,6 +22,3 @@ Media/Events/*
 *.epd
 *.toml
 .venv/
-.env
-Docker/data/
-staticfiles/

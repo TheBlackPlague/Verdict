@@ -45,7 +45,6 @@ RUN curl -LO https://ziglang.org/download/${ZIG_VERSION}/zig-x86_64-linux-${ZIG_
 # Build from the repository root so this image contains the checked-out client.
 COPY Client /Verdict/Client
 COPY LICENSE /Verdict/LICENSE
-COPY Docker/run-client.sh /Verdict/Client/run-client.sh
 
 RUN python3 -m venv /.venv
 
@@ -57,4 +56,4 @@ WORKDIR /Verdict/Client
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-CMD ["bash", "run-client.sh"]
+CMD ["sh", "-c", "exec python client.py --username \"${USERNAME:?Set USERNAME}\" --password \"${PASSWORD:?Set PASSWORD}\" --server \"${SERVER:?Set SERVER}\" --threads \"${THREADS:-auto}\" --nsockets \"${SOCKETS:-1}\" -I \"$(hostname)\""]

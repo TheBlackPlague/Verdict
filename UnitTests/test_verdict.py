@@ -1,7 +1,5 @@
 import io
-import os
 from pathlib import Path
-import subprocess
 import tempfile
 from types import SimpleNamespace
 from unittest import TestCase as PlainTestCase
@@ -122,30 +120,3 @@ class VerdictPageTests(TestCase):
         self.assertEqual(response.json()['client_repo_ref'], 'sync-with-upstream')
         runner = self.client.post('/clientMatchRunnerVersionRef/', {'username': 'reviewer', 'password': 'test-only-password'})
         self.assertEqual(runner.json()['fastchess_min_version'], OPENBENCH_CONFIG['fastchess_min_version'])
-
-
-class DockerEntrypointTests(PlainTestCase):
-    def test_cpu_allocation_including_small_and_restricted_hosts(self):
-        for cores, sockets in [(1, 1), (2, 1), (16, 1), (16, 2), (1, 2), (3, 2)]:
-            with self.subTest(cores=cores, sockets=sockets), tempfile.TemporaryDirectory() as directory:
-                commands = {
-                    'lscpu': 'echo "Socket(s): %d"' % sockets,
-                    'nproc': 'echo %d' % cores,
-                    'hostname': 'echo test-worker',
-                    'python': 'printf "%s\\n" "$@"',
-                }
-                for name, body in commands.items():
-                    path = Path(directory, name)
-                    path.write_text('#!/bin/sh\n' + body + '\n')
-                    path.chmod(0o755)
-                env = dict(os.environ, PATH=directory + os.pathsep + os.environ['PATH'],
-                           USERNAME='test', PASSWORD='test', SERVER='http://example.test')
-                result = subprocess.run(['bash', str(ROOT / 'Docker/run-client.sh')], env=env,
-                                        check=True, capture_output=True, text=True)
-                args = result.stdout.splitlines()
-                threads = int(args[args.index('--threads') + 1])
-                nsockets = int(args[args.index('--nsockets') + 1])
-                self.assertGreaterEqual(threads, 1)
-                self.assertLessEqual(threads, cores)
-                self.assertEqual(threads % nsockets, 0)
-                self.assertEqual(args[args.index('--server') + 1], 'http://example.test')
