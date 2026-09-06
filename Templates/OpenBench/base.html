@@ -18,7 +18,7 @@
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap" rel="stylesheet">
 
-        <title>{% block title %}OpenBench{% endblock %}</title>
+        <title>{% block title %}Verdict{% endblock %}</title>
 
         {% block scripts %}
         {% endblock %}
@@ -149,14 +149,6 @@
             <hr>
 
             <ul>
-                <li class="header">Support</li>
-                <li><a href="{{config.client_repo_url}}"><i class="fa-brands fa-github fa-fw"></i> OpenBench</a></li>
-                <li><a href="https://discord.gg/9MVg7fBTpM"><i class="fa-brands fa-discord fa-fw"></i> Discord</a></li>
-            </ul>
-
-            <hr>
-
-            <ul>
                 <li class="header">Engines</li>
                 {% for engine, data in config.engines.items %}
                     <li><a href="{{data.source}}">{{engine}}</a></li>
@@ -174,7 +166,7 @@
                         <i class="fa-solid fa-bars fa-fw"></i>
                     </button>
                     <h2>
-                        <a class="site-title" href="/">OpenBench&nbsp;Testing&nbsp;Framework</a>
+                        <a class="site-title" href="/">Verdict</a>
                     </h2>
                 </div>
 

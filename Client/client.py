@@ -144,7 +144,15 @@ def download_client_files(args):
                     zip_file.extractall(temp_dir)
 
                 # Copy all files except client.py
-                client_dir = os.path.join(temp_dir, 'OpenBench-%s' % (repo_ref), 'Client')
+                # GitHub names the archive root after the repository and ref.
+                # Discover it so forks, tags and commit refs work as well.
+                candidates = [os.path.join(temp_dir, entry, 'Client')
+                              for entry in os.listdir(temp_dir)]
+                candidates = [path for path in candidates
+                              if os.path.isfile(os.path.join(path, 'worker.py'))]
+                if len(candidates) != 1:
+                    raise ValueError('Expected exactly one Client directory with worker.py')
+                client_dir = candidates[0]
                 for root, dirs, files in os.walk(client_dir):
                     for file in files:
                         if file != 'client.py':

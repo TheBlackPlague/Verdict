@@ -1,0 +1,309 @@
+{
+    "source": "https://github.com/JonathanHallstrom/pawnocchio",
+    "private": false,
+    "nps": 1000000,
+
+    "build": {
+        "path": "",
+        "compilers": ["zig"],
+        "cpuflags": [],
+        "systems": ["Linux", "Windows", "Darwin"]
+    },
+
+    "test_presets": {
+        "default": {
+            "base_branch": "master",
+            "book_name": "UHO_Lichess_4852_v1.epd",
+            "test_bounds": "[0.00, 4.00]",
+            "test_confidence": "[0.1, 0.05]",
+            "win_adj": "movecount=3 score=400",
+            "draw_adj": "movenumber=40 movecount=8 score=10"
+        },
+
+        "STC": {
+            "both_options": "Threads=1 Hash=16",
+            "both_time_control": "10+0.1",
+            "workload_size": 32
+        },
+
+        "LTC": {
+            "both_options": "Threads=1 Hash=128",
+            "both_time_control": "40+0.4",
+            "workload_size": 8
+        },
+
+        "VLTC": {
+            "both_options": "Threads=1 Hash=256",
+            "both_time_control": "80+0.8",
+            "workload_size": 8
+        },
+
+        "VVLTC": {
+            "both_options": "Threads=1 Hash=256",
+            "both_time_control": "120+1.2",
+            "workload_size": 8
+        },
+
+        "STC regression": {
+            "both_options": "Threads=1 Hash=16",
+            "both_time_control": "10+0.1",
+            "workload_size": 32,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "LTC regression": {
+            "both_options": "Threads=1 Hash=128",
+            "both_time_control": "40+0.4",
+            "workload_size": 8,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "VLTC regression": {
+            "both_options": "Threads=1 Hash=256",
+            "both_time_control": "80+0.8",
+            "workload_size": 8,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "VVLTC regression": {
+            "both_options": "Threads=1 Hash=256",
+            "both_time_control": "120+1.2",
+            "workload_size": 8,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "STC progtest": {
+            "both_options": "Threads=1 Hash=16",
+            "both_time_control": "10+0.1",
+            "workload_size": 32,
+            "test_max_games": 20000
+        },
+
+        "LTC progtest": {
+            "both_options": "Threads=1 Hash=128",
+            "both_time_control": "40+0.4",
+            "workload_size": 8,
+            "test_max_games": 20000
+        },
+
+        "VLTC progtest": {
+            "both_options": "Threads=1 Hash=256",
+            "both_time_control": "80+0.8",
+            "workload_size": 8,
+            "test_max_games": 20000
+        },
+
+        "VVLTC progtest": {
+            "both_options": "Threads=1 Hash=256",
+            "both_time_control": "120+1.2",
+            "workload_size": 8,
+            "test_max_games": 20000
+        },
+
+        "STC [2T]": {
+            "both_options": "Threads=2 Hash=32",
+            "both_time_control": "10+0.1",
+            "workload_size": 32
+        },
+
+        "LTC [2T]": {
+            "both_options": "Threads=2 Hash=256",
+            "both_time_control": "40+0.4",
+            "workload_size": 8
+        },
+
+        "VLTC [2T]": {
+            "both_options": "Threads=2 Hash=512",
+            "both_time_control": "80+0.8",
+            "workload_size": 8
+        },
+
+        "VVLTC [2T]": {
+            "both_options": "Threads=2 Hash=512",
+            "both_time_control": "120+1.2",
+            "workload_size": 8
+        },
+
+        "STC regression [2T]": {
+            "both_options": "Threads=2 Hash=32",
+            "both_time_control": "10+0.1",
+            "workload_size": 32,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "LTC regression [2T]": {
+            "both_options": "Threads=2 Hash=256",
+            "both_time_control": "40+0.4",
+            "workload_size": 8,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "VLTC regression [2T]": {
+            "both_options": "Threads=2 Hash=512",
+            "both_time_control": "80+0.8",
+            "workload_size": 8,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "VVLTC regression [2T]": {
+            "both_options": "Threads=2 Hash=512",
+            "both_time_control": "120+1.2",
+            "workload_size": 8,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "STC progtest [2T]": {
+            "both_options": "Threads=2 Hash=32",
+            "both_time_control": "10+0.1",
+            "workload_size": 32,
+            "test_max_games": 20000
+        },
+
+        "LTC progtest [2T]": {
+            "both_options": "Threads=2 Hash=256",
+            "both_time_control": "40+0.4",
+            "workload_size": 8,
+            "test_max_games": 20000
+        },
+
+        "VLTC progtest [2T]": {
+            "both_options": "Threads=2 Hash=512",
+            "both_time_control": "80+0.8",
+            "workload_size": 8,
+            "test_max_games": 20000
+        },
+
+        "VVLTC progtest [2T]": {
+            "both_options": "Threads=2 Hash=512",
+            "both_time_control": "120+1.2",
+            "workload_size": 8,
+            "test_max_games": 20000
+        },
+
+        "STC [4T]": {
+            "both_options": "Threads=4 Hash=64",
+            "both_time_control": "10+0.1",
+            "workload_size": 32
+        },
+
+        "LTC [4T]": {
+            "both_options": "Threads=4 Hash=512",
+            "both_time_control": "40+0.4",
+            "workload_size": 8
+        },
+
+        "VLTC [4T]": {
+            "both_options": "Threads=4 Hash=1024",
+            "both_time_control": "80+0.8",
+            "workload_size": 8
+        },
+
+        "VVLTC [4T]": {
+            "both_options": "Threads=4 Hash=1024",
+            "both_time_control": "120+1.2",
+            "workload_size": 8
+        },
+
+        "STC regression [4T]": {
+            "both_options": "Threads=4 Hash=64",
+            "both_time_control": "10+0.1",
+            "workload_size": 32,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "LTC regression [4T]": {
+            "both_options": "Threads=4 Hash=512",
+            "both_time_control": "40+0.4",
+            "workload_size": 8,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "VLTC regression [4T]": {
+            "both_options": "Threads=4 Hash=1024",
+            "both_time_control": "80+0.8",
+            "workload_size": 8,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "VVLTC regression [4T]": {
+            "both_options": "Threads=4 Hash=1024",
+            "both_time_control": "120+1.2",
+            "workload_size": 8,
+            "test_bounds": "[-3.00, 1.00]"
+        },
+
+        "STC progtest [4T]": {
+            "both_options": "Threads=4 Hash=64",
+            "both_time_control": "10+0.1",
+            "workload_size": 32,
+            "test_max_games": 20000
+        },
+
+        "LTC progtest [4T]": {
+            "both_options": "Threads=4 Hash=512",
+            "both_time_control": "40+0.4",
+            "workload_size": 8,
+            "test_max_games": 20000
+        },
+
+        "VLTC progtest [4T]": {
+            "both_options": "Threads=4 Hash=1024",
+            "both_time_control": "80+0.8",
+            "workload_size": 8,
+            "test_max_games": 20000
+        },
+
+        "VVLTC progtest [4T]": {
+            "both_options": "Threads=4 Hash=1024",
+            "both_time_control": "120+1.2",
+            "workload_size": 8,
+            "test_max_games": 20000
+        }
+    },
+
+    "tune_presets": {
+        "default": {
+            "book_name": "UHO_Lichess_4852_v1.epd",
+            "win_adj": "movecount=3 score=400",
+            "draw_adj": "movenumber=40 movecount=8 score=10"
+        },
+
+        "STC": {
+            "dev_options": "Threads=1 Hash=16",
+            "dev_time_control": "10+0.1"
+        },
+
+        "MTC": {
+            "dev_options": "Threads=1 Hash=64",
+            "dev_time_control": "20+0.2"
+        },
+
+        "LTC": {
+            "dev_options": "Threads=1 Hash=128",
+            "dev_time_control": "60+0.6"
+        },
+
+        "VLTC": {
+            "dev_options": "Threads=1 Hash=256",
+            "dev_time_control": "80+0.8"
+        },
+
+        "VVLTC": {
+            "dev_options": "Threads=1 Hash=256",
+            "dev_time_control": "120+1.2"
+        }
+    },
+
+    "datagen_presets": {
+        "default": {
+            "win_adj": "None",
+            "draw_adj": "None",
+            "workload_size": 128
+        },
+
+        "40k Nodes": {
+            "both_options": "Threads=1 Hash=16",
+            "both_time_control": "N=40000"
+        }
+    }
+}

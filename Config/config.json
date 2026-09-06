@@ -1,7 +1,7 @@
 {
     "client_version"     : 50,
-    "client_repo_url"    : "https://github.com/AndyGrant/OpenBench",
-    "client_repo_ref"    : "master",
+    "client_repo_url"    : "https://github.com/TheBlackPlague/Verdict",
+    "client_repo_ref"    : "sync-with-upstream",
 
     "fastchess_min_version" : "1.8.1",
     "fastchess_repo_url"    : "https://github.com/AndyGrant/fastchess",
@@ -10,52 +10,18 @@
     "use_cross_approval"          : false,
     "require_login_to_view"       : false,
     "require_manual_registration" : false,
-    "balance_engine_throughputs"  : false,
+    "balance_engine_throughputs"  : true,
 
     "use_x_accel_redirect"  : false,
     "x_accel_redirect_root" : "/x-accel-media/",
 
     "books" : [
-        "2moves_v1.epd",
-        "3moves_FRC.epd",
-        "4moves_noob.epd",
-        "8moves_v3.epd",
-        "DFRC.epd",
-        "DFRC_4852_v1.epd",
-        "Endgames.epd",
-        "Pohl.epd",
-        "Pohl.pgn",
-        "UHO_4060_v2.epd",
-        "UHO_4060_vB.epd",
-        "UHO_4060_vT.epd",
-        "UHO_Lichess_4852_v1.epd",
-        "dfrc_pawnocchio.epd",
-        "dfrc_vine_datagen.epd",
-        "endgames_cdb95105.epd",
-        "fortresses_150_250.epd",
-        "fortresses_torch.epd"
+        "UHO_Lichess_4852_v1.epd"
     ],
 
     "engines" : [
-        "4ku",
-        "Berserk",
-        "Bit-Genie",
-        "BlackMarlin",
-        "Demolito",
-        "Drofa",
-        "Equisetum",
-        "Ethereal",
-        "FabChess",
-        "Halogen",
-        "Igel",
-        "Koivisto",
-        "Laser",
-        "RubiChess",
-        "Seer",
-        "Stash",
-        "Stockfish",
-        "Weiss",
-        "Winter",
-        "Zahak"
+        "StockDory",
+        "Pawnocchio",
+        "Stash"
     ]
 }

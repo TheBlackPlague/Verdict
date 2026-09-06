@@ -56,7 +56,7 @@ from django.utils import timezone
 
 ERROR_MESSAGES = {
     'disabled'            : 'Account has not been enabled. Contact an Administrator',
-    'fakeuser'            : 'This is not a real OpenBench User. Create an OpenBench account',
+    'fakeuser'            : 'This is not a real Verdict user. Create a Verdict account',
     'requires_login'      : 'All pages require a user login to access',
     'manual_registration' : 'Registration can only be done via an Administrator',
 }
@@ -1028,10 +1028,3 @@ def api_workload(request, workload_id, query):
 
     valid_endpoints = [ 'results', 'info', 'summary' ]
     return api_response({ 'error' : 'Valid /query/ endpoints are: [ %s ]' % (', '.join(valid_endpoints)) })
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#                                BUSINESS VIEWS                               #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-def buyEthereal(request):
-    return render(request, 'buyEthereal.html')

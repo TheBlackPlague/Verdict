@@ -20,3 +20,5 @@ Media/Events/*
 
 *.lock
 *.epd
+*.toml
+.venv/
