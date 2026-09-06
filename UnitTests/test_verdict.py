@@ -140,7 +140,7 @@ class DockerEntrypointTests(PlainTestCase):
                     path.chmod(0o755)
                 env = dict(os.environ, PATH=directory + os.pathsep + os.environ['PATH'],
                            USERNAME='test', PASSWORD='test', SERVER='http://example.test')
-                result = subprocess.run(['bash', str(ROOT / 'Docker/run.sh')], env=env,
+                result = subprocess.run(['bash', str(ROOT / 'Docker/run-client.sh')], env=env,
                                         check=True, capture_output=True, text=True)
                 args = result.stdout.splitlines()
                 threads = int(args[args.index('--threads') + 1])

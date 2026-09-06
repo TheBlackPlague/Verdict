@@ -23,7 +23,7 @@ upstream development are not Verdict customizations.
 - Keep client/server protocol **50** and the Fastchess configuration from
   upstream. Do not copy the old version 37 worker or Cutechess binaries.
 - The client download source is Verdict's **`sync-with-upstream`** branch.
-  The Docker build defaults to the same branch. Using `master` here would
+  Docker images build from the checked-out source. Using `master` here would
   download the incompatible old client.
 - Discover the `Client` directory inside GitHub archives instead of assuming
   an `OpenBench-<ref>` directory. Missing worker files now raise an error
@@ -49,12 +49,12 @@ python manage.py migrate --noinput
 python manage.py check
 python manage.py makemigrations --check --dry-run
 python manage.py test UnitTests --verbosity 2
-bash -n Docker/run.sh
+bash -n Docker/run-client.sh
 ```
 
-Run these in a disposable checkout/database. The inherited app startup hook
-starts a PGN watcher even for management commands; on an empty database it can
-log a missing-table exception before the first migration creates its table.
+Run these in a disposable checkout/database. Set `VERDICT_DISABLE_WATCHER=1`
+for management commands to suppress background PGN processing during migrations
+and tests. The server Docker entrypoint does this during initialization.
 
 The regression suite covers fork/upstream/commit archive names, incomplete
 archives, client bootstrap preservation, preset books and time controls,
@@ -73,11 +73,12 @@ Docker and suitable worker hardware.
 From the repository root:
 
 ```sh
-docker build --build-arg VERDICT_REF=sync-with-upstream -t verdict:sync Docker
-docker run --rm -e USERNAME -e PASSWORD -e SERVER verdict:sync
+docker build -f Docker/Client.Dockerfile -t verdict-client:local .
+docker run --rm -e USERNAME -e PASSWORD -e SERVER verdict-client:local
 ```
 
-Export `USERNAME`, `PASSWORD` and the staging server's `SERVER` URL first.
+See [Docker deployment](../Docker/README.md) for the separate server image and
+Compose examples. Export `USERNAME`, `PASSWORD` and the staging server's `SERVER` URL first.
 The server must run this branch too. Existing workers need their **bootstrap
 `Client/client.py` refreshed**, not just an automatic worker update: the old
 bootstrap contains the repository-name assumption and deliberately never
@@ -115,6 +116,6 @@ reversing these data migrations is not a substitute for that backup.
 
 The branch is a clean descendant of current upstream. No merge or ancestry
 rewrite of Verdict's `master` is included. Before promoting it, choose the
-long-term client download ref and update **both** `Config/config.json` and
-Docker's `VERDICT_REF` default together (and the branch-specific regression
-assertions). Keep the download ref available while any server advertises it.
+long-term client download ref and update `Config/config.json` and its
+branch-specific regression assertions. Rebuild both images from the promoted
+source. Keep the download ref available while any server advertises it.

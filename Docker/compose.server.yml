@@ -1,0 +1,18 @@
+services:
+  server:
+    image: verdict-server:local
+    build:
+      context: ..
+      dockerfile: Docker/Server.Dockerfile
+    restart: unless-stopped
+    stop_grace_period: 90s
+    ports:
+      - "${VERDICT_PORT:-8000}:8000"
+    environment:
+      VERDICT_SECRET_KEY: "${VERDICT_SECRET_KEY:?Set VERDICT_SECRET_KEY in Docker/.env}"
+      VERDICT_ALLOWED_HOSTS: "${VERDICT_ALLOWED_HOSTS:-*}"
+      VERDICT_CSRF_TRUSTED_ORIGINS: "${VERDICT_CSRF_TRUSTED_ORIGINS:-}"
+      VERDICT_TRUST_PROXY: "${VERDICT_TRUST_PROXY:-0}"
+      VERDICT_SECURE_COOKIES: "${VERDICT_SECURE_COOKIES:-0}"
+    volumes:
+      - "${VERDICT_DATA_PATH:-./data}:/data"

@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 
+from django.core.exceptions import ImproperlyConfigured
+
+
+def env_bool(name, default=False):
+    return os.environ.get(name, str(default)).lower() in ('1', 'true', 'yes', 'on')
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -19,10 +25,21 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECURITY WARNING: don't run with debug turned on in production!
-SECRET_KEY = '@!zw2l8til1(0eb_nk+1w!(n78gqm&u)s)_v7#k6iseia@g9q0'
-DEBUG = True
+CONTAINER = env_bool('VERDICT_CONTAINER')
+SECRET_KEY = os.environ.get('VERDICT_SECRET_KEY', '')
+if not SECRET_KEY:
+    if CONTAINER:
+        raise ImproperlyConfigured('VERDICT_SECRET_KEY must be set for the server container')
+    SECRET_KEY = '@!zw2l8til1(0eb_nk+1w!(n78gqm&u)s)_v7#k6iseia@g9q0'
+DEBUG = env_bool('VERDICT_DEBUG', default=not CONTAINER)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [host.strip() for host in os.environ.get('VERDICT_ALLOWED_HOSTS', '*').split(',') if host.strip()]
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.environ.get('VERDICT_CSRF_TRUSTED_ORIGINS', '').split(',') if origin.strip()]
+if env_bool('VERDICT_TRUST_PROXY'):
+    # Enable only behind a proxy that overwrites this header.
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = env_bool('VERDICT_SECURE_COOKIES')
+CSRF_COOKIE_SECURE = SESSION_COOKIE_SECURE
 
 HTML_MINIFY   = True
 APPEND_SLASH  = True
@@ -37,7 +54,8 @@ PROJECT_PATH  = os.path.abspath(PROJECT_PATH)
 TEMPLATE_PATH = os.path.join(PROJECT_PATH, 'Templates')
 
 MEDIA_URL  = '/Media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'Media')
+DATA_DIR = os.environ.get('VERDICT_DATA_DIR', BASE_DIR)
+MEDIA_ROOT = os.path.join(DATA_DIR, 'Media')
 
 INSTALLED_APPS = [
     'OpenBench',
@@ -61,6 +79,9 @@ MIDDLEWARE = [
     'htmlmin.middleware.HtmlMinifyMiddleware',
     'htmlmin.middleware.MarkRequestMiddleware',
 ]
+
+if CONTAINER:
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 ROOT_URLCONF = 'OpenSite.urls'
 
@@ -90,7 +111,8 @@ WSGI_APPLICATION = 'OpenSite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(DATA_DIR, 'db.sqlite3'),
+        'OPTIONS': {'timeout': 30},
     }
 }
 
@@ -132,3 +154,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.environ.get('VERDICT_STATIC_ROOT', os.path.join(BASE_DIR, 'staticfiles'))

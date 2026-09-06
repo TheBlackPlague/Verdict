@@ -1,0 +1,21 @@
+services:
+  client:
+    image: verdict-client:local
+    build:
+      context: ..
+      dockerfile: Docker/Client.Dockerfile
+    restart: unless-stopped
+    stop_grace_period: 90s
+    environment:
+      USERNAME: "${USERNAME:?Set USERNAME in Docker/.env}"
+      PASSWORD: "${PASSWORD:?Set PASSWORD in Docker/.env}"
+      SERVER: "${SERVER:?Set SERVER to the Verdict server URL}"
+    volumes:
+      - client-engines:/Verdict/Client/Engines
+      - client-networks:/Verdict/Client/Networks
+      - client-books:/Verdict/Client/Books
+
+volumes:
+  client-engines:
+  client-networks:
+  client-books:

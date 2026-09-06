@@ -19,6 +19,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import atexit
+import os
 import pathlib
 import platform
 import threading
@@ -27,7 +28,7 @@ import django.apps
 
 # No imports of OpenBench.* are allowed here
 
-LOCKFILE_PATH = 'openbench_watchers.lock'
+LOCKFILE_PATH = os.environ.get('VERDICT_WATCHER_LOCK', 'openbench_watchers.lock')
 CONFIG_LOCK   = threading.Lock()
 IS_WINDOWS    = platform.system() == 'Windows'
 
@@ -69,6 +70,10 @@ class OpenBenchConfig(django.apps.AppConfig):
         with CONFIG_LOCK:
             if config.OPENBENCH_CONFIG is None:
                 config.OPENBENCH_CONFIG, config.OPENBENCH_CONFIG_CHECKSUM = config.create_openbench_config()
+
+        # Container initialization must finish migrations before starting a watcher.
+        if os.environ.get('VERDICT_DISABLE_WATCHER') == '1':
+            return
 
         # Attempt to spawn the PGN Watcher, globally once
 

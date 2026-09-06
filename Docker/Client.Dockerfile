@@ -42,12 +42,10 @@ RUN curl -LO https://ziglang.org/download/${ZIG_VERSION}/zig-x86_64-linux-${ZIG_
     ln -s ${ZIG_HOME}/zig /usr/bin/zig && \
     rm zig-x86_64-linux-${ZIG_VERSION}.tar.xz
 
-# Clone the Verdict Client
-ARG VERDICT_REF=sync-with-upstream
-RUN git clone --branch "${VERDICT_REF}" --single-branch https://github.com/TheBlackPlague/Verdict
-
-# Fetch the Verdict Client startup script
-COPY run.sh /Verdict/Client/run.sh
+# Build from the repository root so this image contains the checked-out client.
+COPY Client /Verdict/Client
+COPY LICENSE /Verdict/LICENSE
+COPY Docker/run-client.sh /Verdict/Client/run-client.sh
 
 RUN python3 -m venv /.venv
 
@@ -59,4 +57,4 @@ WORKDIR /Verdict/Client
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-CMD ["bash", "run.sh"]
+CMD ["bash", "run-client.sh"]
