@@ -393,6 +393,10 @@ td pre {
     text-align: right;
 }
 
+#content .summary-table td {
+    font-size: 14px;
+}
+
 #content .branch_name {
     font-style: italic;
 }
@@ -527,4 +531,3 @@ td pre {
     border: 1px solid #ccc;
     border-radius: 8px;
 }
-

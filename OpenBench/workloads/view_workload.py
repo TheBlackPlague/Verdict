@@ -139,7 +139,10 @@ def fetch_result_summaries(workload):
         accumulate(by_cpu,  cpu,  penta);
         accumulate(by_isa,  isa,  penta);
 
-        nodes = (row['dev_nodes'], row['dev_time'], row['dev_time_scaled'], row['base_nodes'], row['base_time'], row['base_time_scaled'])
+        nodes = (
+            row['dev_nodes'], row['dev_time'], row['dev_time_scaled'],
+            row['base_nodes'], row['base_time'], row['base_time_scaled']
+        )
 
         accumulate(nps_user, user, nodes)
         accumulate(nps_cpu,  cpu,  nodes)
