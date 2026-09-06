@@ -84,6 +84,14 @@ class Result(Model):
     crashes  = IntegerField(default=0)
     timeloss = IntegerField(default=0)
 
+    # Total counters for nodes and ms for NPS tracking
+    dev_nodes         = BigIntegerField(default=0)
+    dev_time          = BigIntegerField(default=0)
+    dev_time_scaled   = BigIntegerField(default=0)
+    base_nodes        = BigIntegerField(default=0)
+    base_time         = BigIntegerField(default=0)
+    base_time_scaled  = BigIntegerField(default=0)
+
     def __str__(self):
         return '{0} {1}'.format(self.test.dev.name, self.machine.__str__())
 

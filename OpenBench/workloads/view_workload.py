@@ -106,23 +106,44 @@ def fetch_result_summaries(workload):
         'machine__user__username',
         'machine__info',
         'LL', 'LD', 'DD', 'DW', 'WW',
+        'dev_nodes',
+        'dev_time',
+        'dev_time_scaled',
+        'base_nodes',
+        'base_time',
+        'base_time_scaled',
     )
 
     by_user = defaultdict(lambda: [0, 0, 0, 0, 0])
     by_cpu  = defaultdict(lambda: [0, 0, 0, 0, 0])
     by_isa  = defaultdict(lambda: [0, 0, 0, 0, 0])
 
-    def accumulate(bucket, key, penta):
+    nps_user = defaultdict(lambda: [0, 0, 0, 0, 0, 0])
+    nps_cpu  = defaultdict(lambda: [0, 0, 0, 0, 0, 0])
+    nps_isa  = defaultdict(lambda: [0, 0, 0, 0, 0, 0])
+
+    def accumulate(bucket, key, values):
         total = bucket[key if key else 'Unknown']
-        for i in range(5):
-            total[i] += penta[i]
+        for i in range(len(values)):
+            total[i] += values[i]
 
     for row in qs:
-        penta = (row['LL'], row['LD'], row['DD'], row['DW'], row['WW'])
+        user  = row['machine__user__username']
         info  = row['machine__info'] or {}
-        accumulate(by_user, row['machine__user__username'], penta)
-        accumulate(by_cpu,  info.get('cpu_name'),           penta)
-        accumulate(by_isa,  info.get('isa_name'),           penta)
+        cpu   = info.get('cpu_name')
+        isa   = info.get('isa_name')
+
+        penta = (row['LL'], row['LD'], row['DD'], row['DW'], row['WW'])
+
+        accumulate(by_user, user, penta);
+        accumulate(by_cpu,  cpu,  penta);
+        accumulate(by_isa,  isa,  penta);
+
+        nodes = (row['dev_nodes'], row['dev_time'], row['dev_time_scaled'], row['base_nodes'], row['base_time'], row['base_time_scaled'])
+
+        accumulate(nps_user, user, nodes)
+        accumulate(nps_cpu,  cpu,  nodes)
+        accumulate(nps_isa,  isa,  nodes)
 
     # Turn a { key: penta } bucket into ready-to-display rows: the penta as a
     # single "(a, b, c, d, e)" string, a point-estimate Elo with its symmetric
@@ -133,19 +154,26 @@ def fetch_result_summaries(workload):
         lower, mu, upper = OpenBench.stats.Elo(penta)
         return '%.2f ± %.2f' % (mu, (upper - lower) / 2)
 
-    def summarize(bucket):
+    def summarize(bucket, nps_stats):
+        def compute_nps(nodes, time_ms):
+            return round((1000 * nodes) / time_ms) if nodes else 0
+
         total_pairs = sum(sum(penta) for penta in bucket.values())
         rows = [{
-            'key'     : key,
-            'penta'   : '(%d, %d, %d, %d, %d)' % tuple(penta),
-            'elo'     : elo_display(penta),
-            'pairs'   : sum(penta),
-            'percent' : '%.2f' % (100.0 * sum(penta) / total_pairs if total_pairs else 0.0),
+            'key'             : key,
+            'penta'           : '(%d, %d, %d, %d, %d)' % tuple(penta),
+            'elo'             : elo_display(penta),
+            'pairs'           : sum(penta),
+            'percent'         : '%.2f' % (100.0 * sum(penta) / total_pairs if total_pairs else 0.0),
+            'dev_nps'         : compute_nps(nps_stats[key][0], nps_stats[key][1]),
+            'dev_nps_scaled'  : compute_nps(nps_stats[key][0], nps_stats[key][2]),
+            'base_nps'        : compute_nps(nps_stats[key][3], nps_stats[key][4]),
+            'base_nps_scaled' : compute_nps(nps_stats[key][3], nps_stats[key][5]),
         } for key, penta in bucket.items()]
         return sorted(rows, key=lambda row: row['pairs'], reverse=True)
 
     return {
-        'user'     : summarize(by_user),
-        'cpu_name' : summarize(by_cpu),
-        'isa_name' : summarize(by_isa),
+        'user'     : summarize(by_user, nps_user),
+        'cpu_name' : summarize(by_cpu,  nps_cpu),
+        'isa_name' : summarize(by_isa,  nps_isa),
     }

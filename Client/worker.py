@@ -373,6 +373,22 @@ class ServerReporter:
         return ServerReporter.report(config, 'clientHeartbeat', payload)
 
     @staticmethod
+    def report_nps_stats(config, stats):
+
+        payload = {
+            'test_id'          : config.workload['test']['id'],
+            'result_id'        : config.workload['result']['id'],
+            'dev_nodes'        : int(stats['dev' ]['nodes'      ]),
+            'dev_time'         : int(stats['dev' ]['time'       ]),
+            'dev_time_scaled'  : int(stats['dev' ]['time_scaled']),
+            'base_nodes'       : int(stats['base']['nodes'      ]),
+            'base_time'        : int(stats['base']['time'       ]),
+            'base_time_scaled' : int(stats['base']['time_scaled']),
+        }
+
+        return ServerReporter.report(config, 'clientSubmitNPSStats', payload)
+
+    @staticmethod
     def report_pgn(config, compressed_pgn_text):
 
         payload = {
@@ -1136,10 +1152,15 @@ def complete_workload(config):
             MatchRunner.kill_everything(dev_name, base_name)
             raise
 
+        pgn_files = [MatchRunner.pgn_name(config, timestamp, x) for x in range(runner_cnt)]
+
+        # Submit NPS stats
+        if config.workload['test']['type'] in ('SPRT', 'GAMES'):
+            ServerReporter.report_nps_stats(config, pgn_util.collect_nps_stats(pgn_files, scale_factor))
+
         # Upload the PGN if requested
         if config.workload['test']['upload_pgns'] != 'FALSE':
-            compact    = config.workload['test']['upload_pgns'] == 'COMPACT'
-            pgn_files  = [MatchRunner.pgn_name(config, timestamp, x) for x in range(runner_cnt)]
+            compact = config.workload['test']['upload_pgns'] == 'COMPACT'
             ServerReporter.report_pgn(config, pgn_util.compress_pgn_files(pgn_files, scale_factor, compact))
 
 def safe_download_network_weights(config, branch):

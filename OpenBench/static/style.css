@@ -119,7 +119,7 @@ body, html, main{
 /* Tables that are too long can wrap words */
 
 #content .wrappable td {
-    white-space: pre-wrap;
+    white-space: nowrap;
     word-break: break-word;
     word-wrap: break-word;
 }

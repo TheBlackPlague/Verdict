@@ -148,6 +148,32 @@ def compress_pgn_files(file_names, scale_factor, compact):
 
     return bz2.compress('\n'.join(compressed_text).encode())
 
+def collect_nps_stats(pgn_files, scale_factor):
+
+    nps_regex = re.compile(r'([\d.]+)s,\s*n=(\d+)')
+
+    stats = {
+        'dev' : { 'nodes': 0, 'time': 0, 'time_scaled': 0 },
+        'base': { 'nodes': 0, 'time': 0, 'time_scaled': 0 },
+    }
+
+    for file in pgn_files:
+        for (headers, move_text) in pgn_iterator(file):
+
+            white     = headers['White'].split('-')[-1]
+            black     = headers['Black'].split('-')[-1]
+            white_stm = 'FEN' not in headers or headers['FEN'].split()[1] == 'w'
+
+            for time, nodes in nps_regex.findall(move_text):
+                stm = white if white_stm else black
+                if stm in stats:
+                    stats[stm]['nodes']       += int(nodes)
+                    stats[stm]['time']        += float(time) * 1000
+                    stats[stm]['time_scaled'] += float(time) * 1000 / scale_factor
+                white_stm = not white_stm
+
+    return stats
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Process PGN files')

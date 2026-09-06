@@ -68,6 +68,7 @@ urlpatterns = [
     django.urls.path(r'clientSubmitNPS/', OpenBench.views.client_submit_nps),
     django.urls.path(r'clientSubmitError/', OpenBench.views.client_submit_error),
     django.urls.path(r'clientSubmitResults/', OpenBench.views.client_submit_results),
+    django.urls.path(r'clientSubmitNPSStats/', OpenBench.views.client_submit_nps_stats),
     django.urls.path(r'clientHeartbeat/', OpenBench.views.client_heartbeat),
     django.urls.path(r'clientSubmitPGN/', OpenBench.views.client_submit_pgn),
 

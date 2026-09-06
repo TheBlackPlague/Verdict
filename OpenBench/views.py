@@ -787,6 +787,25 @@ def client_heartbeat(request, machine):
 
 @csrf_exempt
 @verify_worker
+def client_submit_nps_stats(request, _):
+
+    result_id = int(request.POST['result_id'])
+
+    # No risk from concurrent access
+    Result.objects.filter(id=result_id).update(
+        dev_nodes        = F('dev_nodes'       ) + int(request.POST['dev_nodes'       ]),
+        dev_time         = F('dev_time'        ) + int(request.POST['dev_time'        ]),
+        dev_time_scaled  = F('dev_time_scaled' ) + int(request.POST['dev_time_scaled' ]),
+        base_nodes       = F('base_nodes'      ) + int(request.POST['base_nodes'      ]),
+        base_time        = F('base_time'       ) + int(request.POST['base_time'       ]),
+        base_time_scaled = F('base_time_scaled') + int(request.POST['base_time_scaled']),
+        updated          = timezone.now(),
+    )
+
+    return JsonResponse({})
+
+@csrf_exempt
+@verify_worker
 def client_submit_pgn(request, machine):
 
     with transaction.atomic():

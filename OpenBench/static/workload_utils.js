@@ -105,6 +105,9 @@ function format_cpu_name(name) {
 
 function append_summary_section(table, label, rows, key_formatter) {
 
+    // Older workloads don't have NPS tracking stats.
+    const is_nps_available =  rows.some(row => row.dev_nps > 0);
+
     // A header row naming the grouping, then one tbody of data rows. All three
     // sections share the one table, so their columns line up automatically.
     const header = document.createElement('tr');
@@ -114,6 +117,11 @@ function append_summary_section(table, label, rows, key_formatter) {
     ['Penta', 'Elo', 'Pairs', '%'].forEach(name => {
         header.appendChild(summary_cell('th', name));
     });
+
+    if (is_nps_available) {
+        header.appendChild(summary_cell('th', 'Dev/Base KNPS'));
+        header.appendChild(summary_cell('th', 'Scaled Dev/Base KNPS'));
+    }
 
     table.appendChild(header);
 
@@ -129,6 +137,13 @@ function append_summary_section(table, label, rows, key_formatter) {
         tr.appendChild(summary_cell('td', row.elo,   'numeric'));
         tr.appendChild(summary_cell('td', row.pairs, 'numeric'));
         tr.appendChild(summary_cell('td', row.percent, 'numeric'));
+
+        if (is_nps_available) {
+            const format_nps = (nps) => (nps / 1000.0).toFixed(3);
+
+            tr.appendChild(summary_cell('td', `${format_nps(row.dev_nps)} / ${format_nps(row.base_nps)}`));
+            tr.appendChild(summary_cell('td', `${format_nps(row.dev_nps_scaled)} / ${format_nps(row.base_nps_scaled)}`));
+        }
 
         tbody.appendChild(tr);
     });
