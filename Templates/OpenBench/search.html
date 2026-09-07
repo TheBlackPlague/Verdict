@@ -58,7 +58,7 @@
 {% endblock %}
 
 {% block content %}
-        <form class="form-page" method="GET" action="/search/" onsubmit="prune_search(this)">
+        <form class="form-page search-form" method="GET" action="/search/" onsubmit="prune_search(this)">
             <input type="hidden" name="go" value="1">
             <div class="form">
                 <div class="col">
@@ -159,7 +159,7 @@
 
     {% if tests %}<div class="search-results-spacer"></div>{% endif %}
 
-    <div class="table-scroll"><table class="test-list stripes hoverable"><thead><tr><th>Created</th><th>Workload</th><th>Status</th><th>Engine</th><th>Time control</th><th>Results</th><th>Notes</th><th>Compare</th></tr></thead><tbody>
+    <div class="table-scroll"><table class="test-list stripes hoverable"><thead><tr><th>Created</th><th>Workload</th><th>Status</th><th>Engine / TC</th><th>Result</th><th>Games / W–L–D / Pentanomial</th><th>Notes</th><th>Compare</th></tr></thead><tbody>
         {% for test in tests %}
             <tr>
                 <td class="datestamp">{{test.creation|date:"U"}}</td>

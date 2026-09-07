@@ -1043,5 +1043,55 @@ def api_workload(request, workload_id, query):
     if query == 'summary':
         return api_response({ 'summary' : fetch_result_summaries(workload) })
 
-    valid_endpoints = [ 'results', 'info', 'summary' ]
+    if query == 'llr':
+        if workload.test_mode != 'SPRT':
+            return api_response({ 'error': 'LLR history is only available for SPRT workloads' })
+
+        # Read the current state first, then exclude any samples committed by
+        # a worker after that read, so each response has a consistent endpoint.
+        history = workload.llr_history.filter(games__lte=workload.games)
+        count = history.count()
+        downsampled = count > 768
+        if not downsampled:
+            points = list(history.values('games', 'llr'))
+        else:
+            # Keep both extrema of every game-range bucket. Streaming avoids
+            # loading an entire long-running test's history into memory.
+            first = history.values('games', 'llr').first()
+            span = max(1, workload.games - first['games'] + 1)
+            buckets = {}
+            for point in history.values('games', 'llr').iterator(chunk_size=1024):
+                bucket = min(383, (point['games'] - first['games']) * 384 // span)
+                low, high = buckets.get(bucket, (point, point))
+                if point['llr'] < low['llr']:
+                    low = point
+                if point['llr'] > high['llr']:
+                    high = point
+                buckets[bucket] = low, high
+            selected = {first['games']: first}
+            for extremes in buckets.values():
+                selected.update((point['games'], point) for point in extremes)
+            points = sorted(selected.values(), key=lambda point: point['games'])
+
+        # Always show the actual current result, including between persisted
+        # samples or for a legacy test with no recorded history at all.
+        current = {'games': workload.games, 'llr': workload.currentllr}
+        if points and points[-1]['games'] == workload.games:
+            points[-1] = current
+        else:
+            points.append(current)
+        return JsonResponse({
+            'points': points,
+            'lowerBound': workload.lowerllr,
+            'upperBound': workload.upperllr,
+            'currentGames': workload.games,
+            'currentLLR': workload.currentllr,
+            'startGames': points[0]['games'],
+            'partial': points[0]['games'] > 0,
+            'finished': workload.finished,
+            'sampleGames': LLRHistory.SAMPLE_GAMES,
+            'downsampled': downsampled,
+        })
+
+    valid_endpoints = [ 'results', 'info', 'summary', 'llr' ]
     return api_response({ 'error' : 'Valid /query/ endpoints are: [ %s ]' % (', '.join(valid_endpoints)) })

@@ -1,8 +1,10 @@
 {% load mytags %}
-<td class="test-identity"><a class="test-name" href="{{ test|workload_url }}">{{ test|prettyDevName }}</a><div class="test-subtitle"><span>#{{ test.id }}</span><span>·</span><a href="/user/{{ test.author }}/">{{ test.author }}</a><span>·</span><span>{{ test.test_mode }}</span></div></td>
+{% with stats=test|compact_stat_blocks %}
+<td class="test-identity"><a class="test-name" href="{{ test|workload_url }}">{{ test|prettyDevName }}</a><div class="test-subtitle"><span>#{{ test.id }}</span><a href="/user/{{ test.author }}/">{{ test.author }}</a><span>{{ test.test_mode }}</span></div></td>
 <td>{% include "OpenBench/Blocks/workload_badge.html" with workload=test %}</td>
-<td>{{ test.dev_engine }}{% if test.error %} <span class="redlink" title="Crash or illegal move" aria-label="Crash or illegal move">!</span>{% endif %}{% if test|test_is_fischer %} <span class="badge" title="Fischer random chess">FRC</span>{% endif %}</td>
-<td>{{ test.dev_time_control }}{% if test|test_is_time_odds %} <span class="badge badge-pending" title="Time odds">Time odds</span>{% endif %}{% if test|test_is_smp_odds %} <span class="badge badge-pending" title="Thread odds">Thread odds</span>{% endif %}</td>
-<td class="statblock statblock-{{ test|testResultColour }}">{{ test|shortStatBlock|linebreaksbr }}</td>
+<td class="test-engine"><span>{{ test.dev_engine }}</span>{% if test.error %} <span class="redlink" title="Crash or illegal move" aria-label="Crash or illegal move">!</span>{% endif %}{% if test|test_is_fischer %} <span class="badge" title="Fischer random chess">FRC</span>{% endif %}<div class="test-subtitle">{{ test.dev_time_control }}</div>{% if test|test_is_time_odds %} <span class="badge badge-pending" title="Time odds">Time odds</span>{% endif %}{% if test|test_is_smp_odds %} <span class="badge badge-pending" title="Thread odds">Thread odds</span>{% endif %}</td>
+<td class="statblock statblock-{{ test|testResultColour }}">{{ stats.result|linebreaksbr }}</td>
+<td class="statblock game-counts">{{ stats.games|linebreaksbr }}</td>
 <td class="test-info"><div>{{ test.info|default:'—' }}</div></td>
 <td><a href="{{ test|gitDiffLink }}" class="icon-button" aria-label="Compare revisions for workload {{ test.id }}" title="Compare revisions"><i class="fa-solid fa-code-compare" aria-hidden="true"></i></a></td>
+{% endwith %}

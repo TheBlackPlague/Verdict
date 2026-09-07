@@ -103,7 +103,7 @@ class VerdictPageTests(TestCase):
         for url in ['/', '/index/', '/search/', '/users/', '/machines/', '/networks/', '/register/']:
             with self.subTest(url=url):
                 response = self.client.get(url)
-                self.assertContains(response, '<title>Verdict</title>')
+                self.assertContains(response, ' · Verdict</title>')
                 self.assertNotContains(response, 'OpenBench&nbsp;Testing&nbsp;Framework')
                 self.assertNotContains(response, 'discord.gg/9MVg7fBTpM')
 
@@ -111,7 +111,7 @@ class VerdictPageTests(TestCase):
         self.client.force_login(self.user)
         for url in ['/test/new/', '/tune/new/', '/datagen/new/', '/profile/']:
             with self.subTest(url=url):
-                self.assertContains(self.client.get(url), '<title>Verdict</title>')
+                self.assertContains(self.client.get(url), ' · Verdict</title>')
         self.assertContains(self.client.get('/profile/'), 'Confirm New Password')
 
     def test_worker_download_configuration(self):

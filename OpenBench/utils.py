@@ -418,6 +418,15 @@ def update_test(request, machine):
         if test.finished or test.deleted:
             return { 'stop' : True }
 
+        # Record only real observations while holding the existing Test lock.
+        # An older workload starts at its current state, never an invented path
+        # from zero. Empty reports do not create or duplicate samples.
+        history = None
+        if test.test_mode == 'SPRT' and games > 0:
+            history = test.llr_history.order_by('-games').first()
+            if history is None:
+                history = LLRHistory.objects.create(test=test, games=test.games, llr=test.currentllr)
+
         test.losses += losses # Trinomial
         test.draws  += draws
         test.wins   += wins
@@ -473,6 +482,9 @@ def update_test(request, machine):
             test.passed = test.finished = test.games >= test.max_games
 
         test.save()
+
+        if history is not None and (test.finished or test.games - history.games >= LLRHistory.SAMPLE_GAMES):
+            LLRHistory.objects.create(test=test, games=test.games, llr=test.currentllr)
 
         # Update Result object; No risk from concurrent access
         Result.objects.filter(id=result_id).update(

@@ -1,7 +1,7 @@
-.pagination,.pages { display:flex; gap:5px; align-items:center; flex-wrap:wrap; }
-#pagebrowse { display:flex; justify-content:center; margin:24px 0; }
-.page { display:inline-grid; place-items:center; min-width:35px; min-height:35px; padding:5px 9px; background:var(--surface); color:var(--muted); border:1px solid var(--line); border-radius:6px; font-size:.8125rem; }
-.page:hover { background:var(--surface-raised); }
-.page.current { border-color:#3473a2; background:#164164; color:#a8dcff; }
-.ellipsis { color:var(--muted); padding:0 5px; }
+.pagination,.pages { display:flex; gap:4px; align-items:center; flex-wrap:wrap; }
+#pagebrowse { display:flex; justify-content:center; margin:14px 0; }
+.page { display:inline-grid; place-items:center; min-width:28px; min-height:28px; padding:3px 7px; background:var(--surface); color:var(--muted); border:1px solid var(--line); border-radius:3px; font-size:.85rem; }
+.page:hover { background:var(--surface-raised); text-decoration:none; }
+.page.current { border-color:#81704f; background:#393226; color:var(--accent); }
+.ellipsis { color:var(--muted); padding:0 4px; }
 .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }

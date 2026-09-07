@@ -1,5 +1,6 @@
 (() => {
     'use strict';
+    document.documentElement.classList.add('js');
 
     function formatDates(root) {
         root.querySelectorAll('.timestamp, .datestamp').forEach(node => {
@@ -10,7 +11,7 @@
             if (Number.isNaN(date.getTime())) return;
             const options = node.classList.contains('datestamp')
                 ? {month: 'short', day: '2-digit'}
-                : {year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit'};
+                : {year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false};
             node.textContent = date.toLocaleString(undefined, options);
             node.title = date.toLocaleString();
             node.dataset.formatted = 'true';
@@ -41,39 +42,30 @@
         const path = location.pathname.replace(/^\/+|\/+$/g, '') || 'index';
         document.querySelectorAll('[data-nav]').forEach(link => {
             const key = link.dataset.nav;
-            if (path === key || (['index', 'greens', 'machines', 'networks', 'events', 'errors'].includes(key) && path.startsWith(key + '/'))) {
+            if ((key === 'index' && /^(test|tune|datagen)\/\d+\/?$/.test(path)) || path === key || (['index', 'greens', 'machines', 'networks', 'events', 'errors'].includes(key) && path.startsWith(key + '/'))) {
                 link.setAttribute('aria-current', 'page');
             }
         });
 
-        const sidebar = document.getElementById('sidebar');
-        const toggle = document.getElementById('sidebar-toggle');
-        const backdrop = document.getElementById('sidebar-backdrop');
-        const mobile = matchMedia('(max-width: 800px)');
-        function setSidebar(open) {
-            document.body.classList.toggle('sidebar-open', open);
+        const navigation = document.getElementById('site-navigation');
+        const toggle = document.getElementById('navigation-toggle');
+        const mobile = matchMedia('(max-width: 950px)');
+        function setNavigation(open) {
+            navigation.classList.toggle('navigation-open', open);
             toggle.setAttribute('aria-expanded', String(open));
-            toggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
-            backdrop.hidden = !open;
-            sidebar.inert = mobile.matches && !open;
-            document.getElementById('main-content').inert = mobile.matches && open;
-            document.getElementById('content-header').inert = mobile.matches && open;
-            if (open) sidebar.querySelector('a').focus();
         }
-        setSidebar(false);
-        toggle.addEventListener('click', () => setSidebar(!document.body.classList.contains('sidebar-open')));
-        backdrop.addEventListener('click', () => { setSidebar(false); toggle.focus(); });
-        document.getElementById('sidebar-close').addEventListener('click', () => { setSidebar(false); toggle.focus(); });
-        mobile.addEventListener('change', () => setSidebar(false));
+        toggle.addEventListener('click', () => setNavigation(!navigation.classList.contains('navigation-open')));
+        mobile.addEventListener('change', () => setNavigation(false));
+        document.addEventListener('click', event => {
+            document.querySelectorAll('.nav-menu[open]').forEach(menu => {
+                if (!menu.contains(event.target)) menu.open = false;
+            });
+        });
         document.addEventListener('keydown', event => {
-            if (event.key === 'Escape' && document.body.classList.contains('sidebar-open')) {
-                setSidebar(false); toggle.focus();
-            }
-            if (event.key === 'Tab' && document.body.classList.contains('sidebar-open')) {
-                const links = [...sidebar.querySelectorAll('a[href],button:not([disabled])')].filter(node => node.getClientRects().length);
-                const first = links[0], last = links[links.length - 1];
-                if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-                else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+            if (event.key === 'Escape') {
+                const menu = document.querySelector('.nav-menu[open]');
+                if (menu) { menu.open = false; menu.querySelector('summary').focus(); }
+                else if (navigation.classList.contains('navigation-open')) { setNavigation(false); toggle.focus(); }
             }
             if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('a[role="button"]')) {
                 event.preventDefault(); event.target.click();
@@ -144,7 +136,7 @@
                 }
                 failures = 0;
                 lastUpdated = new Date();
-                showStatus(state.paused ? 'Paused' : 'Live updates', state.paused ? 'paused' : '');
+                showStatus(state.paused ? 'Paused' : 'Live · 10s', state.paused ? 'paused' : '');
                 document.dispatchEvent(new CustomEvent('verdict:updated', {detail: {manual}}));
             } catch (error) {
                 if (!state.paused && !document.hidden) { failures++; showStatus(navigator.onLine ? 'Retrying…' : 'Offline', 'error'); }

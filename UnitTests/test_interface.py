@@ -212,3 +212,33 @@ class InterfaceTests(TestCase):
         self.test.refresh_from_db()
         self.assertEqual(self.test.info, 'Updated notes')
         self.assertEqual(self.test.priority, 5)
+
+    def test_compact_overview_keeps_every_original_statistic(self):
+        from OpenBench.templatetags.mytags import shortStatBlock
+        for mode in ['SPRT', 'GAMES', 'DATAGEN', 'SPSA']:
+            workload = self.make_workload(test_mode=mode, max_games=1000)
+            if mode == 'SPSA':
+                SPSARun.objects.create(tune=workload, reporting_type='BATCHED', distribution_type='SINGLE',
+                    alpha=.602, gamma=.101, iterations=100, pairs_per=10, a_ratio=.1)
+            soup = BeautifulSoup(self.client.get('/').content, 'html.parser')
+            row = soup.find('a', href=f'/{workload.workload_type_str()}/{workload.id}/').find_parent('tr')
+            for line in shortStatBlock(workload).splitlines():
+                self.assertIn(line, row.get_text(' ', strip=True))
+            self.assertEqual(len(row.select('td')), len(soup.select('.test-list thead th')))
+
+    def test_engine_comparison_preserves_full_settings_and_downloads(self):
+        Network.objects.create(engine='StockDory', name='Candidate net', sha256='ABC12345', author='author')
+        Network.objects.create(engine='StockDory', name='Baseline net', sha256='DEF12345', author='author')
+        Test.objects.filter(pk=self.test.id).update(dev_network='ABC12345', dev_netname='Candidate net',
+            base_network='DEF12345', base_netname='Baseline net', upload_pgns='ALL',
+            dev_options='Threads=1 Hash=16 CustomOption=123', genfens_args='sample-genfens')
+        soup = BeautifulSoup(self.client.get(f'/test/{self.test.id}/').content, 'html.parser')
+        table = soup.select_one('.engine-comparison')
+        for value in [self.dev.sha, self.base.sha, 'CustomOption=123', 'Candidate net', 'Baseline net']:
+            self.assertIn(value, table.get_text(' ', strip=True))
+        links = [link.get('href') for link in soup.select('a[href]')]
+        self.assertTrue(any('ABC12345' in link for link in links))
+        self.assertTrue(any('DEF12345' in link for link in links))
+        self.assertIn(f'/api/pgns/{self.test.id}/', links)
+        self.assertEqual({el.get('name') for el in soup.select('.workload-edit [name]')},
+                         {'csrfmiddlewaretoken', 'info', 'priority', 'throughput', 'workload_size', 'submit'})

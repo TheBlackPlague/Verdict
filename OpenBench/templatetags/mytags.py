@@ -92,6 +92,15 @@ def shortStatBlock(test):
 
     return '\n'.join(statlines)
 
+def compact_stat_blocks(test):
+    lines = shortStatBlock(test).splitlines()
+    if test.test_mode == 'SPSA':
+        return {'result': '\n'.join(lines[:-1]), 'games': lines[-1]}
+    counts = ('Games:', 'Ptnml(0-2):', 'Generated ')
+    return {'result': '\n'.join(line for line in lines if not line.startswith(counts)),
+            'games': '\n'.join(line for line in lines if line.startswith(counts))}
+
+
 def longStatBlock(test):
 
     assert test.test_mode != 'SPSA'
@@ -354,3 +363,5 @@ def finished_label(workload):
 @register.filter
 def bounded_llr(workload):
     return max(workload.lowerllr, min(workload.upperllr, workload.currentllr))
+
+register.filter(compact_stat_blocks)

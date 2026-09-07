@@ -19,7 +19,7 @@ LIVE_REGIONS = {
 }
 
 PAGE_TITLES = {
-    'index.html': ('Testing', 'Overview'),
+    'index.html': ('Testing', 'Tests'),
     'search.html': ('Testing', 'Search workloads'),
     'machines.html': ('Resources', 'Machines'),
     'machine.html': ('Resources', 'Machine details'),
