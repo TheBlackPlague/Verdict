@@ -19,7 +19,7 @@
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="site-header">
-        <a class="brand" href="/" aria-label="Verdict home"><img src="{% static 'verdict.svg' %}" width="26" height="26" alt="">Verdict</a>
+        <a class="brand" href="/" aria-label="Verdict home"><img src="{% static 'verdict.svg' %}?{{ static_version }}" width="26" height="26" alt="">Verdict</a>
         <button id="navigation-toggle" class="button" type="button" aria-controls="site-navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i> Menu</button>
         <nav id="site-navigation" aria-label="Main navigation">
             <a href="/index/" data-nav="index">Tests</a>
@@ -67,7 +67,7 @@
         </div>
         <footer class="site-footer">
             <span><a href="https://github.com/TheBlackPlague/Verdict">Verdict</a> · Built on <a href="https://github.com/AndyGrant/OpenBench">OpenBench</a></span>
-            <nav aria-label="Engine repositories"><span>Engines</span>{% for engine, data in config.engines.items %}<a href="{{ data.source }}">{{ engine }}</a>{% endfor %}</nav>
+            <nav aria-label="Engine repositories">{% for engine, data in config.engines.items %}<a href="{{ data.source }}">{{ engine }}</a>{% endfor %}</nav>
         </footer>
     </main>
     {% if live_regions %}{{ live_regions|json_script:"live-regions" }}{% endif %}

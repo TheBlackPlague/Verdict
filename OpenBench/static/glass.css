@@ -113,7 +113,7 @@ a { transition:color 160ms ease; text-decoration-skip-ink:none; text-decoration-
 .workload-table { border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--depth); background:var(--glass); }
 .fleet-strip + .workload-table { border-top:0; border-radius:0 0 var(--radius) var(--radius); }
 /* Standalone tables receive the same surface without nesting framed panels. */
-#main-content > .table-scroll { border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--depth); }
+#main-content > .table-scroll { background:var(--glass); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--depth); }
 table { background:transparent; }
 th { background:#ffffff03; }
 th,td { border-bottom-color:#ffffff0b; }
@@ -177,3 +177,15 @@ th,td { border-bottom-color:#ffffff0b; }
 @media(prefers-reduced-transparency:reduce) {
     .site-header,.menu-items { background:#1c2023; -webkit-backdrop-filter:none; backdrop-filter:none; }
 }
+
+/* Shared directory surfaces for contributors, activity, and errors. */
+.directory-panel { margin-bottom:0; }
+.directory-table { min-width:680px; }
+.directory-table thead th { padding-block:10px; background:#ffffff05; }
+.directory-table td { padding-block:10px; }
+.directory-table .timestamp { white-space:nowrap; font-variant-numeric:tabular-nums; color:var(--muted); }
+.events-table td:last-child,.errors-table td:nth-child(5) { min-width:220px; overflow-wrap:anywhere; }
+.users-table td:first-child a { color:var(--ink); font-weight:600; }
+.users-table td:first-child a:hover { color:var(--accent); }
+.log-link { white-space:nowrap; font-size:.82rem; }
+.event-log { margin:0; padding:16px; font-size:.85rem; line-height:1.65; tab-size:4; }

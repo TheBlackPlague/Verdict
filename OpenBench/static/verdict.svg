@@ -1,1 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="5" fill="#dab779"/><path d="m7 9 9 15 9-15h-5l-4 8-4-8z" fill="#18191b"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="gold" x1="3" y1="1" x2="28" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f5dfb6"/>
+      <stop offset=".45" stop-color="#dcba7c"/>
+      <stop offset="1" stop-color="#99703a"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="5" y1="0" x2="25" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff3d6" stop-opacity=".9"/>
+      <stop offset=".5" stop-color="#e6c58d" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#6f4b28" stop-opacity=".8"/>
+    </linearGradient>
+    <linearGradient id="shine" x2="0" y2="1">
+      <stop stop-color="#fff" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="mark" x2="0" y2="1">
+      <stop stop-color="#101417"/>
+      <stop offset="1" stop-color="#303438"/>
+    </linearGradient>
+  </defs>
+  <rect x=".5" y=".5" width="31" height="31" rx="8" fill="url(#gold)" stroke="url(#edge)"/>
+  <rect x="2" y="2" width="28" height="28" rx="6.5" fill="none" stroke="#fff0d2" stroke-opacity=".15"/>
+  <path d="M8.5 2h15a6.5 6.5 0 0 1 6.5 6.5V12C19 17 12 9 2 15V8.5A6.5 6.5 0 0 1 8.5 2Z" fill="url(#shine)"/>
+  <path d="m7 9.6 9 15 9-15h-5l-4 8-4-8z" fill="#fff0cf" opacity=".4"/>
+  <path d="m7 9 9 15 9-15h-5l-4 8-4-8z" fill="url(#mark)"/>
+</svg>

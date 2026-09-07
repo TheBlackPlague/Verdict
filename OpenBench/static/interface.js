@@ -42,7 +42,7 @@
         const path = location.pathname.replace(/^\/+|\/+$/g, '') || 'index';
         document.querySelectorAll('[data-nav]').forEach(link => {
             const key = link.dataset.nav;
-            if ((key === 'index' && /^(test|tune|datagen)\/\d+\/?$/.test(path)) || path === key || (['index', 'greens', 'machines', 'networks', 'events', 'errors'].includes(key) && path.startsWith(key + '/'))) {
+            if ((key === 'index' && /^(test|tune|datagen)\/\d+\/?$/.test(path)) || (key === 'errors' && /^event\/\d+$/.test(path)) || path === key || (['index', 'greens', 'machines', 'networks', 'events', 'errors'].includes(key) && path.startsWith(key + '/'))) {
                 link.setAttribute('aria-current', 'page');
             }
         });
