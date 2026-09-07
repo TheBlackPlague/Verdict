@@ -8,6 +8,10 @@
     --ink:#f0eee9;
     --muted:#adb0b2;
     --accent:#e3c38b;
+    --success:#61d99b;
+    --danger:#ff858d;
+    --warning:#f2c064;
+    --info:#80bcff;
     --radius:14px;
     --glass:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.008) 55%),rgba(26,30,34,.97);
     --depth:inset 0 1px 0 rgba(255,255,255,.075),0 4px 8px #00000014,0 16px 36px #00000024;
@@ -120,6 +124,13 @@ th,td { border-bottom-color:#ffffff0b; }
 .hoverable tr:hover td,.hoverable tr:focus-within td { background:var(--hover-tint); }
 .hoverable tr:hover td:first-child,.hoverable tr:focus-within td:first-child { box-shadow:inset 2px 0 0 #b59665; }
 .badge { border-radius:6px; box-shadow:inset 0 1px 0 #ffffff09; }
+/* Saturated state text on dark, tinted badges; preserve OpenBench result meanings. */
+.badge-running { color:#7bc9fa; background:#182d3b; border-color:#38627d; }
+.badge-passed,.badge-green { color:var(--success); background:#182d24; border-color:#35634c; }
+.badge-failed,.badge-red { color:var(--danger); background:#331e25; border-color:#79424d; }
+.badge-pending,.badge-yellow { color:var(--warning); background:#302719; border-color:#796037; }
+.badge-blue { color:var(--info); background:#1c293e; border-color:#405f8a; }
+.badge-deleted { color:var(--danger); background:#331e25; border-color:#79424d; }
 .llr-track { border-radius:4px; }
 .llr-marker { box-shadow:0 0 6px #f0eee930; }
 .llr-line { filter:drop-shadow(0 1px 3px #e3c38b25); }
