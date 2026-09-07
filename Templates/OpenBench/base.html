@@ -1,196 +1,78 @@
 <!DOCTYPE html>
-
+{% load static %}
 <html lang="en">
-
-    {% load static %}
-
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-        <link rel="icon" type="image/svg+xml" href="{% static 'logo.svg' %}?{{ static_version }}">
-        <link rel="stylesheet" href="{% static 'style.css' %}?{{ static_version }}">
-        <link rel="stylesheet" href="{% static 'base.css' %}?{{ static_version }}">
-        <link rel="stylesheet" href="{% static 'form.css' %}?{{ static_version }}">
-        <link rel="stylesheet" href="{% static 'paging.css' %}?{{ static_version }}">
-
-        <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css' rel='stylesheet'>
-
-        <link rel="preconnect" href="https://fonts.gstatic.com">
-        <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap" rel="stylesheet">
-
-        <title>{% block title %}Verdict{% endblock %}</title>
-
-        {% block scripts %}
-        {% endblock %}
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-
-                {
-                    var timestamps = document.getElementsByClassName('timestamp');
-
-                    var options = {
-                        year   : 'numeric', month  : '2-digit',
-                        day    : '2-digit', hour   : '2-digit',
-                        minute : '2-digit', second : '2-digit',
-                        hour12 : false,
-                    };
-
-                    for (var i = 0; i < timestamps.length; i++) {
-                        var date = new Date(1000 * timestamps[i].textContent);
-                        timestamps[i].textContent = date.toLocaleString(undefined, options);
-                    }
-                }
-
-                {
-                    var datestamps = document.getElementsByClassName('datestamp');
-
-                    var options = {
-                        month  : 'short',
-                        day    : '2-digit',
-                    };
-
-                    for (var i = 0; i < datestamps.length; i++) {
-                        var date = new Date(1000 * datestamps[i].textContent);
-                        datestamps[i].textContent = date.toLocaleString(undefined, options);
-                    }
-                }
-
-                {
-                    const cells = document.querySelectorAll('.engine-options');
-
-                    cells.forEach(cell => {
-
-                        // Only have Threads= and Hash= settings
-                        if (cell.textContent.split(/\s+/).length <= 2)
-                            return;
-
-                        // Only display Threads=X Hash=X ...
-                        const re_threads = cell.textContent.match(/Threads=\d+/)[0];
-                        const re_hash    = cell.textContent.match(/Hash=\d+/)[0];
-                        const new_text   = re_threads + ' ' + re_hash + ' ...'
-
-                        // Add all options into the popup text
-                        const popup = document.createElement('div');
-                        popup.classList.add('engine-options-popup');
-                        popup.innerHTML = cell.textContent.trim().replace(/\s+/g, '<br>');
-
-                        // Prune text, and append popup
-                        cell.textContent = new_text;
-                        cell.appendChild(popup);
-                    });
-                }
-
-            }, false);
-
-            document.addEventListener('submit', event => {
-
-                // Prevent duplicate <form> submissions
-                const form = event.target;
-                if (form.dataset.submitting) {
-                    event.preventDefault();
-                    return;
-                }
-
-                form.dataset.submitting = true;
-            }, true);
-
-            function toggle_sidebar() {
-                document.body.classList.toggle('sidebar-open')
-            }
-        </script>
-    </head>
-
-    <body>
-
-        <div id="sidebar">
-
-            <ul>
-                <li class="header">Admin</li>
-                {% if user.is_authenticated %}
-                    <li><a href="/logout/"><i class="fa-solid fa-right-from-bracket fa-fw"></i> Logout</a></li>
-                    <li><a href="/profile/"><i class="fa-solid fa-user fa-fw"></i> Profile</a></li>
-                {% else %}
-                    <li><a href="/login"><i class="fa-solid fa-right-to-bracket fa-fw"></i> Login</a></li>
-                    <li><a href="/register"><i class="fa-solid fa-registered fa-fw"></i> Register</a></li>
-                {% endif %}
-            </ul>
-
-            <hr>
-
-            <ul>
-                <li class="header">Tests</li>
-                <li><a href="/index"><i class="fa-solid fa-house fa-fw"></i> Index</a></li>
-                <li><a href="/greens"><i class="fa-solid fa-heart fa-fw"></i> Greens</a></li>
-                <li><a href="/search"><i class="fa-solid fa-magnifying-glass fa-fw"></i> Search</a></li>
-            </ul>
-
-            <hr>
-
-            <ul>
-                <li class="header">Actions</li>
-                <li><a href="/test/new/"><i class="fa-solid fa-plus fa-fw"></i> Create Test</a></li>
-                <li><a href="/tune/new/"><i class="fa-solid fa-vial fa-fw"></i> Create Tune</a></li>
-                <li><a href="/datagen/new/"><i class="fa-solid fa-database fa-fw"></i> Create Datagen</a></li>
-                <li><a href="/newNetwork"><i class="fa-solid fa-upload fa-fw"></i> Upload Net</a></li>
-            </ul>
-
-            <hr>
-
-            <ul>
-                <li class="header">Info</li>
-                <li><a href="/users"><i class="fa-solid fa-users fa-fw"></i> Users</a></li>
-                <li><a href="/events"><i class="fa-solid fa-circle-exclamation fa-fw"></i> Events</a></li>
-                <li><a href="/errors"><i class="fa-solid fa-exclamation-triangle fa-fw"></i> Errors</a></li>
-                <li><a href="/machines"><i class="fa-solid fa-microchip fa-fw"></i> Machines</a></li>
-                <li><a href="/networks"><i class="fa-solid fa-circle-nodes fa-fw"></i> Networks</a></li>
-            </ul>
-
-            <hr>
-
-            <ul>
-                <li class="header">Engines</li>
-                {% for engine, data in config.engines.items %}
-                    <li><a href="{{data.source}}">{{engine}}</a></li>
-                {% endfor %}
-            </ul>
-
-            <hr>
-
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#07111e">
+    <link rel="icon" type="image/svg+xml" href="{% static 'verdict.svg' %}?{{ static_version }}">
+    <link rel="stylesheet" href="{% static 'base.css' %}?{{ static_version }}">
+    <link rel="stylesheet" href="{% static 'style.css' %}?{{ static_version }}">
+    <link rel="stylesheet" href="{% static 'form.css' %}?{{ static_version }}">
+    <link rel="stylesheet" href="{% static 'paging.css' %}?{{ static_version }}">
+    <link rel="stylesheet" href="{% static 'icons.css' %}?{{ static_version }}">
+    <title>{% block title %}Verdict{% endblock %}</title>
+    <script defer src="{% static 'interface.js' %}?{{ static_version }}"></script>
+    {% block scripts %}{% endblock %}
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <aside id="sidebar" aria-label="Sidebar">
+        <a class="brand" href="/"><img src="{% static 'verdict.svg' %}" width="38" height="38" alt=""><span>Verdict<small>ENGINE TESTING</small></span></a>
+        <button id="sidebar-close" class="icon-button" type="button" aria-label="Close navigation"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        <nav aria-label="Main navigation">
+            <div class="nav-label">Workspace</div>
+            <a href="/index/" data-nav="index"><i class="fa-solid fa-layer-group fa-fw" aria-hidden="true"></i> Overview</a>
+            <a href="/greens/" data-nav="greens"><i class="fa-solid fa-check fa-fw" aria-hidden="true"></i> Passed tests</a>
+            <a href="/search/" data-nav="search"><i class="fa-solid fa-magnifying-glass fa-fw" aria-hidden="true"></i> Search</a>
+            <div class="nav-label">Create</div>
+            <a href="/test/new/" data-nav="test/new"><i class="fa-solid fa-plus fa-fw" aria-hidden="true"></i> New test</a>
+            <a href="/tune/new/" data-nav="tune/new"><i class="fa-solid fa-sliders fa-fw" aria-hidden="true"></i> New tune</a>
+            <a href="/datagen/new/" data-nav="datagen/new"><i class="fa-solid fa-database fa-fw" aria-hidden="true"></i> Generate data</a>
+            <a href="/newNetwork/" data-nav="newNetwork"><i class="fa-solid fa-arrow-up-from-bracket fa-fw" aria-hidden="true"></i> Upload network</a>
+            <div class="nav-label">Resources</div>
+            <a href="/machines/" data-nav="machines"><i class="fa-solid fa-microchip fa-fw" aria-hidden="true"></i> Machines</a>
+            <a href="/networks/" data-nav="networks"><i class="fa-solid fa-circle-nodes fa-fw" aria-hidden="true"></i> Networks</a>
+            <a href="/users/" data-nav="users"><i class="fa-solid fa-users fa-fw" aria-hidden="true"></i> Contributors</a>
+            <a href="/events/" data-nav="events"><i class="fa-solid fa-clock-rotate-left fa-fw" aria-hidden="true"></i> Activity</a>
+            <a href="/errors/" data-nav="errors"><i class="fa-solid fa-triangle-exclamation fa-fw" aria-hidden="true"></i> Errors</a>
+            <div class="nav-label">Engines</div>
+            {% for engine, data in config.engines.items %}
+                <a href="{{ data.source }}" class="engine-link"><span class="engine-avatar">{{ engine|first }}</span>{{ engine }}<span class="external-mark" aria-hidden="true">↗</span></a>
+            {% endfor %}
+        </nav>
+        <div class="sidebar-account">
+            {% if user.is_authenticated %}
+                <a href="/profile/" class="account-link"><span class="avatar">{{ user.username|first|upper }}</span><span>{{ user.username }}<small>Account settings</small></span></a>
+                <a href="/logout/" class="icon-button" aria-label="Log out"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i></a>
+            {% else %}
+                <a href="/login/" class="button button-primary">Log in</a><a href="/register/" class="register-link">Register</a>
+            {% endif %}
         </div>
-
-        <div id="content-parent">
-            <div id="content" class="pb-5">
-                <div id="content-header">
-                    <button id="sidebar-toggle" onclick="toggle_sidebar()">
-                        <i class="fa-solid fa-bars fa-fw"></i>
-                    </button>
-                    <h2>
-                        <a class="site-title" href="/">Verdict</a>
-                    </h2>
-                </div>
-
-                {% if request.session.error_message %}
-                    <div class="error-message">
-                        <pre>{{request.session.error_message}}</pre>
-                    </div>
+    </aside>
+    <button id="sidebar-backdrop" aria-label="Dismiss navigation" tabindex="-1" hidden></button>
+    <div id="content-parent">
+        <header id="content-header">
+            <button id="sidebar-toggle" class="icon-button" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+            <div class="breadcrumb"><a href="/">Workspace</a><span aria-hidden="true">/</span><span>{{ page_title }}</span></div>
+            <div class="header-actions">
+                {% if live_regions %}
+                <div class="live-control"><span id="live-status" role="status">Live updates</span><button type="button" id="live-toggle" class="icon-button" aria-label="Pause live updates" aria-pressed="false" title="Pause live updates"><i class="fa-solid fa-pause" aria-hidden="true"></i></button><button type="button" id="live-refresh" class="icon-button" aria-label="Refresh statistics" title="Refresh statistics"><i class="fa-solid fa-rotate" aria-hidden="true"></i></button></div>
                 {% endif %}
-
-                {% if request.session.warning_message %}
-                    <div class="warning-message">
-                        <pre>{{request.session.warning_message}}</pre>
-                    </div>
-                {% endif %}
-
-                {% if request.session.status_message %}
-                    <div class="status-message">
-                        <pre>{{request.session.status_message}}</pre>
-                    </div>
-                {% endif %}
-
-                {% block content %}
-                {% endblock %}
+                <a href="https://github.com/TheBlackPlague/Verdict" class="icon-button" aria-label="Verdict on GitHub"><i class="fa-brands fa-github" aria-hidden="true"></i></a>
             </div>
-        </div>
-    </body>
+        </header>
+        <main id="content">
+            <div id="main-content" tabindex="-1">
+                <div class="page-heading"><div><p class="eyebrow">{{ page_section }}</p><h1>{{ page_title }}</h1></div>{% block page_actions %}{% endblock %}</div>
+                {% if request.session.error_message %}<div class="error-message" role="alert"><pre>{{ request.session.error_message }}</pre></div>{% endif %}
+                {% if request.session.warning_message %}<div class="warning-message" role="status"><pre>{{ request.session.warning_message }}</pre></div>{% endif %}
+                {% if request.session.status_message %}<div class="status-message" role="status"><pre>{{ request.session.status_message }}</pre></div>{% endif %}
+                {% block content %}{% endblock %}
+            </div>
+            <footer class="site-footer"><span>Verdict</span><span>Built on <a href="https://github.com/AndyGrant/OpenBench">OpenBench</a></span></footer>
+        </main>
+    </div>
+    {% if live_regions %}{{ live_regions|json_script:"live-regions" }}{% endif %}
+</body>
 </html>

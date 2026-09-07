@@ -24,9 +24,9 @@
                 <td>{{event.summary}}</td>
                 <td>{% if event.log_file %}<a href='/event/{{event.id}}'>View</a>{% endif %}</td>
             </tr>
-        {% endfor %}
+        {% empty %}<tr><td colspan="6"><div class="empty-state"><strong>No errors to display</strong></div></td></tr>{% endfor %}
 
-    <table>
+    </table>
 
     {% include "OpenBench/Blocks/pagebrowser.html" %}
 

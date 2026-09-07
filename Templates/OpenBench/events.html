@@ -22,9 +22,9 @@
                 <td>{{event.test_id|testIdToTimeControl}}</td>
                 <td>{{event.summary}}</td>
             </tr>
-        {% endfor %}
+        {% empty %}<tr><td colspan="5"><div class="empty-state"><strong>No activity to display</strong></div></td></tr>{% endfor %}
 
-    <table>
+    </table>
 
     {% include "OpenBench/Blocks/pagebrowser.html" %}
 

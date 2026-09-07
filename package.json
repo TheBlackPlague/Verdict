@@ -1,0 +1,5 @@
+{
+  "name": "verdict-preview",
+  "private": true,
+  "scripts": {"dev": "node Scripts/preview.mjs"}
+}

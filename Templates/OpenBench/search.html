@@ -53,64 +53,12 @@
 
     </script>
 
-    <style>
-        #content {
-            max-width: 100%;
-        }
 
-        /* Trim the wide right-aligned label gutter on the left */
-        #content .form .row label {
-            width: 112px;
-            min-width: 112px;
-            margin-right: 0.5rem;
-            text-align: center;
-            font-size: 15px;
-        }
-
-        /* Dividing lines between filter groups */
-        #content .form hr {
-            border: none;
-            border-top: 1px solid var(--color3);
-            margin: 1rem 0;
-        }
-
-        /* Gap between the search form and the results table */
-        #content .search-results-spacer {
-            height: 2rem;
-        }
-
-        #content .status-filters {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.5rem 1.5rem;
-            margin: 0.5rem 0 1rem;
-        }
-
-        #content .status-filters label {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            width: auto;
-            min-width: 0;
-            margin: 0;
-            text-align: left;
-            cursor: pointer;
-            color: var(--color-font2);
-        }
-
-        #content .status-filters input {
-            flex-grow: 0;
-            width: auto;
-            cursor: pointer;
-            accent-color: var(--color-font3);
-        }
-    </style>
 
 {% endblock %}
 
 {% block content %}
-        <form method="GET" action="/search/" onsubmit="prune_search(this)">
+        <form class="form-page" method="GET" action="/search/" onsubmit="prune_search(this)">
             <input type="hidden" name="go" value="1">
             <div class="form">
                 <div class="col">
@@ -211,12 +159,12 @@
 
     {% if tests %}<div class="search-results-spacer"></div>{% endif %}
 
-    <table class="test-list stripes hoverable">
+    <div class="table-scroll"><table class="test-list stripes hoverable"><thead><tr><th>Created</th><th>Workload</th><th>Status</th><th>Engine</th><th>Time control</th><th>Results</th><th>Notes</th><th>Compare</th></tr></thead><tbody>
         {% for test in tests %}
             <tr>
                 <td class="datestamp">{{test.creation|date:"U"}}</td>
                 {% include "OpenBench/Blocks/testsummary.html" %}
             </tr>
         {% endfor %}
-    </table>
+    </tbody></table></div>
 {% endblock %}

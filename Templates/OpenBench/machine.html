@@ -14,7 +14,7 @@
 
             <tr><td class="td-label">User</td><td>{{machine.user.username}}</td></tr>
             <tr><td class="td-label">Machine Name</td><td>{{machine.info.machine_name}}</td></tr>
-            <tr><td class="td-label">Last Seen</td><td class="timestamp">{{machine.updated|date:'U'}}</td>
+            <tr><td class="td-label">Last Seen</td><td class="timestamp">{{machine.updated|date:'U'}}</td></tr>
             <tr><td class="td-label"></td><td><br></td></tr>
 
             <tr><td class="td-label">Client Version</td><td>{{machine.info.client_ver}}</td></tr>
@@ -47,10 +47,3 @@
     </div>
 
 {% endblock %}
-
-
-    system_info = {
-        'compilers'      : SYSTEM_COMPILERS,      # Key: Engine, Value: (Compiler, Version)
-        'tokens'         : SYSTEM_GIT_TOKENS,     # Key: Engine, Value: True, for tokens we have
-        'cpu_flags'      : SYSTEM_CPU_FLAGS,      # List of CPU flags found in the Client or Server
-    }

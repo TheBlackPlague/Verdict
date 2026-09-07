@@ -11,17 +11,18 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            fetch_summary({{workload.id}});
+            start_workload_updates({{workload.id}});
         });
     </script>
 
 {% endblock %}
 
 {% block content %}
+    <div id="workload-metrics-live">{% include "OpenBench/Blocks/workload_metrics.html" %}</div>
 
-    <div class="workload-container">
+    <div class="workload-container" data-workload-id="{{ workload.id }}">
 
-    <div id="config" style="display: block; overflow-x: auto;">
+    <div id="config"><div class="panel-heading"><h2>Configuration</h2></div>
         <table class="test-config left-align wrappable" style="table-layout: auto; width: 100%;">
 
             <tr><td class="td-label">Author</td><td>{{workload.author|capfirst}}</td></tr>
@@ -75,55 +76,12 @@
         </table>
     </div>
 
-    <div id="actions" class="ml-3">
+    <div id="actions">
 
         <!-- Dev vs Base [Git Diff Link] -->
         <h4><a href="{{workload|gitDiffLink}}">{{workload|git_diff_text}}</a></h4>
 
-        <div class="anchor-container">
-
-            <!-- Approve Button: For Admins, or Cross-approvers -->
-            {% if not workload.approved and profile.approver and profile.user.username != workload.author %}
-                <a class="anchorbutton btn-blue" href="/{{type|lower}}/{{workload.id}}/APPROVE">Approve</a>
-            {% elif not workload.approved and request.user.is_superuser %}
-                <a class="anchorbutton btn-blue" href="/{{type|lower}}/{{workload.id}}/APPROVE">Approve</a>
-            {% else %}
-                <a class="anchorbutton btn-disabled">Approve</a>
-            {% endif %}
-
-            <!-- Restart Button: For Approvers or Workload Authors of finished workloads -->
-            {% if workload.finished and not workload.passed and not workload.failed and profile.approver %}
-                <a class="anchorbutton btn-yellow" href="/{{type|lower}}/{{workload.id}}/RESTART">Restart</a>
-            {% elif workload.finished and not workload.passed and not workload.failed and profile.user.username == workload.author %}
-                <a class="anchorbutton btn-yellow" href="/{{type|lower}}/{{workload.id}}/RESTART">Restart</a>
-            {% elif workload.finished %}
-                <a class="anchorbutton btn-disabled">Restart</a>
-            {% endif %}
-
-            <!-- Stop Button: For Approvers or Workload Authors of active workloads -->
-            {% if not workload.finished and profile.approver %}
-                <a class="anchorbutton btn-yellow" href="/{{type|lower}}/{{workload.id}}/STOP">Stop</a>
-            {% elif not workload.finished and profile.user.username == workload.author %}
-                <a class="anchorbutton btn-yellow" href="/{{type|lower}}/{{workload.id}}/STOP">Stop</a>
-            {% elif not workload.finished %}
-                <a class="anchorbutton btn-disabled">Stop</a>
-            {% endif %}
-
-            <!-- Delete/Restore Button: For Approvers or Workload Authors -->
-            {% if profile.approver or profile.user.username == workload.author %}
-                {% if workload.deleted %}
-                    <a class="anchorbutton btn-preset" href="/{{type|lower}}/{{workload.id}}/RESTORE">Restore</a>
-                {% else %}
-                    <a class="anchorbutton btn-red" href="/{{type|lower}}/{{workload.id}}/DELETE">Delete</a>
-                {% endif %}
-            {% else %}
-                {% if workload.deleted %}
-                    <a class="anchorbutton btn-disabled">Restore</a>
-                {% else %}
-                    <a class="anchorbutton btn-disabled">Delete</a>
-                {% endif %}
-            {% endif %}
-        </div>
+        <div id="workload-actions-live">{% include "OpenBench/Blocks/workload_actions.html" %}</div>
 
         <!-- Copy Button: Copy the current results statblock -->
         {% if type == "TEST" or type == "DATAGEN" %}
@@ -153,14 +111,7 @@
             </div>
         {% endif %}
 
-        <!-- Elo, (SPRT/LRR if SPRT, otherwise CONF), Games -->
-        {% if type == "TEST" %}
-            <pre class="long-statblock" id="long-statblock">{{workload|longStatBlock|linebreaksbr}}</pre>
-        {% elif type == "TUNE" %}
-            <pre class="long-statblock" id="long-statblock">{{workload|shortStatBlock|linebreaksbr}}</pre>
-        {% elif type == "DATAGEN" %}
-            <pre class="long-statblock" id="long-statblock">{{workload|longStatBlock|linebreaksbr}}</pre>
-        {% endif %}
+        <div id="workload-statblock-live">{% include "OpenBench/Blocks/workload_statblock.html" %}</div>
 
         <!-- Forum to modify the Priority, Throughput, or (Tests only) Workload Size -->
         <form method="POST" action="/{{type|lower}}/{{workload.id}}/MODIFY/">
@@ -194,7 +145,7 @@
                     {% if profile.approver or profile.user.username == workload.author %}
                         <input class="anchorbutton btn-blue w-100" type="submit" name="submit" value="Modify">
                     {% else %}
-                        <input class="anchorbutton btn-disabled w-100" type="submit" name="submit" value="Modify">
+                        <input class="anchorbutton btn-disabled w-100" disabled type="submit" name="submit" value="Modify">
                     {% endif %}
                 </div>
             </div>

@@ -178,19 +178,19 @@ def extract_option(options, option):
 
 
 def get_pending_tests():
-    t = Test.objects.select_related('dev', 'base').filter(approved=False)
+    t = Test.objects.select_related('dev', 'base', 'spsa_run').filter(approved=False)
     t = t.exclude(finished=True)
     t = t.exclude(deleted=True)
     return t.order_by('-creation')
 
 def get_active_tests():
-    t = Test.objects.select_related('dev', 'base').filter(approved=True)
+    t = Test.objects.select_related('dev', 'base', 'spsa_run').filter(approved=True)
     t = t.exclude(finished=True)
     t = t.exclude(deleted=True)
     return t.order_by('-priority', '-currentllr')
 
 def get_completed_tests():
-    t = Test.objects.select_related('dev', 'base').filter(finished=True)
+    t = Test.objects.select_related('dev', 'base', 'spsa_run').filter(finished=True)
     t = t.exclude(deleted=True)
     return t.order_by('-updated')
 
@@ -209,6 +209,18 @@ def getRecentMachines(minutes=2):
     target = target - datetime.timedelta(minutes=minutes)
     return Machine.objects.filter(updated__gte=target)
 
+def get_fleet_stats(username=None):
+    machines = getRecentMachines()
+    if username is not None:
+        machines = machines.filter(user__username=username)
+    machines = list(machines.only('info', 'mnps'))
+    return {
+        'machines': len(machines),
+        'threads': sum(m.info.get('concurrency', 0) for m in machines),
+        'mnps': sum(m.info.get('concurrency', 0) * m.mnps for m in machines),
+    }
+
+
 def getMachineStatus(username=None):
 
     machines = getRecentMachines()
@@ -223,8 +235,9 @@ def getMachineStatus(username=None):
 def getPaging(content, page, url, pagelen=25):
 
     start = max(0, pagelen * (page - 1))
-    end   = min(content.count(), pagelen * page)
-    count = 1 + math.ceil(content.count() / pagelen)
+    total = content.count()
+    end   = min(total, pagelen * page)
+    count = 1 + math.ceil(total / pagelen)
 
     part1 = list(range(1, min(4, count)))
     part2 = list(range(page - 2, page + 1))

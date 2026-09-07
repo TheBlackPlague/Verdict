@@ -307,3 +307,50 @@ def next(iterable, index):
 def previous(iterable, index):
     try: return iterable[int(index) - 1]
     except: return None
+
+
+# Cache the interval on this request's model instance; multiple cards share it.
+def _interface_elo(workload):
+    if not hasattr(workload, '_interface_elo'):
+        workload._interface_elo = OpenBench.stats.Elo(workload.results())
+    return workload._interface_elo
+
+
+@register.filter
+def elo_estimate(workload):
+    if not workload.games:
+        return '—'
+    return '%+.2f' % _interface_elo(workload)[1]
+
+
+@register.filter
+def elo_interval(workload):
+    if not workload.games:
+        return 'Waiting for games'
+    lower, elo, upper = _interface_elo(workload)
+    return '± %.2f at 95%% confidence' % max(upper - elo, elo - lower)
+
+
+@register.filter
+def llr_position(workload):
+    width = workload.upperllr - workload.lowerllr
+    return '%.2f' % (max(0, min(100, 100 * (workload.currentllr - workload.lowerllr) / width)) if width else 50)
+
+
+@register.filter
+def tuning_progress(workload):
+    total = workload.spsa_run.iterations * workload.spsa_run.pairs_per * 2
+    return '%.1f' % (min(100, 100 * workload.games / total) if total else 0)
+
+
+@register.filter
+def finished_label(workload):
+    target = workload.max_games
+    if workload.test_mode == 'SPSA':
+        target = workload.spsa_run.iterations * workload.spsa_run.pairs_per * 2
+    return 'Finished' if target and workload.games >= target else 'Stopped'
+
+
+@register.filter
+def bounded_llr(workload):
+    return max(workload.lowerllr, min(workload.upperllr, workload.currentllr))
