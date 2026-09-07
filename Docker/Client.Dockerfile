@@ -17,15 +17,15 @@ RUN apt-get update && \
     python3-venv \
     wget
 
-# Install LLVM 20
+# Install LLVM 22 (StockDory recommends 22.1.8)
 RUN wget https://apt.llvm.org/llvm.sh && \
     chmod +x llvm.sh && \
-    ./llvm.sh 20 && \
+    ./llvm.sh 22 && \
     rm -rf llvm.sh
 
 # Set up LLVM environment
-RUN ln -s /usr/bin/clang-20 /usr/bin/clang && \
-    ln -s /usr/bin/clang++-20 /usr/bin/clang++
+RUN ln -s /usr/bin/clang-22 /usr/bin/clang && \
+    ln -s /usr/bin/clang++-22 /usr/bin/clang++
 
 # Set environment variables for LLVM
 ENV CC=clang
