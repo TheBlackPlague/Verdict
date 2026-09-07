@@ -1,0 +1,59 @@
+name: Checks
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            Client/requirements.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt -r Client/requirements.txt
+
+      - name: Django checks and migrations
+        id: django
+        run: |
+          python manage.py check
+          python manage.py migrate --noinput
+          python manage.py makemigrations --check --dry-run
+
+      - name: Regression tests
+        id: tests
+        run: python manage.py test UnitTests --verbosity 2
+
+      - name: Compile Python sources
+        id: compile
+        run: python -m compileall -q Client OpenBench OpenSite Scripts UnitTests manage.py
+
+      - name: Summary
+        if: always()
+        env:
+          DJANGO_RESULT: ${{ steps.django.outcome }}
+          TEST_RESULT: ${{ steps.tests.outcome }}
+          COMPILE_RESULT: ${{ steps.compile.outcome }}
+        run: |
+          {
+            printf '| Check | Result |\n| --- | --- |\n'
+            printf '| Django and migrations | %s |\n' "$DJANGO_RESULT"
+            printf '| Regression tests | %s |\n' "$TEST_RESULT"
+            printf '| Python compilation | %s |\n' "$COMPILE_RESULT"
+          } >> "$GITHUB_STEP_SUMMARY"

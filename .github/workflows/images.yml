@@ -1,0 +1,122 @@
+name: Container Images
+
+on:
+  push:
+    branches: [master, sync-with-upstream]
+    paths:
+      - ".github/workflows/**"
+      - "Docker/**"
+      - "Client/**"
+      - "OpenBench/**"
+      - "OpenSite/**"
+      - "Templates/**"
+      - "Config/**"
+      - "Engines/**"
+      - "Books/**"
+      - "Scripts/**"
+      - "UnitTests/**"
+      - "manage.py"
+      - "requirements.txt"
+      - "LICENSE"
+  pull_request:
+    branches: [master, sync-with-upstream]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: images-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    uses: ./.github/workflows/checks.yml
+
+  images:
+    needs: checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: verdict-server
+            dockerfile: Docker/Server.Dockerfile
+          - image: verdict-client
+            dockerfile: Docker/Client.Dockerfile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Image tags
+        id: metadata
+        env:
+          IMAGE: ${{ matrix.image }}
+          BRANCH: ${{ github.head_ref || github.ref_name }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          name="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$IMAGE"
+          branch="$(printf '%s' "$BRANCH" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9_.-]+/-/g; s/^[.-]+//; s/[.-]+$//')"
+          branch="${branch:0:111}"
+          tag="${branch:-image}-${GITHUB_SHA:0:16}"
+          {
+            printf 'tags<<EOF\n%s:%s\n' "$name" "$tag"
+            # Staging branches and PRs must never overwrite the stable image.
+            if [[ "$EVENT" != 'pull_request' && "$GITHUB_REF" == 'refs/heads/master' ]]; then
+              printf '%s:latest\n' "$name"
+            fi
+            printf 'EOF\n'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build image
+        id: build
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          # The client's Zig toolchain currently targets x86-64 Linux.
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.metadata.outputs.tags }}
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
+          labels: |
+            org.opencontainers.image.title=${{ matrix.image }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Summary
+        if: always()
+        env:
+          IMAGE: ${{ matrix.image }}
+          TAGS: ${{ steps.metadata.outputs.tags }}
+          RESULT: ${{ steps.build.outcome }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          {
+            printf '### %s\n\nBuild: %s\n\n' "$IMAGE" "$RESULT"
+            if [[ "$EVENT" == 'pull_request' ]]; then
+              printf 'PR validation only; no image published.\n'
+            elif [[ "$RESULT" == 'success' ]]; then
+              printf 'Published tags:\n```text\n%s\n```\n\nDigest: `%s`\n' "$TAGS" "$DIGEST"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
