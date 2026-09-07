@@ -5,7 +5,7 @@
 
     "build": {
         "path": "",
-        "compilers": ["clang++>=22.0.0"],
+        "compilers": ["clang++>=20.0.0"],
         "cpuflags": ["POPCNT"],
         "systems": ["Linux", "Windows", "Darwin"]
     },
