@@ -2,7 +2,7 @@ name: Container Images
 
 on:
   push:
-    branches: [master, sync-with-upstream, improved-ui]
+    branches: [master, sync-with-upstream, improved-ui, improved-ui-2]
     paths:
       - ".github/workflows/**"
       - "Docker/**"
@@ -69,8 +69,8 @@ jobs:
           {
             printf 'tags<<EOF\n%s:%s\n' "$name" "$tag"
             # Keep a convenient preview tag alongside the immutable commit tag.
-            if [[ "$EVENT" != 'pull_request' && "$GITHUB_REF" == 'refs/heads/improved-ui' ]]; then
-              printf '%s:improved-ui\n' "$name"
+            if [[ "$EVENT" != 'pull_request' && ( "$GITHUB_REF" == 'refs/heads/improved-ui' || "$GITHUB_REF" == 'refs/heads/improved-ui-2' ) ]]; then
+              printf '%s:%s\n' "$name" "$branch"
             fi
             # Staging branches and PRs must never overwrite the stable image.
             if [[ "$EVENT" != 'pull_request' && "$GITHUB_REF" == 'refs/heads/master' ]]; then
