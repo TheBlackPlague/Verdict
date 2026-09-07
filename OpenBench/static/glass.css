@@ -4,7 +4,10 @@
     --surface:#1e2226;
     --surface-raised:#2c3136;
     --line:rgba(224,229,232,.15);
-    --hover-tint:rgba(181,150,101,.10);
+    --hover-tint:rgba(215,225,235,.065);
+    --hover-edge:#8698a8;
+    --hover-border:rgba(134,152,168,.42);
+    --hover-ink:#e0e9f1;
     --ink:#f0eee9;
     --muted:#adb0b2;
     --accent:#e3c38b;
@@ -45,17 +48,18 @@ body {
     padding:6px 9px; min-height:32px;
     transition:background-color 180ms var(--ease),color 180ms var(--ease),border-color 180ms var(--ease);
 }
-#site-navigation > a:hover { background:#ffffff0b; border-color:#e3c38b30; }
+#site-navigation > a:hover { background:var(--hover-tint); border-color:var(--hover-border); color:var(--hover-ink); }
 #site-navigation > a[aria-current="page"] {
     background:linear-gradient(180deg,#e3c38b20,#e3c38b0c);
     border-color:#e3c38b45; color:#efdab5; box-shadow:inset 0 1px 0 #ffffff09;
 }
-#site-navigation > a[aria-current="page"]:hover { background:#e3c38b26; border-color:#e3c38b60; }
+#site-navigation > a[aria-current="page"]:hover { background:var(--hover-tint); border-color:var(--hover-edge); color:var(--hover-ink); }
 #content { padding-top:22px; }
 .page-heading { margin-bottom:16px; }
 #main-content { scroll-margin-top:84px; }
 :focus-visible { outline-offset:3px; }
 a { transition:color 160ms ease; text-decoration-skip-ink:none; text-decoration-thickness:1px; }
+a:hover,.test-list .test-name:hover,.table-sort:hover { color:var(--hover-ink); }
 /* Inline margins interrupt link underlines; the existing text space is enough. */
 .fleet-strip a strong { margin-right:0; }
 .fleet-strip a:hover { color:var(--ink); }
@@ -67,7 +71,7 @@ a { transition:color 160ms ease; text-decoration-skip-ink:none; text-decoration-
     background-image:linear-gradient(180deg,#ffffff0b,#ffffff00);
     border-color:#ffffff22; box-shadow:inset 0 1px 0 #ffffff0b,0 2px 4px #0002;
 }
-.button:not(:disabled):hover,.anchorbutton:not(.btn-disabled):hover { background-color:#303438; border-color:#b5966555; }
+.button:not(:disabled):hover,.anchorbutton:not(.btn-disabled):hover { background-color:#303438; border-color:var(--hover-border); }
 .icon-button:not(:disabled):hover,.page:hover { background-color:var(--surface-raised); }
 .button-primary,.btn-start {
     background:linear-gradient(160deg,#efdab2,#dbb576); border-color:#f0d6a5;
@@ -88,7 +92,7 @@ a { transition:color 160ms ease; text-decoration-skip-ink:none; text-decoration-
 .btn-disabled,.anchorbutton[aria-disabled="true"],.button:disabled { box-shadow:none; background-image:none; }
 .menu-items { border-radius:12px; padding:6px; box-shadow:inset 0 1px 0 #ffffff12,0 16px 40px #0007; }
 .menu-items a { border-radius:7px; transition:background-color 160ms ease; }
-.menu-items a:hover { background:var(--surface-raised); }
+.menu-items a:hover { background:var(--surface-raised); color:var(--hover-ink); }
 .live-control { border:1px solid var(--line); border-radius:20px; padding:3px 5px 3px 10px; background:#ffffff04; box-shadow:inset 0 1px 0 #ffffff05; }
 .live-control .icon-button { border-radius:50%; }
 #live-status::before { box-shadow:0 0 7px #8cc59d66; }
@@ -122,7 +126,7 @@ th,td { border-bottom-color:#ffffff0b; }
 .stripes tr:nth-child(even):not(.table-header):not(.table-small-header) { background:rgba(255,255,255,.018); }
 .hoverable td { transition:background-color 160ms ease; }
 .hoverable tr:hover td,.hoverable tr:focus-within td { background:var(--hover-tint); }
-.hoverable tr:hover td:first-child,.hoverable tr:focus-within td:first-child { box-shadow:inset 2px 0 0 #b59665; }
+.hoverable tr:hover td:first-child,.hoverable tr:focus-within td:first-child { box-shadow:inset 2px 0 0 var(--hover-edge); }
 .badge { border-radius:6px; box-shadow:inset 0 1px 0 #ffffff09; }
 /* Saturated state text on dark, tinted badges; preserve OpenBench result meanings. */
 .badge-running { color:#7bc9fa; background:#182d3b; border-color:#38627d; }
@@ -186,6 +190,6 @@ th,td { border-bottom-color:#ffffff0b; }
 .directory-table .timestamp { white-space:nowrap; font-variant-numeric:tabular-nums; color:var(--muted); }
 .events-table td:last-child,.errors-table td:nth-child(5) { min-width:220px; overflow-wrap:anywhere; }
 .users-table td:first-child a { color:var(--ink); font-weight:600; }
-.users-table td:first-child a:hover { color:var(--accent); }
+.users-table td:first-child a:hover { color:var(--hover-ink); }
 .log-link { white-space:nowrap; font-size:.82rem; }
 .event-log { margin:0; padding:16px; font-size:.85rem; line-height:1.65; tab-size:4; }
