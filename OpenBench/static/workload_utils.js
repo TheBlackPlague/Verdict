@@ -203,7 +203,7 @@ function append_summary_section(table, label, rows, key_formatter) {
     header.appendChild(summary_cell('th', label));
 
     ['Penta', 'Elo', 'Pairs', '%'].forEach(name => {
-        header.appendChild(summary_cell('th', name));
+        header.appendChild(summary_cell('th', name, name === 'Penta' ? '' : 'numeric'));
     });
 
     if (is_nps_available) {

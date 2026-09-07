@@ -35,21 +35,23 @@
             <tr><th scope="row">Network</th><td >{% if workload.dev_netname %}<a href="{{workload|network_download_link:'dev'}}">{{workload.dev_netname}}</a>{% else %}—{% endif %}</td>{% if type != "TUNE" %}<td >{% if workload.base_netname %}<a href="{{workload|network_download_link:'base'}}">{{workload.base_netname}}</a>{% else %}—{% endif %}</td>{% endif %}</tr>
             <tr><th scope="row">Options</th><td class="engine-options">{{workload.dev_options}}</td>{% if type != "TUNE" %}<td class="engine-options">{{workload.base_options}}</td>{% endif %}</tr>
             <tr><th scope="row">Time control</th><td >{{workload.dev_time_control}}</td>{% if type != "TUNE" %}<td >{{workload.base_time_control}}</td>{% endif %}</tr>
-        </tbody>
-        </table>
-        <table class="test-config test-settings"><tbody>
-            <tr><th scope="row" class="td-label">Opening book</th><td colspan="3">{% if workload|book_download_link %}<a href="{{workload|book_download_link}}">{{workload.book_name}}</a>{% else %}{{workload.book_name}}{% endif %}</td></tr>
-            <tr><th scope="row" class="td-label">Upload PGNs</th><td>{{workload.upload_pgns}}</td><th scope="row" class="td-label">Scaling</th><td>{{workload.scale_method}} {{workload.scale_nps}} NPS</td></tr>
-            <tr><th scope="row" class="td-label">Syzygy WDL</th><td>{{workload.syzygy_wdl}}</td><th scope="row" class="td-label">Syzygy ADJ.</th><td>{{workload.syzygy_adj}}</td></tr>
-            <tr><th scope="row" class="td-label">Win ADJ.</th><td colspan="3">{{workload.win_adj}}</td></tr>
-            <tr><th scope="row" class="td-label">Draw ADJ.</th><td colspan="3">{{workload.draw_adj}}</td></tr>
+            <tr><th scope="row" class="td-label">Opening book</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{% if workload|book_download_link %}<a href="{{workload|book_download_link}}">{{workload.book_name}}</a>{% else %}{{workload.book_name}}{% endif %}</td></tr>
+            <tr><th scope="row" class="td-label">Upload PGNs</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.upload_pgns}}</td></tr>
+            <tr><th scope="row" class="td-label">Scaling</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.scale_method}} {{workload.scale_nps}} NPS</td></tr>
+            <tr><th scope="row" class="td-label">Syzygy WDL</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.syzygy_wdl}}</td></tr>
+            <tr><th scope="row" class="td-label">Syzygy ADJ.</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.syzygy_adj}}</td></tr>
+            <tr><th scope="row" class="td-label">Win ADJ.</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.win_adj}}</td></tr>
+            <tr><th scope="row" class="td-label">Draw ADJ.</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.draw_adj}}</td></tr>
             {% if type == "TUNE" %}
-            <tr><th scope="row" class="td-label">Alpha</th><td>{{workload.spsa_run.alpha}}</td><th scope="row" class="td-label">Gamma</th><td>{{workload.spsa_run.gamma}}</td></tr>
-            <tr><th scope="row" class="td-label">A-Ratio</th><td>{{workload.spsa_run.a_ratio}}</td><th scope="row" class="td-label">Pairs per point</th><td>{{workload.workload_size}}</td></tr>
-            <tr><th scope="row" class="td-label">Reporting</th><td>{{workload.spsa_run.reporting_type}}</td><th scope="row" class="td-label">Distribution</th><td>{{workload.spsa_run.distribution_type}}</td></tr>
+            <tr><th scope="row" class="td-label">Alpha</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.spsa_run.alpha}}</td></tr>
+            <tr><th scope="row" class="td-label">Gamma</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.spsa_run.gamma}}</td></tr>
+            <tr><th scope="row" class="td-label">A-Ratio</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.spsa_run.a_ratio}}</td></tr>
+            <tr><th scope="row" class="td-label">Pairs per point</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.workload_size}}</td></tr>
+            <tr><th scope="row" class="td-label">Reporting</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.spsa_run.reporting_type}}</td></tr>
+            <tr><th scope="row" class="td-label">Distribution</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.spsa_run.distribution_type}}</td></tr>
             {% elif type == "DATAGEN" %}
-            <tr><th scope="row" class="td-label">Genfens args</th><td colspan="3">{{workload.genfens_args}}</td></tr>
-            <tr><th scope="row" class="td-label">Play reverses</th><td colspan="3">{{workload.play_reverses}}</td></tr>
+            <tr><th scope="row" class="td-label">Genfens args</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.genfens_args}}</td></tr>
+            <tr><th scope="row" class="td-label">Play reverses</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.play_reverses}}</td></tr>
             {% endif %}
         </tbody></table>
     </section>

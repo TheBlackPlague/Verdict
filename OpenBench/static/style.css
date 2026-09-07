@@ -128,7 +128,7 @@ tbody tr:last-child td { border-bottom:0; }
 .metric-label { display:flex; align-items:center; gap:8px; color:var(--muted); font-size:.8rem; }
 .metric-reading { display:flex; align-items:baseline; flex-wrap:wrap; gap:6px; margin-top:3px; }
 .metric-value { color:var(--ink); font-size:1.25rem; font-weight:600; font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
-.metric-value small { font-size:.85rem; font-weight:400; color:var(--muted); }
+.metric-outcomes { font-size:.95rem; font-weight:400; color:var(--ink); font-variant-numeric:tabular-nums; }
 .metric-note { color:var(--muted); font-size:.8rem; }
 .llr-reading { display:flex; align-items:center; gap:12px; }
 .llr-track { flex:1; position:relative; height:3px; background:linear-gradient(90deg,#b1757566,#555 50%,#84b39166); margin:0 2px; min-width:65px; }
@@ -144,7 +144,7 @@ tbody tr:last-child td { border-bottom:0; }
 #results table,#parameters table,.summary-table { min-width:650px; }
 .test-config { font-size:.85rem; }
 .test-config td,.test-config th { padding:6px 10px; }
-.test-config .td-label { color:var(--muted); width:115px; }
+.test-config .td-label { color:var(--muted); }
 .test-config td { overflow-wrap:anywhere; }
 .engine-comparison { table-layout:fixed; }
 .engine-comparison th:first-child { width:100px; }
@@ -152,7 +152,6 @@ tbody tr:last-child td { border-bottom:0; }
 .engine-comparison .revision { font-size:.76rem; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
 .engine-options { white-space:normal; overflow-wrap:anywhere; }
 .branch_name { font-family:ui-monospace,SFMono-Regular,Consolas,monospace; color:var(--ink); }
-.test-settings .td-label { width:115px; }
 .active-highlight { border-left:3px solid var(--success); }
 .default-network { color:var(--success); }
 .was-default-network { color:var(--warning); }
