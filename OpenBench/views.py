@@ -274,6 +274,8 @@ def profile_config(request):
 
 def index(request, page=1):
 
+    from OpenBench.eta import queue_eta
+
     pending   = OpenBench.utils.get_pending_tests().prefetch_related('spsa_run__parameters')
     active    = OpenBench.utils.get_active_tests().prefetch_related('spsa_run__parameters')
     completed = OpenBench.utils.get_completed_tests().prefetch_related('spsa_run__parameters')
@@ -287,6 +289,7 @@ def index(request, page=1):
         'paging'    : paging,
         'fleet'     : OpenBench.utils.get_fleet_stats(),
         'active_count': len(active),
+        'queue_eta': queue_eta(active, OpenBench.utils.getRecentMachines().only('info', 'workload')),
     }
 
     return render(request, 'index.html', data)

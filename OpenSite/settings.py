@@ -127,6 +127,9 @@ USE_L10N = True
 
 USE_TZ = True
 
+ETA_SPRT_AVERAGE_GAMES = 25000
+ETA_SPRT_BOOK_POSITIONS = 2632036
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
