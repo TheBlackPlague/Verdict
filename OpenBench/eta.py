@@ -12,7 +12,7 @@ def remaining_games(test):
         return 0
 
     if test.test_mode == 'SPRT':
-        average = getattr(settings, 'ETA_SPRT_AVERAGE_GAMES', 95000)
+        average = getattr(settings, 'ETA_SPRT_AVERAGE_GAMES', 25000)
         positions = getattr(settings, 'ETA_SPRT_BOOK_POSITIONS', 2632036)
         boundary = abs(test.upperllr if test.currentllr > 0 else test.lowerllr)
         if not math.isfinite(boundary) or boundary <= 0 or not math.isfinite(test.currentllr):
