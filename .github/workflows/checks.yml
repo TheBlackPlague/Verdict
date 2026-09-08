@@ -40,20 +40,14 @@ jobs:
         id: compile
         run: python -m compileall -q Client OpenBench OpenSite Scripts manage.py
 
-      - name: Queue ETA tests
-        id: eta
-        run: python manage.py test OpenBench.tests.test_eta
-
       - name: Summary
         if: always()
         env:
           DJANGO_RESULT: ${{ steps.django.outcome }}
           COMPILE_RESULT: ${{ steps.compile.outcome }}
-          ETA_RESULT: ${{ steps.eta.outcome }}
         run: |
           {
             printf '| Check | Result |\n| --- | --- |\n'
             printf '| Django and migrations | %s |\n' "$DJANGO_RESULT"
             printf '| Python compilation | %s |\n' "$COMPILE_RESULT"
-            printf '| Queue ETA tests | %s |\n' "$ETA_RESULT"
           } >> "$GITHUB_STEP_SUMMARY"

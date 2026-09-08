@@ -1,11 +1,4 @@
-"""Queue-clearance heuristic adapted from official-stockfish/fishtest util.py.
-
-https://github.com/official-stockfish/fishtest/blob/b8eecff220b562a0dc2c4e68d1fa02521e06d72c/server/fishtest/util.py
-
-This predicts nominal core-hours, not an SPRT stopping-time confidence interval.
-The game-count prior and opening-book weighting should be calibrated as Verdict
-accumulates test history. Worker speed and scheduling constraints are not modeled.
-"""
+# Adapted from Fishtest: https://github.com/official-stockfish/fishtest/blob/b8eecff220b562a0dc2c4e68d1fa02521e06d72c/server/fishtest/util.py
 
 import math
 import re
@@ -28,13 +21,12 @@ def remaining_games(test):
         if test.currentllr >= test.upperllr or test.currentllr <= test.lowerllr:
             return 0
 
-        # Beta(1, 15) CDF, expressed directly to avoid a statistics dependency.
+
         weight = 1 - (1 - min(test.games / 2 / positions, 1.0)) ** 15
         projected = test.games * boundary / max(0.1, abs(test.currentllr))
         expected = (1 - weight) * average + weight * projected
 
-        # Unlike Fishtest, an undecided SPRT must not appear to be complete just
-        # because its estimated total has fallen below its completed game count.
+
         return max(2, expected - test.games)
 
     if test.test_mode == 'SPSA':
@@ -49,14 +41,13 @@ def remaining_games(test):
 
 def player_seconds(control):
 
-    # Fishtest's empirical assumptions: 68 moves, 92% of the clock budget used.
-    # Verdict stores fixed movetime in milliseconds, and ordinary clocks in seconds.
+
     if re.fullmatch(r'MT=\d+', control):
         seconds = 68 * int(control[3:]) / 1000
     else:
         match = re.fullmatch(r'(?:(\d+)/)?(\d+(?:\.\d+)?)(?:\+(\d+(?:\.\d+)?))?', control)
         if not match:
-            return None # Node/depth limits cannot be converted from a clock budget.
+            return None
         moves, base, increment = match.groups()
         if moves is not None and int(moves) == 0:
             return None
@@ -68,7 +59,7 @@ def player_seconds(control):
 
 def remaining_core_hours(test):
 
-    # Imported lazily because utils and views already import one another.
+
     from OpenBench.utils import extract_option
 
     games = remaining_games(test)
@@ -79,7 +70,7 @@ def remaining_core_hours(test):
     if games is None or dev_seconds is None or base_seconds is None:
         return None
 
-    # The match runner reserves the larger thread count for thread-odds games.
+
     threads = max(int(extract_option(test.dev_options, 'Threads') or 1),
                   int(extract_option(test.base_options, 'Threads') or 1))
     return games * (dev_seconds + base_seconds) * threads / 3600
@@ -100,7 +91,7 @@ def format_hours(hours):
 
 def queue_eta(tests, machines):
 
-    # Approval is a human decision; only runnable workloads belong in this ETA.
+
     tests = [test for test in tests if test.approved and not test.finished and not test.deleted]
     if not tests:
         return {'label': 'Queue empty', 'hours': 0, 'detail': 'No approved workloads remain.'}
