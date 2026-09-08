@@ -44,7 +44,13 @@ class LegacyDatabaseUpgradeTests(TransactionTestCase):
 
             MigrationExecutor(connection).migrate(latest)
             from OpenBench.models import Engine as CurrentEngine, Profile as CurrentProfile
-            from OpenBench.models import Result as CurrentResult, Test as CurrentTest
+            from OpenBench.models import Result as CurrentResult, Test as CurrentTest, LLRHistory
+
+            tables = connection.introspection.table_names()
+            self.assertIn('_VERDICT_llr_history', tables)
+            self.assertNotIn('OpenBench_llrhistory', tables)
+            history = LLRHistory.objects.create(test_id=tune.pk, games=200, llr=0.25)
+            self.assertEqual(LLRHistory.objects.get(pk=history.pk).llr, 0.25)
 
             upgraded = CurrentTest.objects.get(pk=tune.pk)
             self.assertEqual((upgraded.games, upgraded.wins, upgraded.draws, upgraded.losses), (200, 50, 100, 50))

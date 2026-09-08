@@ -20,11 +20,12 @@ class Migration(migrations.Migration):
                 ('test', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='llr_history', to='OpenBench.test')),
             ],
             options={
+                'db_table': '_VERDICT_llr_history',
                 'ordering': ['games'],
             },
         ),
         migrations.AddConstraint(
             model_name='llrhistory',
-            constraint=models.UniqueConstraint(fields=('test', 'games'), name='unique_test_llr_games'),
+            constraint=models.UniqueConstraint(fields=('test', 'games'), name='_VERDICT_llr_test_games'),
         ),
     ]

@@ -211,8 +211,9 @@ class LLRHistory(Model):
     llr   = FloatField()
 
     class Meta:
+        db_table = '_VERDICT_llr_history'
         ordering = ['games']
-        constraints = [UniqueConstraint(fields=['test', 'games'], name='unique_test_llr_games')]
+        constraints = [UniqueConstraint(fields=['test', 'games'], name='_VERDICT_llr_test_games')]
 
 class LogEvent(Model):
 
