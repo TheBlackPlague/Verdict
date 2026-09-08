@@ -1,33 +1,26 @@
-
-var Networks = JSON.parse(document.getElementById('json-networks').textContent);
-
-function is_greater_than(a, b, attrs) {
-
-    for (const attr of attrs) {
-        if (a[attr] === b[attr])
-            continue;
-        return a[attr] > b[attr];
-    }
-
-    return false; // Objects are equal
-}
-
-function swap_networks(index1, index2) {
-
-    var temp = Networks[index1];
-    Networks[index1] = Networks[index2];
-    Networks[index2] = temp;
-
-    var table = document.getElementById("network-table");
-    var temp_row = table.rows[index1+1].innerHTML
-    table.rows[index1+1].innerHTML = table.rows[index2+1].innerHTML;
-    table.rows[index2+1].innerHTML = temp_row;
-}
+const Networks = JSON.parse(document.getElementById('json-networks').textContent);
+let networkRows;
+let currentSort = '';
+let ascending = false;
 
 function sort_networks(fields) {
-
-    for (let i = 0; i != Networks.length; i++)
-        for (let j = i + 1; j != Networks.length; j++)
-            if (is_greater_than(Networks[j], Networks[i], fields))
-                swap_networks(i, j);
+    const table = document.getElementById('network-table');
+    if (!networkRows) networkRows = Networks.map((network, index) => ({network, row: table.rows[index + 1]}));
+    const key = fields.join(',');
+    ascending = currentSort === key ? !ascending : false;
+    currentSort = key;
+    networkRows.sort((a, b) => {
+        for (const field of fields) {
+            const left = a.network[field], right = b.network[field];
+            if (left === right) continue;
+            const comparison = left > right ? 1 : -1;
+            return ascending ? comparison : -comparison;
+        }
+        return 0;
+    });
+    const body = table.tBodies[0];
+    networkRows.forEach(({row}) => body.appendChild(row));
+    table.querySelectorAll('[data-sort]').forEach(header => {
+        header.setAttribute('aria-sort', header.dataset.sort === fields[0] ? (ascending ? 'ascending' : 'descending') : 'none');
+    });
 }

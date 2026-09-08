@@ -1,0 +1,41 @@
+/*
+ * @generated
+ * Machine-generated CSS. Manual edits are not recommended.
+ */
+/* Font Awesome Free 6.2.0; local glyph subsets. See fonts/LICENSE.txt. */
+@font-face{font-family:"Verdict Solid";src:url("fonts/fa-solid-900.woff2") format("woff2");font-display:block}
+@font-face{font-family:"Verdict Regular";src:url("fonts/fa-regular-400.woff2") format("woff2");font-display:block}
+@font-face{font-family:"Verdict Brands";src:url("fonts/fa-brands-400.woff2") format("woff2");font-display:block}
+.fa,.fas,.fa-solid,.far,.fa-regular,.fab,.fa-brands{display:inline-block;font-family:"Verdict Solid";font-style:normal;font-weight:normal;line-height:1;text-rendering:auto;-webkit-font-smoothing:antialiased}
+.far,.fa-regular{font-family:"Verdict Regular"}
+.fab,.fa-brands{font-family:"Verdict Brands"}
+.fa-fw{width:1.25em;text-align:center}
+.fa-trash-can::before{content:"\f2ed"}
+.fa-right-from-bracket::before{content:"\f2f5"}
+.fa-bars::before{content:"\f0c9"}
+.fa-pen-to-square::before{content:"\f044"}
+.fa-users::before{content:"\f0c0"}
+.fa-arrow-up-from-bracket::before{content:"\e09a"}
+.fa-star::before{content:"\f005"}
+.fa-server::before{content:"\f233"}
+.fa-microchip::before{content:"\f2db"}
+.fa-pause::before{content:"\f04c"}
+.fa-layer-group::before{content:"\f5fd"}
+.fa-arrow-right::before{content:"\f061"}
+.fa-arrow-left::before{content:"\f060"}
+.fa-circle-nodes::before{content:"\e4e2"}
+.fa-sliders::before{content:"\f1de"}
+.fa-flask::before{content:"\f0c3"}
+.fa-ellipsis::before{content:"\f141"}
+.fa-gauge-high::before{content:"\f625"}
+.fa-play::before{content:"\f04b"}
+.fa-magnifying-glass::before{content:"\f002"}
+.fa-code-compare::before{content:"\e13a"}
+.fa-plus::before{content:"\2b"}
+.fa-xmark::before{content:"\f00d"}
+.fa-rotate::before{content:"\f2f1"}
+.fa-clock-rotate-left::before{content:"\f1da"}
+.fa-check::before{content:"\f00c"}
+.fa-triangle-exclamation::before{content:"\f071"}
+.fa-database::before{content:"\f1c0"}
+.fa-github::before{content:"\f09b"}

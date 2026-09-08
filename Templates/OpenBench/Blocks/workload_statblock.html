@@ -1,0 +1,10 @@
+{% load mytags %}
+        <!-- Elo, (SPRT/LRR if SPRT, otherwise CONF), Games -->
+        {% if type == "TEST" %}
+            <pre class="long-statblock" id="long-statblock">{{workload|longStatBlock|linebreaksbr}}</pre>
+        {% elif type == "TUNE" %}
+            <pre class="long-statblock" id="long-statblock">{{workload|shortStatBlock|linebreaksbr}}</pre>
+        {% elif type == "DATAGEN" %}
+            <pre class="long-statblock" id="long-statblock">{{workload|longStatBlock|linebreaksbr}}</pre>
+        {% endif %}
+

@@ -2,15 +2,15 @@
 
 {% block content %}
 
-    <form method="POST" action="/login/">
+    <form class="auth-form" method="POST" action="/login/">
         {% csrf_token %}
         <div class="form">
             <div class="col">
                 <div class="row">
-                    <label type="text">Username</label> <input type="text" name="username"><br>
+                    <label for="username">Username</label><input id="username" type="text" name="username" autocomplete="username" required><br>
                 </div>
                 <div class="row">
-                    <label type="text">Password</label> <input type="password" name="password"><br>
+                    <label for="password">Password</label><input id="password" type="password" name="password" autocomplete="current-password" required><br>
                 </div>
                 <input type="submit" name="submit" value="Login" class="anchorbutton btn-blue w-100">
             </div>

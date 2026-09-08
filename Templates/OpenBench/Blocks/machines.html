@@ -1,0 +1,40 @@
+{% load mytags %}
+<section class="panel"><div class="panel-heading"><h2>Connected machines <span class="count-badge">{{ machines|length }}</span></h2><span class="panel-meta">Active in the last 2 minutes</span></div><div class="table-scroll">
+
+    <table class="hoverable">
+
+        <tr class="table-header">
+            <th>#</th>
+            <th>User</th>
+            <th>Name</th>
+            <th>System</th>
+            <th>ISA</th>
+            <th>Workload</th>
+            <th>Threads</th>
+            <th>NPS</th>
+        </tr>
+
+        {% for machine in machines %}
+            <tr>
+                <td class="numeric"><a href="/machines/{{machine.id}}/">{{machine.id}}</a></td>
+                <td>{{machine.user.username|capfirst}}</td>
+                <td>{{machine.info.machine_name}}</td>
+                <td>{{machine.info.os_name}}</td>
+                <td>{{machine.info.isa_name}}</td>
+                <td>
+                    {% if machine.current_workload %}
+                        <a href="{{machine.current_workload|workload_url}}">
+                            {{machine.current_workload|workload_pretty_name}}
+                        </a>
+                    {% else %}
+                        None
+                    {% endif %}
+                </td>
+                <td class="numeric">{{machine.info.concurrency}}</td>
+                <td class="numeric">{{machine.dev_mnps|twoDigitPrecision}}M / {{machine.base_mnps|twoDigitPrecision}}M</td>
+            </tr>
+        {% empty %}<tr><td colspan="8"><div class="empty-state"><strong>No machines connected</strong><p>Workers appear here when they connect to this server.</p></div></td></tr>{% endfor %}
+
+    </table>
+
+</div></section>

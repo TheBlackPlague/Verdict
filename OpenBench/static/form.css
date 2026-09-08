@@ -1,137 +1,59 @@
-#content .form .col-half {
-    display: inline-block;
-    width: 25%;
-    white-space: normal;
-    box-sizing: border-box;
-    vertical-align: top;
+/*
+ * @generated
+ * Machine-generated CSS. Manual edits are not recommended.
+ */
+#content .form{width:100%}
+#content .form .col{display:inline-block;vertical-align:top;width:calc(50% - 3px);padding:0 12px}
+#content .form .col-half{display:inline-block;width:25%;vertical-align:top;padding:0 10px}
+#content .form .col-full{display:block;width:100%}
+#content form{max-width:100%}
+#content .form h3{color:var(--ink);font-size:1rem;margin:16px 0 12px;padding-bottom:7px;border-bottom:1px solid var(--line)}
+#content .form .row{display:flex;align-items:center;margin-bottom:9px;gap:10px}
+#content .row label{font-size:.9rem;width:112px;flex-shrink:0;color:var(--muted)}
+#content .row input,#content .row select,#content .row textarea{flex:1;width:100%;min-width:0;padding:5px 8px;border:1px solid #484b50;border-radius:3px;background:#202225;color:var(--ink);font-size:.9rem;resize:vertical;min-height:31px}
+#content .row input:focus,#content .row select:focus,#content .row textarea:focus{outline:1px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+#content .row input::placeholder,#content .row textarea::placeholder{color:#929496}
+#content .row input[readonly]{color:var(--muted)}
+#content input[type="checkbox"],#content input[type="radio"]{accent-color:var(--accent);min-height:16px;width:16px;height:16px;flex:0 0 auto}
+#content .row input[type="file"]{padding:4px}
+#content input[type="file"]::file-selector-button{background:#35383c;border:1px solid #55595e;border-radius:3px;color:var(--ink);padding:3px 7px;margin-right:8px;cursor:pointer}
+#content .form .flex{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+#content .form .flex button{max-width:100%}
+#content .form .workflow-edit{flex-direction:column;align-items:stretch;gap:4px}
+#content .workflow-edit label{width:auto}
+#content .workload-edit .col-full{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 10px}
+#content .workload-edit .notes-field{grid-column:1/-1}
+#content .workload-edit input[type="submit"]{width:auto;justify-self:start;grid-column:1/-1}
+#engines-container span{display:inline-flex;align-items:center;gap:6px;margin:3px 10px 3px 0;font-size:.9rem}
+#content .auth-form{max-width:430px;margin:30px auto;padding:20px;background:var(--surface);border:1px solid var(--line);border-radius:4px}
+#content .auth-form .form .col{width:100%;padding:0}
+#content .auth-form .row{display:flex;flex-direction:column;align-items:stretch;gap:5px}
+#content .auth-form label{width:auto}
+#content .auth-form br{display:none}
+#content .auth-form .anchorbutton{margin-top:8px}
+#content .form-page{background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:4px 8px 16px}
+#content .form-page>.form>.col-full{padding:0 12px}
+#content .search-form{padding-top:12px}
+#content .search-form .form>.col{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 18px;width:100%}
+#content .search-form .row{flex-direction:column;align-items:stretch;gap:4px}
+#content .search-form .row label{width:auto}
+#content .search-form .row input,#content .search-form .row select{max-width:100%;margin-right:0;flex:none}
+#content .search-form br,#content .search-form hr{display:none}
+#content .search-form .status-filters{grid-column:1/-1;margin:6px 0 12px}
+#content .search-form input[type="submit"]{grid-column:1/-1;width:auto;justify-self:start}
+@media(max-width:1050px){
+    #content .form .col{width:100%}
+    #content .form .col-half{width:50%}
 }
-
-#content .form .col {
-    display: inline-block;
-    width: 50%;
-    white-space: normal;
-    margin-left: 0;
-    box-sizing: border-box;
-    vertical-align: top;
+@media(max-width:700px){
+    #content .search-form .form>.col{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-
-#content .form .col-full {
-    display: block;
-    width: 100%;
-    white-space: normal;
-    margin-left: 0;
-    box-sizing: border-box;
-    vertical-align: top;
-}
-
-/* Styles for screen widths less than 600px */
-
-@media (max-width: 1024px) {
-    #content .form .col {
-        display: block;
-        width: 100%;
-    }
-}
-
-#content .form h3 {
-    font-size: 14px;
-    color: var(--color-font3);
-    text-align: left;
-    padding-left: 1.5rem;
-}
-
-#content .form .row {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.25rem;
-}
-
-#content .row label {
-    font-size: 13px;
-    width: 25%;
-    min-width: 128px;
-    margin-right: 1rem;
-    text-align: right;
-    color: var(--color-font2)
-}
-
-
-#content .row input, #content .row select, #content .row textarea {
-    flex-grow: 1;
-    min-width: 0;
-    border: 1px solid var(--color3);
-    border-radius: 4px;
-    padding: 9px 6px 6px;
-    background-color: var(--color2);
-    color: var(--color-font2);
-    font-family: "Courier Prime", serif;
-    resize: vertical;
-}
-
-#content .row input[type="file"]{
-    padding: 2px 2px;
-}
-
-#content .row input:focus, #content .row select:focus, #content .row textarea:focus {
-    outline: none;
-    border-color: var(--color3);
-    box-shadow: 0 0 0 2px rgba(77, 144, 254, 0.75);
-    background-color: var(--color2);
-    color: var(--color-font2);
-}
-
-#content .row select > option{
-    font-family: "Helvetica", serif;
-}
-
-#content .row input[type="file"]::file-selector-button {
-    background-color: var(--color3);
-    border: 1px solid var(--color2);
-    border-radius: 4px;
-    padding: 6px 6px 3px;
-    color: var(--color-font2);
-    cursor: pointer;
-    transition: background-color 0.3s, border-color 0.3s;
-    font-family: "Courier Prime", serif;
-}
-
-#content .row input[type="file"]::file-selector-button:hover {
-    background-color: rgba(77, 144, 254, 0.8);
-    border-color: var(--color2);
-}
-
-#content .row input[readonly] {
-    color: var(--color-font1);
-}
-
-#content .form .flex {
-    display: flex;
-    flex-wrap: wrap;
-    max-width: 100%;
-    justify-content: flex-start;
-}
-
-#content .form .flex button{
-    max-width: 100%;
-}
-
-#content #engines-container span {
-    margin: 0px 4px 0px 4px;
-    cursor: pointer;
-}
-
-#content #engines-container span input {
-    cursor: pointer;
-}
-
-#content .form .workflow-edit {
-    flex-direction: column;
-    align-items: stretch;
-    margin-bottom: 0.6rem;
-}
-
-#content .form .workflow-edit label {
-    width: 100%;
-    text-align: left;
-    margin-bottom: 0.15rem;
+@media(max-width:600px){
+    #content .form .row{flex-direction:column;align-items:stretch;gap:4px}
+    #content .row label{width:auto}
+    #content .form .col,#content .form .col-half{width:100%;padding:0}
+    #content .auth-form{padding:18px}
+    #content .form-page{padding:8px 12px 16px}
+    #content .form-page>.form>.col-full{padding:0}
+    #content .row select.mw-20{max-width:100%}
 }

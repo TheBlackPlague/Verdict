@@ -4,16 +4,21 @@
 
 {% block content %}
 
-    <table class="hoverable">
+    <div class="panel directory-panel">
+    <div class="table-scroll">
+    <table class="hoverable directory-table errors-table" aria-label="Errors">
+        <thead>
 
         <tr class="table-header">
-            <th>Date</th>
-            <th>#</th>
-            <th>User</th>
-            <th>Test</th>
-            <th>Summary</th>
-            <th>Logs</th>
+            <th scope="col">Date</th>
+            <th scope="col">Machine</th>
+            <th scope="col">User</th>
+            <th scope="col">Test</th>
+            <th scope="col">Summary</th>
+            <th scope="col">Logs</th>
         </tr>
+        </thead>
+        <tbody>
 
         {% for event in events %}
             <tr>
@@ -22,11 +27,14 @@
                 <td>{{event.author|capfirst}}</td>
                 <td><a href="{{event.test_id|workload_url}}">{{event.test_id|testIdToPrettyName}}</a></td>
                 <td>{{event.summary}}</td>
-                <td>{% if event.log_file %}<a href='/event/{{event.id}}'>View</a>{% endif %}</td>
+                <td>{% if event.log_file %}<a class="button log-link" href='/event/{{event.id}}' aria-label="View log for event {{event.id}}">View log</a>{% endif %}</td>
             </tr>
-        {% endfor %}
+        {% empty %}<tr><td colspan="6"><div class="empty-state"><strong>No errors to display</strong></div></td></tr>{% endfor %}
 
-    <table>
+        </tbody>
+    </table>
+    </div>
+    </div>
 
     {% include "OpenBench/Blocks/pagebrowser.html" %}
 

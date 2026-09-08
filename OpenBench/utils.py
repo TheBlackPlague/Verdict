@@ -178,19 +178,19 @@ def extract_option(options, option):
 
 
 def get_pending_tests():
-    t = Test.objects.select_related('dev', 'base').filter(approved=False)
+    t = Test.objects.select_related('dev', 'base', 'spsa_run').filter(approved=False)
     t = t.exclude(finished=True)
     t = t.exclude(deleted=True)
     return t.order_by('-creation')
 
 def get_active_tests():
-    t = Test.objects.select_related('dev', 'base').filter(approved=True)
+    t = Test.objects.select_related('dev', 'base', 'spsa_run').filter(approved=True)
     t = t.exclude(finished=True)
     t = t.exclude(deleted=True)
     return t.order_by('-priority', '-currentllr')
 
 def get_completed_tests():
-    t = Test.objects.select_related('dev', 'base').filter(finished=True)
+    t = Test.objects.select_related('dev', 'base', 'spsa_run').filter(finished=True)
     t = t.exclude(deleted=True)
     return t.order_by('-updated')
 
@@ -209,6 +209,18 @@ def getRecentMachines(minutes=2):
     target = target - datetime.timedelta(minutes=minutes)
     return Machine.objects.filter(updated__gte=target)
 
+def get_fleet_stats(username=None):
+    machines = getRecentMachines()
+    if username is not None:
+        machines = machines.filter(user__username=username)
+    machines = list(machines.only('info', 'mnps'))
+    return {
+        'machines': len(machines),
+        'threads': sum(m.info.get('concurrency', 0) for m in machines),
+        'mnps': sum(m.info.get('concurrency', 0) * m.mnps for m in machines),
+    }
+
+
 def getMachineStatus(username=None):
 
     machines = getRecentMachines()
@@ -223,8 +235,9 @@ def getMachineStatus(username=None):
 def getPaging(content, page, url, pagelen=25):
 
     start = max(0, pagelen * (page - 1))
-    end   = min(content.count(), pagelen * page)
-    count = 1 + math.ceil(content.count() / pagelen)
+    total = content.count()
+    end   = min(total, pagelen * page)
+    count = 1 + math.ceil(total / pagelen)
 
     part1 = list(range(1, min(4, count)))
     part2 = list(range(page - 2, page + 1))
@@ -405,6 +418,15 @@ def update_test(request, machine):
         if test.finished or test.deleted:
             return { 'stop' : True }
 
+        # Record only real observations while holding the existing Test lock.
+        # An older workload starts at its current state, never an invented path
+        # from zero. Empty reports do not create or duplicate samples.
+        history = None
+        if test.test_mode == 'SPRT' and games > 0:
+            history = test.llr_history.order_by('-games').first()
+            if history is None:
+                history = LLRHistory.objects.create(test=test, games=test.games, llr=test.currentllr)
+
         test.losses += losses # Trinomial
         test.draws  += draws
         test.wins   += wins
@@ -460,6 +482,9 @@ def update_test(request, machine):
             test.passed = test.finished = test.games >= test.max_games
 
         test.save()
+
+        if history is not None and (test.finished or test.games - history.games >= LLRHistory.SAMPLE_GAMES):
+            LLRHistory.objects.create(test=test, games=test.games, llr=test.currentllr)
 
         # Update Result object; No risk from concurrent access
         Result.objects.filter(id=result_id).update(

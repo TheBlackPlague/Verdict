@@ -4,15 +4,20 @@
 
 {% block content %}
 
-    <table class="hoverable">
+    <div class="panel directory-panel">
+    <div class="table-scroll">
+    <table class="hoverable directory-table events-table" aria-label="Activity">
+        <thead>
 
         <tr class="table-header">
-            <th>Date</th>
-            <th>User</th>
-            <th>Test</th>
-            <th>TC</th>
-            <th>Summary</th>
+            <th scope="col">Date</th>
+            <th scope="col">User</th>
+            <th scope="col">Test</th>
+            <th scope="col">TC</th>
+            <th scope="col">Summary</th>
         </tr>
+        </thead>
+        <tbody>
 
         {% for event in events %}
             <tr>
@@ -22,9 +27,12 @@
                 <td>{{event.test_id|testIdToTimeControl}}</td>
                 <td>{{event.summary}}</td>
             </tr>
-        {% endfor %}
+        {% empty %}<tr><td colspan="5"><div class="empty-state"><strong>No activity to display</strong></div></td></tr>{% endfor %}
 
-    <table>
+        </tbody>
+    </table>
+    </div>
+    </div>
 
     {% include "OpenBench/Blocks/pagebrowser.html" %}
 

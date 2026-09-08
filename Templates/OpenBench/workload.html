@@ -11,166 +11,108 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            fetch_summary({{workload.id}});
+            start_workload_updates({{workload.id}});
         });
     </script>
 
 {% endblock %}
 
 {% block content %}
+    <div id="workload-metrics-live">{% include "OpenBench/Blocks/workload_metrics.html" %}</div>
 
-    <div class="workload-container">
+    <div class="workload-container" data-workload-id="{{ workload.id }}">
 
-    <div id="config" style="display: block; overflow-x: auto;">
-        <table class="test-config left-align wrappable" style="table-layout: auto; width: 100%;">
-
-            <tr><td class="td-label">Author</td><td>{{workload.author|capfirst}}</td></tr>
-            <tr><td class="td-label">Creation</td><td class="timestamp">{{workload.creation|date:'U'}}</td></tr>
-
-            <!-- All of the Dev Engine ( or Sole Engine ) information -->
-            <tr><td class="td-label">{{dev_text}} Source</td><td><a href="{{workload.dev_repo}}">{{workload.dev_repo}}</a></td></tr>
-            <tr><td class="td-label">{{dev_text}} Sha</td><td>{{workload.dev.sha}}</td></tr>
-            <tr><td class="td-label">{{dev_text}} Branch</td><td class="branch_name">{{workload.dev.name|prettyName}}</td></tr>
-            <tr><td class="td-label">{{dev_text}} Bench</td><td>{{workload.dev.bench}}</td></tr>
-            <tr><td class="td-label">{{dev_text}} Network</td><td><a href="{{workload|network_download_link:'dev'}}">{{workload.dev_netname}}</td></tr>
-            <tr><td class="td-label">{{dev_text}} Options</td><td class="engine-options">{{workload.dev_options}}</td></tr>
-            <tr><td class="td-label">{{dev_text}} Time</td><td>{{workload.dev_time_control}}</td></tr>
-
-            <!-- All of the Base Engine information, which only exists for TESTs -->
-            {% if type == "TEST" or type == "DATAGEN" %}
-                <tr><td class="td-label">Base Source</td><td><a href="{{workload.base_repo}}">{{workload.base_repo}}</a></td></tr>
-                <tr><td class="td-label">Base Sha</td><td>{{workload.base.sha}}</td></tr>
-                <tr><td class="td-label">Base Branch</td><td class="branch_name">{{workload.base.name|prettyName}}</td></tr>
-                <tr><td class="td-label">Base Bench</td><td>{{workload.base.bench}}</td></tr>
-                <tr><td class="td-label">Base Network</td><td><a href="{{workload|network_download_link:'base'}}">{{workload.base_netname}}</td></tr>
-                <tr><td class="td-label">Base Options</td><td class="engine-options">{{workload.base_options}}</td></tr>
-                <tr><td class="td-label">Base Time</td><td>{{workload.base_time_control}}</td></tr>
-            {% endif %}
-
-            {% if workload|book_download_link %}
-                <tr><td class="td-label">Opening Book</td><td><a href="{{workload|book_download_link}}">{{workload.book_name}}</a></td></tr>
-            {% else %}
-                <tr><td class="td-label">Opening Book</td><td><a>{{workload.book_name}}</a></td></tr>
-            {% endif %}
-
-            <tr><td class="td-label">Upload PGNs</td><td>{{workload.upload_pgns}}</td></tr>
-            <tr><td class="td-label">Syzygy WDL</td><td>{{workload.syzygy_wdl}}</td></tr>
-            <tr><td class="td-label">Syzygy ADJ.</td><td>{{workload.syzygy_adj}}</td></tr>
-            <tr><td class="td-label">Win ADJ.</td><td>{{workload.win_adj}}</td></tr>
-            <tr><td class="td-label">Draw ADJ.</td><td>{{workload.draw_adj}}</td></tr>
-            <tr><td class="td-label">Scaling</td><td>{{workload.scale_method}} {{workload.scale_nps}} NPS</td></tr>
-
+    <section id="config" aria-label="Workload configuration">
+        <div class="panel-heading"><h2>Configuration</h2><span class="panel-meta"><a href="/user/{{workload.author}}/">{{workload.author}}</a> · <span class="timestamp">{{workload.creation|date:'U'}}</span></span></div>
+        <table class="test-config engine-comparison">
+            <thead><tr><th scope="col">Setting</th><th scope="col">{{dev_text|default:"Engine"}}{% if type != "TUNE" %}</th><th scope="col">Base{% endif %}</th></tr></thead>
+            <tbody>
+            <tr><th scope="row">Engine</th><td >{{workload.dev_engine}}</td>{% if type != "TUNE" %}<td >{{workload.base_engine}}</td>{% endif %}</tr>
+            <tr><th scope="row">Source</th><td ><a href="{{workload.dev_repo}}">{{workload.dev_repo}}</a></td>{% if type != "TUNE" %}<td ><a href="{{workload.base_repo}}">{{workload.base_repo}}</a></td>{% endif %}</tr>
+            <tr><th scope="row">Revision</th><td class="revision">{{workload.dev.sha}}</td>{% if type != "TUNE" %}<td class="revision">{{workload.base.sha}}</td>{% endif %}</tr>
+            <tr><th scope="row">Branch</th><td class="branch_name">{{workload.dev.name|prettyName}}</td>{% if type != "TUNE" %}<td class="branch_name">{{workload.base.name|prettyName}}</td>{% endif %}</tr>
+            <tr><th scope="row">Bench</th><td >{{workload.dev.bench}}</td>{% if type != "TUNE" %}<td >{{workload.base.bench}}</td>{% endif %}</tr>
+            <tr><th scope="row">Network</th><td >{% if workload.dev_netname %}<a href="{{workload|network_download_link:'dev'}}">{{workload.dev_netname}}</a>{% else %}—{% endif %}</td>{% if type != "TUNE" %}<td >{% if workload.base_netname %}<a href="{{workload|network_download_link:'base'}}">{{workload.base_netname}}</a>{% else %}—{% endif %}</td>{% endif %}</tr>
+            <tr><th scope="row">Options</th><td class="engine-options">{{workload.dev_options}}</td>{% if type != "TUNE" %}<td class="engine-options">{{workload.base_options}}</td>{% endif %}</tr>
+            <tr><th scope="row">Time control</th><td >{{workload.dev_time_control}}</td>{% if type != "TUNE" %}<td >{{workload.base_time_control}}</td>{% endif %}</tr>
+            <tr><th scope="row" class="td-label">Opening book</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{% if workload|book_download_link %}<a href="{{workload|book_download_link}}">{{workload.book_name}}</a>{% else %}{{workload.book_name}}{% endif %}</td></tr>
+            <tr><th scope="row" class="td-label">Upload PGNs</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.upload_pgns}}</td></tr>
+            <tr><th scope="row" class="td-label">Scaling</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.scale_method}} {{workload.scale_nps}} NPS</td></tr>
+            <tr><th scope="row" class="td-label">Syzygy WDL</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.syzygy_wdl}}</td></tr>
+            <tr><th scope="row" class="td-label">Syzygy ADJ.</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.syzygy_adj}}</td></tr>
+            <tr><th scope="row" class="td-label">Win ADJ.</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.win_adj}}</td></tr>
+            <tr><th scope="row" class="td-label">Draw ADJ.</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.draw_adj}}</td></tr>
             {% if type == "TUNE" %}
-                <tr><td class="td-label">Alpha</td><td>{{workload.spsa_run.alpha}}</td></tr>
-                <tr><td class="td-label">Gamma</td><td>{{workload.spsa_run.gamma}}</td></tr>
-                <tr><td class="td-label">A-Ratio</td><td>{{workload.spsa_run.a_ratio}}</td></tr>
-                <tr><td class="td-label">Reporting</td><td>{{workload.spsa_run.reporting_type}}</td></tr>
-                <tr><td class="td-label">Distribution</td><td>{{workload.spsa_run.distribution_type}}</td></tr>
-                <tr><td class="td-label">Pairs Per Point</td><td>{{workload.workload_size}}</td></tr>
+            <tr><th scope="row" class="td-label">Alpha</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.spsa_run.alpha}}</td></tr>
+            <tr><th scope="row" class="td-label">Gamma</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.spsa_run.gamma}}</td></tr>
+            <tr><th scope="row" class="td-label">A-Ratio</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.spsa_run.a_ratio}}</td></tr>
+            <tr><th scope="row" class="td-label">Pairs per point</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.workload_size}}</td></tr>
+            <tr><th scope="row" class="td-label">Reporting</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.spsa_run.reporting_type}}</td></tr>
+            <tr><th scope="row" class="td-label">Distribution</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.spsa_run.distribution_type}}</td></tr>
             {% elif type == "DATAGEN" %}
-                <tr><td class="td-label">Genfens Args</td><td>{{workload.genfens_args}}</td></tr>
-                <tr><td class="td-label">Play Reverses</td><td>{{workload.play_reverses}}</td></tr>
+            <tr><th scope="row" class="td-label">Genfens args</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.genfens_args}}</td></tr>
+            <tr><th scope="row" class="td-label">Play reverses</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.play_reverses}}</td></tr>
             {% endif %}
+        </tbody></table>
+    </section>
 
-        </table>
-    </div>
-
-    <div id="actions" class="ml-3">
+    <div id="actions">
 
         <!-- Dev vs Base [Git Diff Link] -->
         <h4><a href="{{workload|gitDiffLink}}">{{workload|git_diff_text}}</a></h4>
 
-        <div class="anchor-container">
+        <div id="workload-actions-live">{% include "OpenBench/Blocks/workload_actions.html" %}</div>
 
-            <!-- Approve Button: For Admins, or Cross-approvers -->
-            {% if not workload.approved and profile.approver and profile.user.username != workload.author %}
-                <a class="anchorbutton btn-blue" href="/{{type|lower}}/{{workload.id}}/APPROVE">Approve</a>
-            {% elif not workload.approved and request.user.is_superuser %}
-                <a class="anchorbutton btn-blue" href="/{{type|lower}}/{{workload.id}}/APPROVE">Approve</a>
-            {% else %}
-                <a class="anchorbutton btn-disabled">Approve</a>
-            {% endif %}
-
-            <!-- Restart Button: For Approvers or Workload Authors of finished workloads -->
-            {% if workload.finished and not workload.passed and not workload.failed and profile.approver %}
-                <a class="anchorbutton btn-yellow" href="/{{type|lower}}/{{workload.id}}/RESTART">Restart</a>
-            {% elif workload.finished and not workload.passed and not workload.failed and profile.user.username == workload.author %}
-                <a class="anchorbutton btn-yellow" href="/{{type|lower}}/{{workload.id}}/RESTART">Restart</a>
-            {% elif workload.finished %}
-                <a class="anchorbutton btn-disabled">Restart</a>
-            {% endif %}
-
-            <!-- Stop Button: For Approvers or Workload Authors of active workloads -->
-            {% if not workload.finished and profile.approver %}
-                <a class="anchorbutton btn-yellow" href="/{{type|lower}}/{{workload.id}}/STOP">Stop</a>
-            {% elif not workload.finished and profile.user.username == workload.author %}
-                <a class="anchorbutton btn-yellow" href="/{{type|lower}}/{{workload.id}}/STOP">Stop</a>
-            {% elif not workload.finished %}
-                <a class="anchorbutton btn-disabled">Stop</a>
-            {% endif %}
-
-            <!-- Delete/Restore Button: For Approvers or Workload Authors -->
-            {% if profile.approver or profile.user.username == workload.author %}
-                {% if workload.deleted %}
-                    <a class="anchorbutton btn-preset" href="/{{type|lower}}/{{workload.id}}/RESTORE">Restore</a>
-                {% else %}
-                    <a class="anchorbutton btn-red" href="/{{type|lower}}/{{workload.id}}/DELETE">Delete</a>
-                {% endif %}
-            {% else %}
-                {% if workload.deleted %}
-                    <a class="anchorbutton btn-disabled">Restore</a>
-                {% else %}
-                    <a class="anchorbutton btn-disabled">Delete</a>
-                {% endif %}
-            {% endif %}
-        </div>
-
+        <div class="workload-utilities">
         <!-- Copy Button: Copy the current results statblock -->
         {% if type == "TEST" or type == "DATAGEN" %}
-            <div class="anchor-container">
-                <a class="mt-1 anchorbutton btn-blue" onclick="copy_text_from_element('long-statblock', true)">Copy Stat Block</a>
+            <div>
+                <a class="anchorbutton" onclick="copy_text_from_element('long-statblock', true)">Copy Stat Block</a>
             </div>
         {% endif %}
 
         <!-- PGN Download Button -->
         {% if workload.upload_pgns != "FALSE" %}
-            <div class="anchor-container">
-                <a class="mt-1 anchorbutton btn-blue" href="/api/pgns/{{workload.id}}/">Download PGN Archive</a>
+            <div>
+                <a class="anchorbutton" href="/api/pgns/{{workload.id}}/">Download PGN Archive</a>
             </div>
         {% endif %}
 
         <!-- Copies Raw SPSA Input from /api/spsa/{{workload.id}}/inputs/ -->
         {% if type == "TUNE" %}
-            <div class="anchor-container">
-                <a class="mt-1 anchorbutton btn-blue" onclick="copy_spsa_inputs({{workload.id}})">Copy SPSA Inputs</a>
+            <div>
+                <a class="anchorbutton" onclick="copy_spsa_inputs({{workload.id}})">Copy SPSA Inputs</a>
             </div>
         {% endif %}
 
         <!-- Copies Optimal Values from /api/spsa/{{workload.id}}/outputs/ -->
         {% if type == "TUNE" %}
-            <div class="anchor-container">
-                <a class="mt-1 anchorbutton btn-blue" onclick="copy_spsa_outputs({{workload.id}})">Copy SPSA Outputs</a>
+            <div>
+                <a class="anchorbutton" onclick="copy_spsa_outputs({{workload.id}})">Copy SPSA Outputs</a>
             </div>
         {% endif %}
 
-        <!-- Elo, (SPRT/LRR if SPRT, otherwise CONF), Games -->
-        {% if type == "TEST" %}
-            <pre class="long-statblock" id="long-statblock">{{workload|longStatBlock|linebreaksbr}}</pre>
-        {% elif type == "TUNE" %}
-            <pre class="long-statblock" id="long-statblock">{{workload|shortStatBlock|linebreaksbr}}</pre>
-        {% elif type == "DATAGEN" %}
-            <pre class="long-statblock" id="long-statblock">{{workload|longStatBlock|linebreaksbr}}</pre>
-        {% endif %}
+        </div>
+        <div id="workload-statblock-live">{% include "OpenBench/Blocks/workload_statblock.html" %}</div>
+
+
+    {% if workload.test_mode == "SPRT" %}
+    <section id="llr-history" class="llr-history" aria-labelledby="llr-heading" data-lower="{{ workload.lowerllr }}" data-upper="{{ workload.upperllr }}">
+        <div class="panel-heading"><h2 id="llr-heading">LLR history</h2><span id="llr-history-caption" class="panel-meta">Loading recorded results…</span></div>
+        <div id="llr-history-chart"></div>
+        <p id="llr-history-readout" class="chart-readout" aria-live="off"></p>
+    </section>
+    {% endif %}
 
         <!-- Forum to modify the Priority, Throughput, or (Tests only) Workload Size -->
-        <form method="POST" action="/{{type|lower}}/{{workload.id}}/MODIFY/">
+        <form class="workload-edit" method="POST" action="/{{type|lower}}/{{workload.id}}/MODIFY/">
             {% csrf_token %}
             <div class="form">
                 <div class="col-full">
 
-                    <div class="row workflow-edit">
-                        <label for="info">Info</label>
-                        <textarea id="info" name="info" rows="4">{{workload.info}}</textarea>
+                    <div class="row workflow-edit notes-field">
+                        <label for="info">Notes</label>
+                        <textarea id="info" name="info" rows="2">{{workload.info}}</textarea>
                     </div>
 
                     <div class="row workflow-edit">
@@ -194,16 +136,18 @@
                     {% if profile.approver or profile.user.username == workload.author %}
                         <input class="anchorbutton btn-blue w-100" type="submit" name="submit" value="Modify">
                     {% else %}
-                        <input class="anchorbutton btn-disabled w-100" type="submit" name="submit" value="Modify">
+                        <input class="anchorbutton btn-disabled w-100" disabled type="submit" name="submit" value="Modify">
                     {% endif %}
                 </div>
             </div>
         </form>
+
+
     </div>
 
     <!-- SPSA Paramater Summary, for Tunes -->
     {% if type == "TUNE" %}
-        <div id="parameters" class="w-100 mt-3" style="float:left;">
+        <div id="parameters" class="w-100">
             <table class="stripes wrappable">
                 <thead>
                     <tr class="table-header">
@@ -233,9 +177,10 @@
     {% endif %}
 
     <!-- Aggregate pentanomial summary; fetched automatically on page load -->
-    <div id="summary-container" class="w-100 mt-3" style="float:left;"></div>
+    <section class="result-summary"><div class="panel-heading"><h2>Results by contributor, CPU & ISA</h2></div><div id="summary-container" class="w-100"></div></section>
 
-    <div id="results" class="w-100 mt-3" style="float:left;">
+    <div id="results" class="w-100">
+        <div class="panel-heading"><h2>Individual machine results</h2><button class="button" type="button" onclick="fetch_results({{workload.id}})">Fetch results</button></div>
         <table class="stripes wrappable">
             <tr class="table-header">
                 <th>#</th>
@@ -252,8 +197,7 @@
             </tbody>
         </table>
 
-        <!-- Individual per-machine results are only ever fetched on demand -->
-        <button class="w-100 mt-1 anchorbutton btn-blue" type="submit" onclick="fetch_results({{workload.id}})">Fetch Individual Results</button>
+
     </div>
 
     </div>

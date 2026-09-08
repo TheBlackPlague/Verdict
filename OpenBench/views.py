@@ -42,6 +42,9 @@ from OpenBench.models import *
 from django.contrib.auth.models import User
 from OpenSite.settings import MEDIA_ROOT
 
+from OpenBench.interface import is_live_request, presentation_context, live_response
+from django.utils.cache import patch_vary_headers
+
 from django.db import transaction
 from django.db.models import F, Q
 from django.http import HttpResponse, JsonResponse
@@ -70,31 +73,39 @@ def render(request, template, content={}, always_allow=False, error=None, warnin
     data.update({ 'config' : OPENBENCH_CONFIG })
     data.update({ 'static_version' : OPENBENCH_STATIC_VERSION })
 
+    live = is_live_request(request)
     if OPENBENCH_CONFIG['require_login_to_view']:
         if not request.user.is_authenticated and not always_allow:
-            return redirect(request, '/login/',  error=ERROR_MESSAGES['requires_login'])
+            if live:
+                response = JsonResponse({'error': ERROR_MESSAGES['requires_login']}, status=401)
+                response['Cache-Control'] = 'no-store'
+                return response
+            return redirect(request, '/login/', error=ERROR_MESSAGES['requires_login'])
 
     if request.user.is_authenticated:
+        profile = Profile.objects.filter(user=request.user).first()
+        data['profile'] = profile
+        if not live:
+            if profile and not profile.enabled:
+                request.session['error_message'] = ERROR_MESSAGES['disabled']
+            elif not profile:
+                request.session['error_message'] = ERROR_MESSAGES['fakeuser']
 
-        profile = Profile.objects.filter(user=request.user)
-        data.update({'profile' : profile.first()})
-
-        if profile.first() and not profile.first().enabled:
-            request.session['error_message'] = ERROR_MESSAGES['disabled']
-
-        elif request.user.is_authenticated and not profile.first():
-            request.session['error_message'] = ERROR_MESSAGES['fakeuser']
+    data.update(presentation_context(template, data))
+    if live:
+        return live_response(request, template, data)
 
     if error:
         request.session['error_message'] = error
 
     if warning:
-        request.session['warning_message'] = error
+        request.session['warning_message'] = warning
 
     if status:
         request.session['status_message'] = status
 
     response = django.shortcuts.render(request, 'OpenBench/{0}'.format(template), data)
+    patch_vary_headers(response, ['Cookie', 'X-Verdict-Live'])
 
     for key in ['status_message', 'warning_message', 'error_message']:
         if key in request.session: del request.session[key]
@@ -263,9 +274,9 @@ def profile_config(request):
 
 def index(request, page=1):
 
-    pending   = OpenBench.utils.get_pending_tests()
-    active    = OpenBench.utils.get_active_tests()
-    completed = OpenBench.utils.get_completed_tests()
+    pending   = OpenBench.utils.get_pending_tests().prefetch_related('spsa_run__parameters')
+    active    = OpenBench.utils.get_active_tests().prefetch_related('spsa_run__parameters')
+    completed = OpenBench.utils.get_completed_tests().prefetch_related('spsa_run__parameters')
 
     start, end, paging = OpenBench.utils.getPaging(completed, int(page), 'index')
 
@@ -274,16 +285,17 @@ def index(request, page=1):
         'active'    : OpenBench.utils.group_active_tests_by_priority(active),
         'completed' : completed[start:end],
         'paging'    : paging,
-        'status'    : OpenBench.utils.getMachineStatus(),
+        'fleet'     : OpenBench.utils.get_fleet_stats(),
+        'active_count': len(active),
     }
 
     return render(request, 'index.html', data)
 
 def user(request, username, page=1):
 
-    pending   = OpenBench.utils.get_pending_tests().filter(author=username)
-    active    = OpenBench.utils.get_active_tests().filter(author=username)
-    completed = OpenBench.utils.get_completed_tests().filter(author=username)
+    pending   = OpenBench.utils.get_pending_tests().prefetch_related('spsa_run__parameters').filter(author=username)
+    active    = OpenBench.utils.get_active_tests().prefetch_related('spsa_run__parameters').filter(author=username)
+    completed = OpenBench.utils.get_completed_tests().prefetch_related('spsa_run__parameters').filter(author=username)
 
     start, end, paging = OpenBench.utils.getPaging(completed, int(page), 'user/%s' % (username))
 
@@ -292,14 +304,15 @@ def user(request, username, page=1):
         'active'    : OpenBench.utils.group_active_tests_by_priority(active),
         'completed' : completed[start:end],
         'paging'    : paging,
-        'status'    : OpenBench.utils.getMachineStatus(username),
+        'fleet'     : OpenBench.utils.get_fleet_stats(username),
+        'active_count': len(active),
     }
 
     return render(request, 'index.html', data)
 
 def greens(request, page=1):
 
-    completed = OpenBench.utils.get_completed_tests().filter(passed=True)
+    completed = OpenBench.utils.get_completed_tests().prefetch_related('spsa_run__parameters').filter(passed=True)
     start, end, paging = OpenBench.utils.getPaging(completed, int(page), 'greens')
 
     data = { 'completed' : completed[start:end], 'paging' : paging }
@@ -313,7 +326,7 @@ def search(request):
     if not (params := request.GET):
         return render(request, 'search.html', {})
 
-    tests  = Test.objects.all()
+    tests = Test.objects.select_related('dev', 'base', 'spsa_run').prefetch_related('spsa_run__parameters')
 
     # Optional field-based filters, defaulting to no restriction
 
@@ -445,7 +458,7 @@ def search(request):
 
 def users(request):
 
-    data = { 'profiles' : Profile.objects.order_by('-games', '-tests') }
+    data = { 'profiles' : Profile.objects.select_related('user').order_by('-games', '-tests') }
     return render(request, 'users.html', data)
 
 def event(request, pk):
@@ -475,7 +488,11 @@ def events_errors(request, page=1):
 def machines(request, pk=None):
 
     if pk == None:
-        data = { 'machines' : OpenBench.utils.getRecentMachines() }
+        recent = list(OpenBench.utils.getRecentMachines().select_related('user'))
+        workloads = Test.objects.filter(id__in=[m.workload for m in recent]).select_related('dev').in_bulk()
+        for machine in recent:
+            machine.current_workload = workloads.get(machine.workload)
+        data = { 'machines': recent }
         return render(request, 'machines.html', data)
 
     try:
@@ -495,7 +512,7 @@ def workload(request, workload_type, pk, action=None):
     if action != None:
         return modify_workload(request, pk, action)
 
-    if not (workload := Test.objects.select_related('spsa_run').filter(id=int(pk)).first()):
+    if not (workload := Test.objects.select_related('dev', 'base', 'spsa_run').prefetch_related('spsa_run__parameters').filter(id=int(pk)).first()):
         return redirect(request, '/index/', error='No such Workload exists')
 
     # Trying to view a Tune as a Test, for example
@@ -1026,5 +1043,55 @@ def api_workload(request, workload_id, query):
     if query == 'summary':
         return api_response({ 'summary' : fetch_result_summaries(workload) })
 
-    valid_endpoints = [ 'results', 'info', 'summary' ]
+    if query == 'llr':
+        if workload.test_mode != 'SPRT':
+            return api_response({ 'error': 'LLR history is only available for SPRT workloads' })
+
+        # Read the current state first, then exclude any samples committed by
+        # a worker after that read, so each response has a consistent endpoint.
+        history = workload.llr_history.filter(games__lte=workload.games)
+        count = history.count()
+        downsampled = count > 768
+        if not downsampled:
+            points = list(history.values('games', 'llr'))
+        else:
+            # Keep both extrema of every game-range bucket. Streaming avoids
+            # loading an entire long-running test's history into memory.
+            first = history.values('games', 'llr').first()
+            span = max(1, workload.games - first['games'] + 1)
+            buckets = {}
+            for point in history.values('games', 'llr').iterator(chunk_size=1024):
+                bucket = min(383, (point['games'] - first['games']) * 384 // span)
+                low, high = buckets.get(bucket, (point, point))
+                if point['llr'] < low['llr']:
+                    low = point
+                if point['llr'] > high['llr']:
+                    high = point
+                buckets[bucket] = low, high
+            selected = {first['games']: first}
+            for extremes in buckets.values():
+                selected.update((point['games'], point) for point in extremes)
+            points = sorted(selected.values(), key=lambda point: point['games'])
+
+        # Always show the actual current result, including between persisted
+        # samples or for a legacy test with no recorded history at all.
+        current = {'games': workload.games, 'llr': workload.currentllr}
+        if points and points[-1]['games'] == workload.games:
+            points[-1] = current
+        else:
+            points.append(current)
+        return JsonResponse({
+            'points': points,
+            'lowerBound': workload.lowerllr,
+            'upperBound': workload.upperllr,
+            'currentGames': workload.games,
+            'currentLLR': workload.currentllr,
+            'startGames': points[0]['games'],
+            'partial': points[0]['games'] > 0,
+            'finished': workload.finished,
+            'sampleGames': LLRHistory.SAMPLE_GAMES,
+            'downsampled': downsampled,
+        })
+
+    valid_endpoints = [ 'results', 'info', 'summary', 'llr' ]
     return api_response({ 'error' : 'Valid /query/ endpoints are: [ %s ]' % (', '.join(valid_endpoints)) })

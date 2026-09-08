@@ -29,7 +29,7 @@
 
 {% block content %}
 
-    <form method="post" enctype="multipart/form-data" id="network-form">
+    <form class="form-page" method="post" enctype="multipart/form-data" id="network-form">
         {% csrf_token %}
         <div class="form">
              <div class="col">
@@ -56,6 +56,6 @@
                 <input type="submit" class="anchorbutton btn-blue w-100" value="Upload">
             </div>
         </div>
-    <form>
+    </form>
 
 {% endblock %}

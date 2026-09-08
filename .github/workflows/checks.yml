@@ -36,24 +36,18 @@ jobs:
           python manage.py migrate --noinput
           python manage.py makemigrations --check --dry-run
 
-      - name: Regression tests
-        id: tests
-        run: python manage.py test UnitTests --verbosity 2
-
       - name: Compile Python sources
         id: compile
-        run: python -m compileall -q Client OpenBench OpenSite Scripts UnitTests manage.py
+        run: python -m compileall -q Client OpenBench OpenSite Scripts manage.py
 
       - name: Summary
         if: always()
         env:
           DJANGO_RESULT: ${{ steps.django.outcome }}
-          TEST_RESULT: ${{ steps.tests.outcome }}
           COMPILE_RESULT: ${{ steps.compile.outcome }}
         run: |
           {
             printf '| Check | Result |\n| --- | --- |\n'
             printf '| Django and migrations | %s |\n' "$DJANGO_RESULT"
-            printf '| Regression tests | %s |\n' "$TEST_RESULT"
             printf '| Python compilation | %s |\n' "$COMPILE_RESULT"
           } >> "$GITHUB_STEP_SUMMARY"

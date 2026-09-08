@@ -2,7 +2,7 @@ name: Container Images
 
 on:
   push:
-    branches: [master, sync-with-upstream]
+    branches: [master]
     paths:
       - ".github/workflows/**"
       - "Docker/**"
@@ -14,13 +14,11 @@ on:
       - "Engines/**"
       - "Books/**"
       - "Scripts/**"
-      - "UnitTests/**"
       - "manage.py"
       - "requirements.txt"
       - "LICENSE"
   pull_request:
-    branches: [master, sync-with-upstream]
-  workflow_dispatch:
+    branches: [master]
 
 permissions:
   contents: read
@@ -68,7 +66,7 @@ jobs:
           tag="${branch:-image}-${GITHUB_SHA:0:16}"
           {
             printf 'tags<<EOF\n%s:%s\n' "$name" "$tag"
-            # Staging branches and PRs must never overwrite the stable image.
+            # Only master pushes publish the stable image.
             if [[ "$EVENT" != 'pull_request' && "$GITHUB_REF" == 'refs/heads/master' ]]; then
               printf '%s:latest\n' "$name"
             fi

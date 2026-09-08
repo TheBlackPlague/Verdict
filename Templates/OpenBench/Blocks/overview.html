@@ -1,0 +1,36 @@
+{% load mytags %}
+{% if fleet %}
+<div class="fleet-strip" aria-label="Server statistics">
+    <span><strong>{{ active_count|insertCommas }}</strong> active</span>
+    <span><strong>{{ pending|length }}</strong> awaiting approval</span>
+    <a href="/machines/" title="Machines connected in the last 2 minutes"><strong>{{ fleet.machines|insertCommas }}</strong> machines online</a>
+    <span><strong>{{ fleet.threads|insertCommas }}</strong> threads</span>
+    <span title="Concurrency × benchmark speed"><strong>{{ fleet.mnps|floatformat:1 }}</strong> MNPS</span>
+</div>
+{% endif %}
+<div class="table-scroll workload-table">
+<table class="test-list hoverable">
+    <thead>{% include "OpenBench/Blocks/test_columns.html" %}</thead>
+    {% if paging.page == 1 and paging.url != 'greens' %}
+    {% if pending %}
+    <tbody>
+        <tr class="section-row"><th colspan="7" scope="rowgroup">Awaiting approval <span class="count-badge">{{ pending|length }}</span></th></tr>
+        {% for test in pending %}<tr>{% include "OpenBench/Blocks/testsummary.html" %}</tr>{% endfor %}
+    </tbody>
+    {% endif %}
+    <tbody>
+        <tr class="section-row"><th colspan="7" scope="rowgroup"><span>Active workloads <span class="count-badge">{{ active_count }}</span></span><span class="section-note">{% if active|length == 1 %}Priority {{ active.0.priority }}{% else %}Ordered by priority{% endif %}</span></th></tr>
+        {% for group in active %}
+            {% if active|length > 1 %}<tr class="table-small-header"><th colspan="7" scope="rowgroup">Priority {{ group.priority }}</th></tr>{% endif %}
+            {% for test in group.tests %}<tr>{% include "OpenBench/Blocks/testsummary.html" %}</tr>{% endfor %}
+        {% empty %}<tr><td colspan="7" class="empty-row">No active workloads. <a href="/test/new/">Create a test</a> to get started.</td></tr>{% endfor %}
+    </tbody>
+    {% endif %}
+    <tbody>
+        <tr class="section-row"><th colspan="7" scope="rowgroup"><span>{% if paging.url == 'greens' %}Passed tests{% else %}Finished workloads{% endif %}</span><span class="section-note">Most recently updated</span></th></tr>
+        {% for test in completed %}<tr>{% include "OpenBench/Blocks/testsummary.html" %}</tr>
+        {% empty %}<tr><td colspan="7" class="empty-row">No {% if paging.url == 'greens' %}passed tests{% else %}finished workloads{% endif %} yet.</td></tr>{% endfor %}
+    </tbody>
+</table>
+</div>
+{% include "OpenBench/Blocks/pagebrowser.html" %}
