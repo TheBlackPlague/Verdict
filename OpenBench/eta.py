@@ -107,8 +107,8 @@ def queue_eta(tests, machines):
         return {'label': 'Unavailable', 'hours': None,
                 'detail': 'Some queued workloads cannot be estimated from their time controls or test settings.'}
 
-    hours = sum(work) / threads
+    hours = sum(work) / (threads * 0.5)
     return {'label': format_hours(hours), 'hours': hours,
             'detail': 'Approximate time to clear all approved workloads at the current active thread count. '
-                      'Assumes reference-speed workers; SPRT results and available capacity can change the estimate. '
+                      'Assumes workers run at half the reference speed; SPRT results and available capacity can change the estimate. '
                       'Excludes workloads awaiting approval.'}
