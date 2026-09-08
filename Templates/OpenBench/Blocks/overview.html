@@ -6,6 +6,7 @@
     <a href="/machines/" title="Machines connected in the last 2 minutes"><strong>{{ fleet.machines|insertCommas }}</strong> machines online</a>
     <span><strong>{{ fleet.threads|insertCommas }}</strong> threads</span>
     <span title="Concurrency × benchmark speed"><strong>{{ fleet.mnps|floatformat:1 }}</strong> MNPS</span>
+    {% if queue_eta %}<span class="queue-eta" title="{{ queue_eta.detail }}" tabindex="0" aria-label="Estimated Time Remaining: {{ queue_eta.label }}. {{ queue_eta.detail }}">Estimated Time Remaining <strong>{{ queue_eta.label }}</strong></span>{% endif %}
 </div>
 {% endif %}
 <div class="table-scroll workload-table">

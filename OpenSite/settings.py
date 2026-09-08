@@ -127,6 +127,11 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Fishtest-derived queue ETA priors. Calibrate these against local test history
+# and the typical opening book; they do not affect SPRT decisions or scheduling.
+ETA_SPRT_AVERAGE_GAMES = 95000
+ETA_SPRT_BOOK_POSITIONS = 2632036
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
