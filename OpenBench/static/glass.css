@@ -11,10 +11,13 @@
     --ink:#f0eee9;
     --muted:#adb0b2;
     --accent:#e3c38b;
-    --success:#61d99b;
-    --danger:#ff858d;
-    --warning:#f2c064;
-    --info:#80bcff;
+    /* Jewel: vivid status text paired with dark, quiet containers. */
+    --success:#55dc85;
+    --danger:#ff758a;
+    --warning:#f3b64d;
+    --info:#45caff;
+    --pending:#b99af5;
+    --deleted:#9ba6b5;
     --radius:14px;
     --glass:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.008) 55%),rgba(26,30,34,.97);
     --depth:inset 0 1px 0 rgba(255,255,255,.075),0 4px 8px #00000014,0 16px 36px #00000024;
@@ -128,13 +131,15 @@ th,td { border-bottom-color:#ffffff0b; }
 .hoverable tr:hover td,.hoverable tr:focus-within td { background:var(--hover-tint); }
 .hoverable tr:hover td:first-child,.hoverable tr:focus-within td:first-child { box-shadow:inset 2px 0 0 var(--hover-edge); }
 .badge { border-radius:6px; box-shadow:inset 0 1px 0 #ffffff09; }
-/* Saturated state text on dark, tinted badges; preserve OpenBench result meanings. */
-.badge-running { color:#7bc9fa; background:#182d3b; border-color:#38627d; }
-.badge-passed,.badge-green { color:var(--success); background:#182d24; border-color:#35634c; }
-.badge-failed,.badge-red { color:var(--danger); background:#331e25; border-color:#79424d; }
-.badge-pending,.badge-yellow { color:var(--warning); background:#302719; border-color:#796037; }
-.badge-blue { color:var(--info); background:#1c293e; border-color:#405f8a; }
-.badge-deleted { color:var(--danger); background:#331e25; border-color:#79424d; }
+/* Jewel status palette. All passes share green; workflow states have separate hues. */
+.badge-running { color:var(--info); background:#172b36; border-color:#3d6c83; }
+.badge-passed,.badge-green { color:var(--success); background:#142b1e; border-color:#376b49; }
+.badge-failed,.badge-red { color:var(--danger); background:#321c24; border-color:#874451; }
+.badge-yellow { color:var(--warning); background:#302514; border-color:#826333; }
+.badge-pending { color:var(--pending); background:#261f34; border-color:#665584; }
+.badge-blue { color:var(--info); background:#172b36; border-color:#3d6c83; }
+.badge-deleted { color:var(--deleted); background:#22262d; border-color:#505966; }
+.statblock-deleted { color:var(--deleted); }
 .llr-track { border-radius:4px; }
 .llr-marker { box-shadow:0 0 6px #f0eee930; }
 .llr-line { filter:drop-shadow(0 1px 3px #e3c38b25); }
