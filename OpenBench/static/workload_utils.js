@@ -320,10 +320,22 @@ function llr_history_path(points, x, y) {
 
 // Axes and presentation adapted from Silverrzz’s Mattbench LLR graph (GPL-3.0).
 // https://github.com/nocturn9x/OpenBench · https://github.com/Silverrzz
+function llr_display_points(points) {
+    if (points.length < 3) return points;
+    const first = points[0], last = points[points.length - 1];
+    const interval = 32 * Math.max(1, Math.ceil((last.games - first.games) / (64 * 32)));
+    const displayed = [first];
+    for (const point of points.slice(1, -1)) {
+        if (point.games - displayed[displayed.length - 1].games >= interval) displayed.push(point);
+    }
+    displayed.push(last);
+    return displayed;
+}
+
 function render_llr_history(data) {
     const container = document.getElementById('llr-history-chart');
     if (!container || section_busy(container)) return;
-    const points = data.points.filter(point => Number.isFinite(point.games) && Number.isFinite(point.llr));
+    const points = llr_display_points(data.points.filter(point => Number.isFinite(point.games) && Number.isFinite(point.llr)));
     if (!points.length) return;
     const caption = document.getElementById('llr-history-caption');
     caption.textContent = data.partial ? `Recorded from game ${data.startGames.toLocaleString()}` : 'Recorded results';
