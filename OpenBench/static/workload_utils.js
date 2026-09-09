@@ -287,6 +287,37 @@ function fetch_spsa_digest(workload_id) {
     });
 }
 
+function llr_history_path(points, x, y) {
+    if (!points.length) return '';
+    const slopes = points.slice(1).map((point, index) => {
+        const previous = points[index];
+        return point.games > previous.games ? (point.llr - previous.llr) / (point.games - previous.games) : 0;
+    });
+    const tangents = points.map((point, index) => {
+        if (index === 0) return slopes[0] || 0;
+        if (index === points.length - 1) return slopes[index - 1];
+        const before = slopes[index - 1], after = slopes[index];
+        if (before * after <= 0) return 0;
+        const previousWidth = point.games - points[index - 1].games;
+        const nextWidth = points[index + 1].games - point.games;
+        const mean = (before * nextWidth + after * previousWidth) / (previousWidth + nextWidth);
+        return Math.sign(before) * Math.min(Math.abs(mean), 2 * Math.abs(before), 2 * Math.abs(after));
+    });
+    const path = [`M${x(points[0].games)},${y(points[0].llr)}`];
+    for (let index = 1; index < points.length; index++) {
+        const previous = points[index - 1], point = points[index];
+        const step = (point.games - previous.games) / 3;
+        if (step <= 0) {
+            path.push(`L${x(point.games)},${y(point.llr)}`);
+            continue;
+        }
+        path.push(`C${x(previous.games + step)},${y(previous.llr + step * tangents[index - 1])} ` +
+            `${x(point.games - step)},${y(point.llr - step * tangents[index])} ` +
+            `${x(point.games)},${y(point.llr)}`);
+    }
+    return path.join(' ');
+}
+
 function render_llr_history(data) {
     const container = document.getElementById('llr-history-chart');
     if (!container || section_busy(container)) return;
@@ -322,7 +353,7 @@ function render_llr_history(data) {
     svg.append(element('line', {x1:left, x2:right, y1:bottom, y2:bottom, class:'llr-grid'}));
     svg.append(element('text', {x:left, y:height - 8}, first.games.toLocaleString()));
     if (last.games !== first.games) svg.append(element('text', {x:right, y:height - 8, 'text-anchor':'end'}, `${last.games.toLocaleString()} games`));
-    svg.append(element('path', {d:points.map((point, index) => `${index ? 'L' : 'M'}${x(point.games).toFixed(2)},${y(point.llr).toFixed(2)}`).join(' '), class:'llr-line'}));
+    svg.append(element('path', {d:llr_history_path(points, x, y), class:'llr-line'}));
     svg.append(element('circle', {cx:x(last.games), cy:y(last.llr), r:3, class:'llr-dot'}));
     const cursor = element('line', {x1:x(last.games), x2:x(last.games), y1:top, y2:bottom, class:'llr-cursor', visibility:'hidden'});
     const dot = element('circle', {cx:x(last.games), cy:y(last.llr), r:4, class:'llr-dot', visibility:'hidden'});
