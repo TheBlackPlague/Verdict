@@ -289,16 +289,31 @@ function fetch_spsa_digest(workload_id) {
 
 function llr_history_path(points, x, y) {
     if (!points.length) return '';
-    const first = points[0], last = points[points.length - 1];
-    const padded = [first, first, ...points, last, last];
-    const position = (a, b, c, wa, wb, wc) =>
-        `${x((wa * a.games + wb * b.games + wc * c.games) / 6)},` +
-        `${y((wa * a.llr + wb * b.llr + wc * c.llr) / 6)}`;
-    const path = [`M${x(first.games)},${y(first.llr)}`];
-    for (let index = 0; index < padded.length - 3; index++) {
-        const [, b, c, d] = padded.slice(index, index + 4);
-        path.push(`C${position(b, c, d, 4, 2, 0)} ` +
-            `${position(b, c, d, 2, 4, 0)} ${position(b, c, d, 1, 4, 1)}`);
+    const slopes = points.slice(1).map((point, index) => {
+        const previous = points[index];
+        return point.games > previous.games ? (point.llr - previous.llr) / (point.games - previous.games) : 0;
+    });
+    const tangents = points.map((point, index) => {
+        if (index === 0) return slopes[0] || 0;
+        if (index === points.length - 1) return slopes[index - 1];
+        const before = slopes[index - 1], after = slopes[index];
+        if (before * after <= 0) return 0;
+        const previousWidth = point.games - points[index - 1].games;
+        const nextWidth = points[index + 1].games - point.games;
+        const mean = (before * nextWidth + after * previousWidth) / (previousWidth + nextWidth);
+        return Math.sign(before) * Math.min(Math.abs(mean), 2 * Math.abs(before), 2 * Math.abs(after));
+    });
+    const path = [`M${x(points[0].games)},${y(points[0].llr)}`];
+    for (let index = 1; index < points.length; index++) {
+        const previous = points[index - 1], point = points[index];
+        const step = (point.games - previous.games) / 3;
+        if (step <= 0) {
+            path.push(`L${x(point.games)},${y(point.llr)}`);
+            continue;
+        }
+        path.push(`C${x(previous.games + step)},${y(previous.llr + step * tangents[index - 1])} ` +
+            `${x(point.games - step)},${y(point.llr - step * tangents[index])} ` +
+            `${x(point.games)},${y(point.llr)}`);
     }
     return path.join(' ');
 }
@@ -309,7 +324,7 @@ function render_llr_history(data) {
     const points = data.points.filter(point => Number.isFinite(point.games) && Number.isFinite(point.llr));
     if (!points.length) return;
     const caption = document.getElementById('llr-history-caption');
-    caption.textContent = data.partial ? `Recorded from game ${data.startGames.toLocaleString()}` : 'Smoothed trend';
+    caption.textContent = data.partial ? `Recorded from game ${data.startGames.toLocaleString()}` : 'Recorded results';
     const readout = document.getElementById('llr-history-readout');
     const ns = 'http://www.w3.org/2000/svg';
     const width = Math.max(320, container.clientWidth - 10), height = 180;
@@ -352,7 +367,7 @@ function render_llr_history(data) {
         dot.setAttribute('cx', x(point.games)); dot.setAttribute('cy', y(point.llr));
         cursor.setAttribute('visibility', show ? 'visible' : 'hidden'); dot.setAttribute('visibility', show ? 'visible' : 'hidden');
         readout.textContent = `${point.games.toLocaleString()} games · LLR ${point.llr.toFixed(3)}` +
-            (points.length === 1 ? (data.finished ? ' · Earlier history was not recorded.' : ' · Waiting for the next recorded result.') : ' · Smoothed trend · Hover or use ← → for recorded results.');
+            (points.length === 1 ? (data.finished ? ' · Earlier history was not recorded.' : ' · Waiting for the next recorded result.') : ' · Hover or use ← → to inspect.');
     }
     svg.addEventListener('pointermove', event => {
         const rect = svg.getBoundingClientRect();
