@@ -346,6 +346,22 @@ function render_llr_history(data) {
     const svg = element('svg', {viewBox: `0 0 ${width} ${height}`, class: 'llr-chart', role: 'img', tabindex: '0',
         'aria-label': `LLR history, ${first.games.toLocaleString()} to ${last.games.toLocaleString()} games. Current LLR ${last.llr.toFixed(2)}. Lower bound ${data.lowerBound.toFixed(2)}, upper bound ${data.upperBound.toFixed(2)}. Use arrow keys to inspect recorded points.`,
         'aria-describedby': 'llr-history-readout'});
+    const defs = element('defs');
+    const zeroOffset = data.upperBound / (data.upperBound - data.lowerBound);
+    const strokeId = `${container.id}-stroke`, fillId = `${container.id}-fill`;
+    for (const [id, shaded] of [[strokeId, false], [fillId, true]]) {
+        const gradient = element('linearGradient', {id, gradientUnits:'userSpaceOnUse',
+            x1:0, x2:0, y1:y(data.upperBound), y2:y(data.lowerBound)});
+        for (const [offset, color] of [[0, 'success'], [zeroOffset, 'accent'], [1, 'danger']]) {
+            gradient.append(element('stop', {offset, 'stop-color':`var(--${color})`,
+                'stop-opacity':shaded ? (color === 'accent' ? .025 : .22) : 1}));
+        }
+        defs.append(gradient);
+    }
+    svg.append(defs);
+    const path = llr_history_path(points, x, y);
+    svg.append(element('path', {d:`${path} L${x(last.games)},${y(0)} L${x(first.games)},${y(0)} Z`,
+        fill:`url(#${fillId})`, 'pointer-events':'none'}));
     for (const [value, name] of [[data.lowerBound, 'lower'], [0, 'zero'], [data.upperBound, 'upper']]) {
         svg.append(element('line', {x1:left, x2:right, y1:y(value), y2:y(value), class:name === 'zero' ? 'llr-grid' : `llr-bound llr-${name}`}));
         svg.append(element('text', {x:left - 7, y:y(value) + 4, 'text-anchor':'end'}, value.toFixed(2)));
@@ -353,10 +369,10 @@ function render_llr_history(data) {
     svg.append(element('line', {x1:left, x2:right, y1:bottom, y2:bottom, class:'llr-grid'}));
     svg.append(element('text', {x:left, y:height - 8}, first.games.toLocaleString()));
     if (last.games !== first.games) svg.append(element('text', {x:right, y:height - 8, 'text-anchor':'end'}, `${last.games.toLocaleString()} games`));
-    svg.append(element('path', {d:llr_history_path(points, x, y), class:'llr-line'}));
-    svg.append(element('circle', {cx:x(last.games), cy:y(last.llr), r:3, class:'llr-dot'}));
+    svg.append(element('path', {d:path, class:'llr-line', style:`stroke:url(#${strokeId})`}));
+    svg.append(element('circle', {cx:x(last.games), cy:y(last.llr), r:3, class:'llr-dot', style:`fill:url(#${strokeId})`}));
     const cursor = element('line', {x1:x(last.games), x2:x(last.games), y1:top, y2:bottom, class:'llr-cursor', visibility:'hidden'});
-    const dot = element('circle', {cx:x(last.games), cy:y(last.llr), r:4, class:'llr-dot', visibility:'hidden'});
+    const dot = element('circle', {cx:x(last.games), cy:y(last.llr), r:4, class:'llr-dot', visibility:'hidden', style:`fill:url(#${strokeId})`});
     svg.append(cursor, dot);
     let selected = points.length - 1;
     function describe(index, show = true, announce = false) {
