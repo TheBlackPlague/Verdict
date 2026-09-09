@@ -79,7 +79,6 @@ th,td{border-bottom-color:#ffffff0b}
 .statblock-deleted{color:var(--deleted)}
 .llr-track{border-radius:4px}
 .llr-marker{box-shadow:0 0 6px #f0eee930}
-.llr-line{filter:drop-shadow(0 1px 3px #e3c38b25)}
 #content .row input,#content .row select,#content .row textarea{background:#15181ab3;border-color:#ffffff20;border-radius:8px;box-shadow:inset 0 2px 4px #0002;transition:border-color 160ms ease,box-shadow 160ms ease,background-color 160ms ease}
 #content .row input:focus,#content .row select:focus,#content .row textarea:focus{background:#1d2023;box-shadow:0 0 0 3px #e3c38b12,inset 0 1px 2px #0002}
 #content select option{background:var(--surface);color:var(--ink)}

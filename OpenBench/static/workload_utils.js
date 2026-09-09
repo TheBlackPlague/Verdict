@@ -318,6 +318,8 @@ function llr_history_path(points, x, y) {
     return path.join(' ');
 }
 
+// Axes and presentation adapted from Silverrzz’s Mattbench LLR graph (GPL-3.0).
+// https://github.com/nocturn9x/OpenBench · https://github.com/Silverrzz
 function render_llr_history(data) {
     const container = document.getElementById('llr-history-chart');
     if (!container || section_busy(container)) return;
@@ -331,10 +333,9 @@ function render_llr_history(data) {
     const left = 44, right = width - 16, top = 18, bottom = height - 29;
     const first = points[0], last = points[points.length - 1];
     const xStart = first.games, xEnd = Math.max(first.games + 1, last.games);
-    const min = Math.min(data.lowerBound, ...points.map(point => point.llr), 0);
-    const max = Math.max(data.upperBound, ...points.map(point => point.llr), 0);
-    const padding = Math.max(.2, (max - min) * .12);
-    const yMin = min - padding, yMax = max + padding;
+    const extreme = Math.max(1, Math.abs(data.lowerBound), Math.abs(data.upperBound), ...points.map(point => Math.abs(point.llr)));
+    const limit = Math.ceil(extreme * 1.15 * 10) / 10;
+    const yMin = -limit, yMax = limit;
     const x = games => left + (games - xStart) / (xEnd - xStart) * (right - left);
     const y = llr => bottom - (llr - yMin) / (yMax - yMin) * (bottom - top);
     function element(tag, attributes = {}, text = null) {
@@ -348,29 +349,36 @@ function render_llr_history(data) {
         'aria-describedby': 'llr-history-readout'});
     const defs = element('defs');
     const zeroOffset = data.upperBound / (data.upperBound - data.lowerBound);
-    const strokeId = `${container.id}-stroke`, fillId = `${container.id}-fill`;
-    for (const [id, shaded] of [[strokeId, false], [fillId, true]]) {
-        const gradient = element('linearGradient', {id, gradientUnits:'userSpaceOnUse',
-            x1:0, x2:0, y1:y(data.upperBound), y2:y(data.lowerBound)});
-        for (const [offset, color] of [[0, 'success'], [zeroOffset, 'accent'], [1, 'danger']]) {
-            gradient.append(element('stop', {offset, 'stop-color':`var(--${color})`,
-                'stop-opacity':shaded ? (color === 'accent' ? .025 : .22) : 1}));
-        }
-        defs.append(gradient);
+    const strokeId = `${container.id}-stroke`;
+    const gradient = element('linearGradient', {id:strokeId, gradientUnits:'userSpaceOnUse',
+        x1:0, x2:0, y1:y(data.upperBound), y2:y(data.lowerBound)});
+    for (const [offset, color] of [[0, 'success'], [zeroOffset, 'accent'], [1, 'danger']]) {
+        gradient.append(element('stop', {offset, 'stop-color':`var(--${color})`}));
     }
+    defs.append(gradient);
     svg.append(defs);
+    const compact = new Intl.NumberFormat(undefined, {notation:'compact', maximumFractionDigits:1});
+    for (const value of [-limit, 0, limit]) {
+        svg.append(element('line', {x1:left, x2:right, y1:y(value), y2:y(value), class:value === 0 ? 'llr-zero' : 'llr-grid'}));
+        svg.append(element('text', {x:left - 9, y:y(value), 'text-anchor':'end', 'dominant-baseline':'middle'},
+            Math.abs(value) >= 100 ? compact.format(value) : value.toFixed(1)));
+    }
+    const ticks = Math.min(last.games - first.games, width < 480 ? 2 : 4);
+    for (let index = 0; index <= ticks; index++) {
+        const games = ticks ? Math.round(xStart + (last.games - xStart) * index / ticks) : xStart;
+        svg.append(element('line', {x1:x(games), x2:x(games), y1:top, y2:bottom, class:'llr-grid'}));
+        svg.append(element('text', {x:x(games), y:height - 8,
+            'text-anchor':index === 0 ? 'start' : index === ticks ? 'end' : 'middle'},
+            games >= 10000 ? compact.format(games) : games.toLocaleString()));
+    }
+    for (const [value, name] of [[data.lowerBound, 'lower'], [data.upperBound, 'upper']]) {
+        svg.append(element('line', {x1:left, x2:right, y1:y(value), y2:y(value), class:`llr-bound llr-${name}`}));
+    }
     const path = llr_history_path(points, x, y);
     svg.append(element('path', {d:`${path} L${x(last.games)},${y(0)} L${x(first.games)},${y(0)} Z`,
-        fill:`url(#${fillId})`, 'pointer-events':'none'}));
-    for (const [value, name] of [[data.lowerBound, 'lower'], [0, 'zero'], [data.upperBound, 'upper']]) {
-        svg.append(element('line', {x1:left, x2:right, y1:y(value), y2:y(value), class:name === 'zero' ? 'llr-grid' : `llr-bound llr-${name}`}));
-        svg.append(element('text', {x:left - 7, y:y(value) + 4, 'text-anchor':'end'}, value.toFixed(2)));
-    }
-    svg.append(element('line', {x1:left, x2:right, y1:bottom, y2:bottom, class:'llr-grid'}));
-    svg.append(element('text', {x:left, y:height - 8}, first.games.toLocaleString()));
-    if (last.games !== first.games) svg.append(element('text', {x:right, y:height - 8, 'text-anchor':'end'}, `${last.games.toLocaleString()} games`));
+        fill:`url(#${strokeId})`, class:'llr-area', 'pointer-events':'none'}));
     svg.append(element('path', {d:path, class:'llr-line', style:`stroke:url(#${strokeId})`}));
-    svg.append(element('circle', {cx:x(last.games), cy:y(last.llr), r:3, class:'llr-dot', style:`fill:url(#${strokeId})`}));
+    svg.append(element('circle', {cx:x(last.games), cy:y(last.llr), r:4, class:'llr-dot', style:`fill:url(#${strokeId})`}));
     const cursor = element('line', {x1:x(last.games), x2:x(last.games), y1:top, y2:bottom, class:'llr-cursor', visibility:'hidden'});
     const dot = element('circle', {cx:x(last.games), cy:y(last.llr), r:4, class:'llr-dot', visibility:'hidden', style:`fill:url(#${strokeId})`});
     svg.append(cursor, dot);
