@@ -289,7 +289,8 @@ def index(request, page=1):
         'paging'    : paging,
         'fleet'     : OpenBench.utils.get_fleet_stats(),
         'active_count': len(active),
-        'queue_eta': queue_eta(active, OpenBench.utils.getRecentMachines().only('info', 'workload')),
+        'queue_eta': queue_eta(active, OpenBench.utils.getRecentMachines().only(
+            'info', 'workload', 'updated', 'dev_mnps', 'base_mnps')),
     }
 
     return render(request, 'index.html', data)
@@ -759,6 +760,9 @@ def client_submit_nps(request, machine):
     machine.dev_mnps  = float(request.POST['dev_nps' ]) / 1e6;
     machine.base_mnps = float(request.POST['base_nps']) / 1e6;
     machine.save(update_fields=['mnps', 'dev_mnps', 'base_mnps', 'updated'])
+
+    from OpenBench.eta import record_benchmarks
+    record_benchmarks(machine)
 
     # Pass back an empty JSON response
     return JsonResponse({})

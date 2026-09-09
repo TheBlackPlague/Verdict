@@ -91,6 +91,7 @@ class Result(Model):
     base_nodes        = BigIntegerField(default=0)
     base_time         = BigIntegerField(default=0)
     base_time_scaled  = BigIntegerField(default=0)
+    eta               = JSONField(default=dict, blank=True)
 
     def __str__(self):
         return '{0} {1}'.format(self.test.dev.name, self.machine.__str__())

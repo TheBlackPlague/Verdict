@@ -38,12 +38,20 @@ from django.db import transaction
 
 def get_workload(request, machine):
 
+    blacklist = request.POST.getlist('blacklist')
+    if machine.info.get('blacklist') != blacklist:
+        machine.info['blacklist'] = blacklist
+        machine.save(update_fields=['info'])
+
     # Select a workload from the possible ones, if we can
     if not (test := select_workload(request, machine)):
         return {}
 
     # Avoid creating duplicate Result objects
     result, created = Result.objects.get_or_create(test=test, machine=machine)
+
+    from OpenBench.eta import start_assignment
+    start_assignment(result.id, test, machine)
 
     # Update the Machine's status. Only the touched columns are written back,
     # to avoid re-serializing the (large) info blob on every workload request

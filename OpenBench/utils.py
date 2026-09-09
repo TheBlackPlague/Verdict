@@ -487,6 +487,9 @@ def update_test(request, machine):
             LLRHistory.objects.create(test=test, games=test.games, llr=test.currentllr)
 
         # Update Result object; No risk from concurrent access
+        from OpenBench.eta import record_completion
+        record_completion(result_id, test, machine, games)
+
         Result.objects.filter(id=result_id).update(
             games    = F('games'   ) + games,
             losses   = F('losses'  ) + losses,
