@@ -204,7 +204,7 @@ class Test(Model):
 
 class LLRHistory(Model):
 
-    SAMPLE_GAMES = 256
+    SAMPLE_GAMES = 32
 
     test  = ForeignKey(Test, CASCADE, related_name='llr_history')
     games = IntegerField()
