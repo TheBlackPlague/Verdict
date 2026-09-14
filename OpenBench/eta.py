@@ -36,6 +36,26 @@ def _sprt_pt(lower, upper, h):
     return probability, max(0.0, duration)
 
 
+def _normalized_elo_from_penta(test):
+
+    results = (test.LL, test.LD, test.DD, test.DW, test.WW)
+    pairs = sum(results)
+    if pairs <= 1:
+        return None
+
+    mean = sum((index / 4) * count for index, count in enumerate(results)) / pairs
+    variance = sum(
+        ((index / 4) - mean) ** 2 * count
+        for index, count in enumerate(results)
+    ) / pairs
+
+    if not math.isfinite(variance) or variance <= 0:
+        return None
+
+    sigma_per_game = math.sqrt(2 * variance)
+    return NELO_DIVIDED_BY_NT * (mean - 0.5) / sigma_per_game
+
+
 def _normalized_sprt_remaining_games(test):
 
     lower = test.lowerllr
@@ -56,10 +76,14 @@ def _normalized_sprt_remaining_games(test):
     if not math.isfinite(w2) or w2 <= 0:
         return None
 
-    # In the normalized Fishtest model, the LLR process has variance w2 per
-    # game and drift h*w2/2. Estimate h from the test's observed LLR slope.
-    h = 0.0 if test.games <= 0 else 2 * current / (test.games * w2)
+    observed_elo = _normalized_elo_from_penta(test)
+    if observed_elo is None:
+        observed_elo = (elo0 + elo1) / 2
 
+    # Fishtest's Brownian approximation has variance w2 per game and drift
+    # h*w2/2. Estimate h from the current normalized-Elo result, then shift
+    # both absorbing boundaries by the LLR already accumulated by the test.
+    h = (2 * observed_elo - (elo0 + elo1)) / (elo1 - elo0)
     estimate = _sprt_pt(lower - current, upper - current, h)
     if estimate is None:
         return None
@@ -199,6 +223,6 @@ def queue_eta(tests, machines):
         'label': format_hours(hours),
         'hours': hours,
         'detail': 'Approximate time to clear all approved workloads at the current active thread count. '
-                  'SPRT duration uses a Fishtest-derived stopping-time estimate conditioned on the current LLR. '
+                  'SPRT duration uses a Fishtest-derived stopping-time estimate conditioned on the current LLR and result distribution. '
                   'Assumes workers run at half the reference speed and excludes workloads awaiting approval.',
     }
