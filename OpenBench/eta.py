@@ -8,6 +8,7 @@ from django.conf import settings
 
 
 NELO_DIVIDED_BY_NT = 800 / math.log(10)
+FALLBACK_RELATIVE_SPEED = 0.5
 
 
 def _sprt_pt(lower, upper, h):
@@ -170,6 +171,70 @@ def remaining_core_hours(test):
     return games * (dev_seconds + base_seconds) * threads / 3600
 
 
+def _machine_threads(test, machine):
+
+    from OpenBench.utils import extract_option
+
+    concurrency = int(machine.info.get('concurrency', 0))
+    if concurrency <= 0:
+        return 0
+
+    dev_threads = int(extract_option(test.dev_options, 'Threads') or 1)
+    base_threads = int(extract_option(test.base_options, 'Threads') or 1)
+    physical = int(machine.info.get('physical_cores', concurrency))
+
+    # Match workload assignment: core-odds tests do not use hyperthreads.
+    if physical < concurrency and dev_threads != base_threads:
+        concurrency //= 2
+
+    return concurrency
+
+
+def _machine_relative_speed(test, machine):
+
+    target = test.scale_nps / 1e6
+    dev = float(machine.dev_mnps or 0)
+    base = float(machine.base_mnps or 0)
+
+    if target <= 0:
+        return FALLBACK_RELATIVE_SPEED
+
+    if test.scale_method == 'DEV' and dev > 0:
+        return dev / target
+
+    if test.scale_method == 'BASE' and base > 0:
+        return base / target
+
+    if test.scale_method == 'BOTH' and dev > 0 and base > 0:
+        # The client scales by the arithmetic mean of the two time factors.
+        # Invert that factor to express this worker in reference-speed cores.
+        factor = (target / dev + target / base) / 2
+        return 1 / factor
+
+    return FALLBACK_RELATIVE_SPEED
+
+
+def _fleet_capacity(tests, machines):
+
+    by_id = {test.id: test for test in tests}
+    capacity = 0.0
+    fallbacks = 0
+
+    for machine in machines:
+        test = by_id.get(machine.workload)
+        if test is None:
+            continue
+
+        threads = _machine_threads(test, machine)
+        speed = _machine_relative_speed(test, machine)
+        capacity += threads * speed
+
+        if speed == FALLBACK_RELATIVE_SPEED and not (machine.dev_mnps or machine.base_mnps):
+            fallbacks += 1
+
+    return capacity, fallbacks
+
+
 def format_hours(hours):
 
     minutes = math.ceil(hours * 60)
@@ -197,13 +262,16 @@ def queue_eta(tests, machines):
             'detail': 'No approved workloads remain.',
         }
 
-    ids = {test.id for test in tests}
-    threads = sum(
-        machine.info.get('concurrency', 0)
-        for machine in machines
-        if machine.workload in ids
-    )
-    if threads <= 0:
+    # Callers may defer benchmark fields with QuerySet.only(). Replace that
+    # projection here so capacity is computed without per-machine DB queries.
+    if hasattr(machines, 'only'):
+        machines = machines.only(
+            'info', 'workload', 'dev_mnps', 'base_mnps'
+        )
+    machines = list(machines)
+
+    capacity, fallbacks = _fleet_capacity(tests, machines)
+    if capacity <= 0:
         return {
             'label': 'No workers',
             'hours': None,
@@ -218,11 +286,18 @@ def queue_eta(tests, machines):
             'detail': 'Some queued workloads cannot be estimated from their time controls or test settings.',
         }
 
-    hours = sum(work) / (threads * 0.5)
+    hours = sum(work) / capacity
+    detail = (
+        'Approximate time to clear all approved workloads at current capacity. '
+        'SPRT duration uses a Fishtest-derived stopping-time estimate conditioned '
+        'on the current LLR and result distribution. Worker capacity uses reported '
+        'benchmark speeds and excludes workloads awaiting approval.'
+    )
+    if fallbacks:
+        detail += ' Workers awaiting benchmark data temporarily use 0.5x reference speed.'
+
     return {
         'label': format_hours(hours),
         'hours': hours,
-        'detail': 'Approximate time to clear all approved workloads at the current active thread count. '
-                  'SPRT duration uses a Fishtest-derived stopping-time estimate conditioned on the current LLR and result distribution. '
-                  'Assumes workers run at half the reference speed and excludes workloads awaiting approval.',
+        'detail': detail,
     }
