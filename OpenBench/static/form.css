@@ -23,6 +23,7 @@
 #content .workflow-edit label{width:auto}
 #content .workload-edit .col-full{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 10px}
 #content .workload-edit .notes-field{grid-column:1/-1}
+#content .workload-edit .notes-field textarea{flex:none}
 #content .workload-edit input[type="submit"]{width:auto;justify-self:start;grid-column:1/-1}
 #engines-container span{display:inline-flex;align-items:center;gap:6px;margin:3px 10px 3px 0;font-size:.9rem}
 #content .auth-form{max-width:430px;margin:30px auto;padding:20px;background:var(--surface);border:1px solid var(--line);border-radius:4px}
