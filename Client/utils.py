@@ -242,6 +242,10 @@ def download_network(server, username, password, engine, net_name, net_sha, net_
         print ('Fetching %s (%s) for %s' % (net_name, net_sha, engine))
         endpoint = 'api/networks/%s/%s' % (engine, net_sha)
         request  = credentialed_request(server, username, password, endpoint)
+        request.raise_for_status()
+
+        if request.headers.get('Content-Type', '').split(';')[0].strip() == 'application/json':
+            raise OpenBenchFatalWorkerException(request.json().get('error', 'Unexpected network API response'))
 
         # Write the content out to the net_path in kb chunks
         with open(net_path, 'wb') as fout:

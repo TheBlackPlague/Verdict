@@ -28,6 +28,7 @@ import re
 import requests
 import urllib.parse
 
+from django.conf import settings
 from django.contrib.auth import authenticate
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage
@@ -37,7 +38,7 @@ from django.http import FileResponse, HttpResponse
 from django.utils import timezone
 from wsgiref.util import FileWrapper
 
-from OpenSite.settings import MEDIA_ROOT, PROJECT_PATH
+from OpenSite.settings import PROJECT_PATH
 
 from OpenBench.config import OPENBENCH_CONFIG
 from OpenBench.models import *
@@ -150,7 +151,7 @@ def media_download_response(fpath, filename, expires):
     else:
         # nginx serves the body, and sets the Content-Length for us
         root     = OPENBENCH_CONFIG['x_accel_redirect_root'].rstrip('/')
-        relative = os.path.relpath(fpath, MEDIA_ROOT).replace(os.sep, '/')
+        relative = os.path.relpath(fpath, settings.MEDIA_ROOT).replace(os.sep, '/')
         response = HttpResponse(content_type='application/octet-stream')
         response['X-Accel-Redirect'] = urllib.parse.quote('%s/%s' % (root, relative))
 
@@ -336,7 +337,7 @@ def network_delete(request, engine, network):
 def network_download(request, engine, network):
 
     # Craft the download HTML response
-    netfile = os.path.join(MEDIA_ROOT, network.sha256)
+    netfile = os.path.join(settings.MEDIA_ROOT, network.sha256)
     expires = (datetime.datetime.utcnow() + datetime.timedelta(days=7)).ctime()
     return media_download_response(netfile, network.sha256, expires)
 

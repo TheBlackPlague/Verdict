@@ -40,7 +40,7 @@ from OpenSite.settings import PROJECT_PATH
 
 from OpenBench.models import *
 from django.contrib.auth.models import User
-from OpenSite.settings import MEDIA_ROOT
+from django.conf import settings
 
 from OpenBench.interface import is_live_request, presentation_context, live_response
 from django.utils.cache import patch_vary_headers
@@ -467,7 +467,7 @@ def users(request):
 def event(request, pk):
 
     try:
-        with open(os.path.join(MEDIA_ROOT, LogEvent.objects.get(id=pk).log_file)) as fin:
+        with open(os.path.join(settings.MEDIA_ROOT, LogEvent.objects.get(id=pk).log_file)) as fin:
             return render(request, 'event.html', { 'content' : fin.read() })
     except:
         return redirect(request, '/index/', error='No logs for event exist')
