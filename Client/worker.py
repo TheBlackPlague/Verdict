@@ -61,7 +61,7 @@ from client import try_forever
 
 ## Basic configuration of the Client. These timeouts can be changed at will
 
-CLIENT_VERSION   = 50 # Client version to send to the Server
+CLIENT_VERSION   = 51 # Client version to send to the Server
 TIMEOUT_HTTP     = 30 # Timeout in seconds for HTTP requests
 TIMEOUT_ERROR    = 60 # Timeout in seconds when any errors are thrown
 TIMEOUT_WORKLOAD = 60 # Timeout in seconds between workload requests
@@ -1235,7 +1235,8 @@ def safe_create_genfens_opening_book(config, dev_name):
 def safe_run_benchmarks(config, branch, engine):
 
     name     = config.workload['test'][branch]['name']
-    expected = int(config.workload['test'][branch]['bench'])
+    expected = config.workload['test'][branch]['bench']
+    expected = int(expected) if expected is not None else None
     binary   = os.path.join('Engines', engine)
 
     try:

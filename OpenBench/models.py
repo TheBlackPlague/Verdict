@@ -28,10 +28,10 @@ class Engine(Model):
     name     = CharField(max_length=128)
     source   = CharField(max_length=1024)
     sha      = CharField(max_length=64)
-    bench    = IntegerField(default=0)
+    bench    = IntegerField(default=0, null=True, blank=True)
 
     def __str__(self):
-        return '{0} ({1})'.format(self.name, self.bench)
+        return '{0} ({1})'.format(self.name, self.bench if self.bench is not None else 'Unconfirmed')
 
 class Profile(Model):
 

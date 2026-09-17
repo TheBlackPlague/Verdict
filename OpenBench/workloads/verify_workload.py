@@ -424,8 +424,11 @@ def collect_github_info(errors, request, field):
         errors.append('%s could not be found' % (branch or 'Branch'))
         return
 
-    # Extract the bench from the web form, or from the commit message
-    if not (bench := determine_bench(request, field, data['commit']['message'])):
+    # A network override may discover its bench on the worker. Invalid or
+    # missing benches without an override must still prevent creation.
+    try:
+        bench = determine_bench(request, field, data['commit']['message'])
+    except ValueError:
         errors.append('Unable to parse a Bench for %s' % (branch))
         return
 
@@ -445,15 +448,24 @@ def requests_illegal_fork(request, field):
 
 def determine_bench(request, field, message):
 
-    # Use the provided bench if possible
-    try: return int(request.POST['{0}_bench'.format(field)])
-    except: pass
+    supplied = request.POST.get('%s_bench' % field, '').strip()
+
+    # Explicit confirmation always wins, including for network overrides.
+    if supplied and supplied.lower() != 'autofill':
+        bench = int(supplied)
+        if bench <= 0: raise ValueError('Bench must be positive')
+        return bench
+
+    # A commit's bench describes its bundled network, not the selected one.
+    if request.POST.get('%s_network' % field):
+        return None
 
     # Fallback to try to parse the Bench from the commit
-    try:
-        benches = re.findall('(?:BENCH|NODES)[ :=]+([0-9,]+)', message, re.IGNORECASE)
-        return int(benches[-1].replace(',', ''))
-    except: return None
+    benches = re.findall('(?:BENCH|NODES)[ :=]+([0-9,]+)', message, re.IGNORECASE)
+    if not benches: raise ValueError('Missing bench')
+    bench = int(benches[-1].replace(',', ''))
+    if bench <= 0: raise ValueError('Bench must be positive')
+    return bench
 
 def strip_message(message):
     lines = message.strip().split("\n")
