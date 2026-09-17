@@ -31,7 +31,7 @@
             <tr><th scope="row">Source</th><td ><a href="{{workload.dev_repo}}">{{workload.dev_repo}}</a></td>{% if type != "TUNE" %}<td ><a href="{{workload.base_repo}}">{{workload.base_repo}}</a></td>{% endif %}</tr>
             <tr><th scope="row">Revision</th><td class="revision">{{workload.dev.sha}}</td>{% if type != "TUNE" %}<td class="revision">{{workload.base.sha}}</td>{% endif %}</tr>
             <tr><th scope="row">Branch</th><td class="branch_name">{{workload.dev.name|prettyName}}</td>{% if type != "TUNE" %}<td class="branch_name">{{workload.base.name|prettyName}}</td>{% endif %}</tr>
-            <tr><th scope="row">Bench</th><td >{{workload.dev.bench}}</td>{% if type != "TUNE" %}<td >{{workload.base.bench}}</td>{% endif %}</tr>
+            <tr><th scope="row">Bench</th><td >{{workload.dev.bench|default_if_none:"Unconfirmed"}}</td>{% if type != "TUNE" %}<td >{{workload.base.bench|default_if_none:"Unconfirmed"}}</td>{% endif %}</tr>
             <tr><th scope="row">Network</th><td >{% if workload.dev_netname %}<a href="{{workload|network_download_link:'dev'}}">{{workload.dev_netname}}</a>{% else %}—{% endif %}</td>{% if type != "TUNE" %}<td >{% if workload.base_netname %}<a href="{{workload|network_download_link:'base'}}">{{workload.base_netname}}</a>{% else %}—{% endif %}</td>{% endif %}</tr>
             <tr><th scope="row">Options</th><td class="engine-options">{{workload.dev_options}}</td>{% if type != "TUNE" %}<td class="engine-options">{{workload.base_options}}</td>{% endif %}</tr>
             <tr><th scope="row">Time control</th><td >{{workload.dev_time_control}}</td>{% if type != "TUNE" %}<td >{{workload.base_time_control}}</td>{% endif %}</tr>
