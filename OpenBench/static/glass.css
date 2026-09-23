@@ -85,10 +85,6 @@ th,td{border-bottom-color:#ffffff0b}
 #content input[type="file"]::file-selector-button{border-radius:6px}
 .error-message,.warning-message,.status-message{border-radius:10px;box-shadow:inset 0 1px 0 #ffffff08}
 .site-footer{border-top-color:#ffffff0a}
-@keyframes surface-arrive{
-    from{opacity:0;transform:translateY(5px)}
-    to{opacity:1;transform:translateY(0)}
-}
 @keyframes menu-arrive{
     from{opacity:0;transform:translateY(-4px) scale(.98)}
     to{opacity:1;transform:translateY(0) scale(1)}
@@ -97,7 +93,6 @@ th,td{border-bottom-color:#ffffff0b}
     to{transform:rotate(360deg)}
 }
 @media(prefers-reduced-motion:no-preference){
-    #main-content{animation:surface-arrive 280ms var(--ease) both}
     .nav-menu[open] .menu-items{transform-origin:top right;animation:menu-arrive 160ms var(--ease)}
     #live-refresh:disabled i{animation:refresh-turn 900ms linear infinite}
 }
