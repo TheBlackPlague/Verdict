@@ -201,7 +201,48 @@
         }
     },
 
-    "tune_presets": {},
+    "tune_presets": {
+        "default": {
+            "book_name": "UHO_Lichess_4852_v1.epd",
+            "win_adj": "movecount=3 score=400",
+            "draw_adj": "movenumber=40 movecount=8 score=10"
+        },
+
+        "STC": {
+            "dev_options": "Threads=1 Hash=16",
+            "dev_time_control": "10+0.1"
+        },
+
+        "LTC": {
+            "dev_options": "Threads=1 Hash=128",
+            "dev_time_control": "60+0.6"
+        },
+
+        "VLTC": {
+            "dev_options": "Threads=1 Hash=256",
+            "dev_time_control": "120+1.2"
+        },
+
+        "STC [SMP 2T]": {
+            "dev_options": "Threads=2 Hash=32",
+            "dev_time_control": "10+0.1"
+        },
+
+        "LTC [SMP 2T]": {
+            "dev_options": "Threads=2 Hash=256",
+            "dev_time_control": "60+0.6"
+        },
+
+        "STC [SMP 4T]": {
+            "dev_options": "Threads=4 Hash=64",
+            "dev_time_control": "10+0.1"
+        },
+
+        "LTC [SMP 4T]": {
+            "dev_options": "Threads=4 Hash=512",
+            "dev_time_control": "60+0.6"
+        }
+    },
 
     "datagen_presets": {}
 }
