@@ -347,9 +347,22 @@ def llr_position(workload):
 
 
 @register.filter
-def tuning_progress(workload):
-    total = workload.spsa_run.iterations * workload.spsa_run.pairs_per * 2
-    return '%.1f' % (min(100, 100 * workload.games / total) if total else 0)
+def workload_target(workload):
+    if workload.test_mode == 'SPSA':
+        return workload.spsa_run.iterations * workload.spsa_run.pairs_per * 2
+    return workload.max_games
+
+
+@register.filter
+def workload_progress(workload):
+    target = workload_target(workload)
+    return '%.1f' % (min(100, 100 * workload.games / target) if target else 0)
+
+
+@register.filter
+def tuning_iterations(workload):
+    games_per_iteration = workload.spsa_run.pairs_per * 2
+    return int(workload.games / games_per_iteration) if games_per_iteration else 0
 
 
 @register.filter
