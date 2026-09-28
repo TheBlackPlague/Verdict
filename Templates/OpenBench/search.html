@@ -159,10 +159,10 @@
 
     {% if tests %}<div class="search-results-spacer"></div>{% endif %}
 
-    <div class="table-scroll"><table class="test-list stripes hoverable"><thead><tr><th>Created</th><th>Workload</th><th>Status</th><th>Engine / TC</th><th>Result</th><th>Games / W–L–D / Pentanomial</th><th>Notes</th><th>Compare</th></tr></thead><tbody>
+    <div class="table-scroll"><table role="table" class="test-list stripes hoverable"><thead><tr><th>Created</th><th>Workload</th><th>Status</th><th>Engine / TC</th><th>Result</th><th>Games / W–L–D / Pentanomial</th><th>Notes</th><th>Compare</th></tr></thead><tbody role="rowgroup">
         {% for test in tests %}
-            <tr>
-                <td class="datestamp">{{test.creation|date:"U"}}</td>
+            <tr role="row" class="test-row">
+                <td role="cell" class="datestamp">{{test.creation|date:"U"}}</td>
                 {% include "OpenBench/Blocks/testsummary.html" %}
             </tr>
         {% endfor %}

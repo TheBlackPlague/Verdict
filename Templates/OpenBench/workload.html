@@ -24,6 +24,7 @@
 
     <section id="config" aria-label="Workload configuration">
         <div class="panel-heading"><h2>Configuration</h2><span class="panel-meta"><a href="/user/{{workload.author}}/">{{workload.author}}</a> · <span class="timestamp">{{workload.creation|date:'U'}}</span></span></div>
+        <div class="table-scroll">
         <table class="test-config engine-comparison">
             <thead><tr><th scope="col">Setting</th><th scope="col">{{dev_text|default:"Engine"}}{% if type != "TUNE" %}</th><th scope="col">Base{% endif %}</th></tr></thead>
             <tbody>
@@ -54,6 +55,7 @@
             <tr><th scope="row" class="td-label">Play reverses</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.play_reverses}}</td></tr>
             {% endif %}
         </tbody></table>
+        </div>
     </section>
 
     <div id="actions">
@@ -148,6 +150,7 @@
     <!-- SPSA Paramater Summary, for Tunes -->
     {% if type == "TUNE" %}
         <div id="parameters" class="w-100">
+            <div class="table-scroll">
             <table class="stripes wrappable">
                 <thead>
                     <tr class="table-header">
@@ -173,6 +176,7 @@
                     <!-- Dynamically created -->
                 </tbody>
             </table>
+            </div>
         </div>
     {% endif %}
 
@@ -181,6 +185,7 @@
 
     <div id="results" class="w-100">
         <div class="panel-heading"><h2>Individual machine results</h2><button class="button" type="button" onclick="fetch_results({{workload.id}})">Fetch results</button></div>
+        <div class="table-scroll">
         <table class="stripes wrappable">
             <tr class="table-header">
                 <th>#</th>
@@ -196,7 +201,7 @@
                 <!-- Dynamically created -->
             </tbody>
         </table>
-
+        </div>
 
     </div>
 
