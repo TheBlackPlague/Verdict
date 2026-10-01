@@ -101,7 +101,7 @@ th,td{border-bottom-color:#ffffff0b}
     #site-navigation{gap:1px}
     #site-navigation>a{padding-inline:6px}
 }
-@media(max-width:950px){
+@media(max-width:1120px){
     .site-header{position:relative;margin:8px 10px 0;gap:8px 12px}
     #site-navigation{gap:4px}
     #site-navigation>a{padding-inline:9px}
