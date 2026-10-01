@@ -130,3 +130,6 @@ th,td{border-bottom-color:#ffffff0b}
 .users-table td:first-child a:hover{color:var(--hover-ink)}
 .log-link{white-space:nowrap;font-size:.82rem}
 .event-log{margin:0;padding:16px;font-size:.85rem;line-height:1.65;tab-size:4}
+
+.manage-table td:nth-child(2){min-width:220px;max-width:520px;overflow-wrap:anywhere}
+.manage-table td:nth-child(n+3){text-align:center;white-space:nowrap}

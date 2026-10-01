@@ -1,0 +1,13 @@
+{% extends "OpenBench/base.html" %}
+
+{% block content %}
+
+    <nav class="anchor-container mb-4" aria-label="Manage resources">
+        <a class="anchorbutton btn-start" href="/manage/books/">Books</a>
+        <a class="anchorbutton btn-start" href="/manage/engines/">Engines</a>
+    </nav>
+
+    {% block manage %}
+    {% endblock %}
+
+{% endblock %}

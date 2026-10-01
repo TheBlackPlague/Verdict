@@ -30,6 +30,7 @@
             <a href="/users/" data-nav="users">Contributors</a>
             <a href="/events/" data-nav="events">Activity</a>
             <a href="/errors/" data-nav="errors">Errors</a>
+            <a href="/manage/" data-nav="manage">Manage</a>
         </nav>
         <div class="site-account">
             <details class="nav-menu">
@@ -67,7 +68,7 @@
         </div>
         <footer class="site-footer">
             <span><a href="https://github.com/TheBlackPlague/Verdict">Verdict</a> · Built on <a href="https://github.com/AndyGrant/OpenBench">OpenBench</a></span>
-            <nav aria-label="Engine repositories">{% for engine, data in config.engines.items %}<a href="{{ data.source }}">{{ engine }}</a>{% endfor %}</nav>
+            <nav aria-label="Engine repositories">{% for engine in engines %}<a href="{{ engine.source }}">{{ engine.name }}</a>{% endfor %}</nav>
         </footer>
     </main>
     {% if live_regions %}{{ live_regions|json_script:"live-regions" }}{% endif %}
