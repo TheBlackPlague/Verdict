@@ -1,0 +1,123 @@
+{% extends "OpenBench/manage.html" %}
+
+{% load mytags %}
+
+{% block scripts %}
+
+    <script>
+
+        document.addEventListener(
+            'DOMContentLoaded', function () {
+
+                var form = document.getElementById("book-form");
+                if (!form) return; // Only Managers are served the form
+
+                form.addEventListener("submit", function(event) {
+
+                    event.preventDefault(); // Stop event from hitting the wrong URL
+
+                    // Adjust the Form endpoint based on the new Book's name
+                    var book_name = encodeURIComponent(document.getElementById("book-name").value);
+
+                    // OpenBench Endpoint: manage/books/name/create/
+                    form.action = '/manage/books/' + book_name + '/create/'
+                    form.submit()
+                });
+            }, false
+        );
+
+    </script>
+
+{% endblock %}
+
+{% block manage %}
+
+    <div class="panel directory-panel">
+    <div class="table-scroll">
+    <table class="hoverable directory-table manage-table" aria-label="Opening books">
+        <thead>
+
+        <tr class="table-header">
+            <th scope="col">Name</th>
+            <th scope="col">Source</th>
+            <th scope="col">Status</th>
+            <th scope="col">Settings</th>
+            <th scope="col">Delete</th>
+        </tr>
+
+        </thead>
+        <tbody>
+        {% for book in books %}
+            <tr>
+                <td>{{book.name}}</td>
+                <td><a href="{{book.source}}">{{book.source|removePrefix:"https://raw.githubusercontent.com/"}}</a></td>
+
+                <td style="text-align: center">
+                    {% if book.enabled %}
+                        <span class="badge badge-green">Enabled</span>
+                    {% else %}
+                        <span class="badge badge-deleted">Disabled</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    <a class="icon-button" aria-label="Settings for {{book.name}}" href="/manage/books/{{book.name}}/">
+                        <i class="fa-solid fa-pen-to-square" style="color: grey;"></i>
+                    </a>
+                </td>
+
+                <td>
+                    {% if can_manage %}
+                        <form method="POST" action="/manage/books/{{book.name}}/delete/">
+                            {% csrf_token %}
+                            <button type="submit" onclick="return confirm('Permanently delete this book?')" class="icon-button" aria-label="Delete {{book.name}}"><i class="fa-solid fa-trash-can" aria-hidden="true"></i></button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+    </table>
+    </div>
+    </div>
+
+    {% if can_manage %}
+        <form method="POST" id="book-form" class="form-page mt-4">
+            {% csrf_token %}
+            <div class="form">
+                <div class="col-full">
+
+                    <h3> New Book </h3>
+
+                    <div class="row">
+                        <label for="book-name"> Name </label>
+                        <input id="book-name" required pattern="[a-zA-Z0-9_.-]{1,32}">
+                    </div>
+
+                    <div class="row">
+                        <label for="source"> Source </label>
+                        <input id="source" name="source" value="https://raw.githubusercontent.com/">
+                    </div>
+
+                    <div class="row">
+                        <label for="sha"> Sha256 </label>
+                        <input id="sha" name="sha">
+                    </div>
+
+                    <div class="row">
+                        <label for="enabled"> Enabled </label>
+                        <select id="enabled" name="enabled">
+                            <option selected value="TRUE"> True </option>
+                            <option value="FALSE"> False </option>
+                        </select>
+                    </div>
+
+                    <input type="submit" class="anchorbutton btn-blue w-100" value="Create Book">
+
+                </div>
+            </div>
+        </form>
+    {% endif %}
+
+{% endblock %}

@@ -33,14 +33,14 @@ from django.contrib.auth import authenticate
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage
 from django.db import transaction
-from django.db.models import F
+from django.db.models import F, Q
 from django.http import FileResponse, HttpResponse
 from django.utils import timezone
 from wsgiref.util import FileWrapper
 
 from OpenSite.settings import PROJECT_PATH
 
-from OpenBench.config import OPENBENCH_CONFIG
+from OpenBench.config import OPENBENCH_CONFIG, PRESET_TYPES, verify_engine_presets
 from OpenBench.models import *
 from OpenBench.stats import TrinomialSPRT, PentanomialSPRT
 
@@ -300,7 +300,7 @@ def network_upload(request, engine, name):
         return OpenBench.views.redirect(request, '/networks/', error='Network with that name already exists for that engine')
 
     # Filter out anyone who has used an unknown engine
-    if engine not in OPENBENCH_CONFIG['engines'].keys():
+    if not EngineConfig.objects.filter(name=engine).exists():
         return OpenBench.views.redirect(request, '/networks/', error='No Engine found with matching name')
 
     # Save the file locally into /Media/ if we don't already have this file
@@ -378,6 +378,155 @@ def network_edit(request, engine, network):
         network.save()
 
     return OpenBench.views.redirect(request, '/networks/%s' % (network.engine), status='Applied changes')
+
+
+# Purely Helper functions for Books views
+
+def book_verify(request):
+
+    # A bad sha or source breaks every Client that downloads the Book. Books are
+    # only served out of Github for now, hence the restriction on the source.
+
+    if not re.match(r'^[0-9a-f]{64}$', request.POST['sha']):
+        return 'Sha must be a 64 digit lowercase hex digest'
+
+    required_path = 'https://raw.githubusercontent.com/'
+    if not request.POST['source'].startswith(required_path):
+        return 'Sources must start with %s' % (required_path)
+
+    return None
+
+def book_create(request, name):
+
+    # Rejecct Books with strange characters, or names too long for the column
+    if not re.match(r'^[a-zA-Z0-9_.-]{1,32}$', name):
+        return OpenBench.views.redirect(request, '/manage/books/', error='Valid names are 1-32 of [a-zA-Z0-9_.-]')
+
+    # Don't allow duplicates, as Workloads refer to Books by name
+    if Book.objects.filter(name=name).exists():
+        error = 'A Book already exists with the name %s' % (name)
+        return OpenBench.views.redirect(request, '/manage/books/', error=error)
+
+    if (error := book_verify(request)):
+        return OpenBench.views.redirect(request, '/manage/books/', error=error)
+
+    # The only place a Book's name is ever set
+    Book.objects.create(
+        name=name, source=request.POST['source'],
+        sha=request.POST['sha'], enabled=request.POST['enabled'] == 'TRUE')
+
+    return OpenBench.views.redirect(request, '/manage/books/', status='Created Book %s' % (name))
+
+def book_edit(request, book):
+
+    if (error := book_verify(request)):
+        return OpenBench.views.redirect(request, '/manage/books/%s/' % (book.name), error=error)
+
+    # The name is never changed, since Workloads refer to Books by name
+    book.source  = request.POST['source']
+    book.sha     = request.POST['sha']
+    book.enabled = request.POST['enabled'] == 'TRUE'
+    book.save()
+
+    return OpenBench.views.redirect(request, '/manage/books/', status='Updated Book %s' % (book.name))
+
+def book_delete(request, book):
+
+    # Workloads refer to Books by name, so any Book still in use has to be kept.
+    # Only checked here, to keep the cost off of every view of the Book list.
+    if Test.objects.filter(book_name=book.name).exists():
+        error = 'Cannot delete %s, as it is still used by existing Workloads' % (book.name)
+        return OpenBench.views.redirect(request, '/manage/books/', error=error)
+
+    book.delete()
+    return OpenBench.views.redirect(request, '/manage/books/', status='Deleted Book %s' % (book.name))
+
+
+# Purely Helper functions for Engines views
+
+def engine_verify(request, name):
+
+    # Sources are Github repos, which is where the Client clones the Engine from
+    if not request.POST['source'].startswith('https://github.com/'):
+        return 'Sources must start with https://github.com/'
+
+    try: assert int(request.POST['nps']) > 0
+    except: return 'NPS must be a positive integer'
+
+    # Presets are only offered when editing. A new Engine starts off blank
+    if 'presets' in request.POST:
+
+        try: presets = json.loads(request.POST['presets'])
+        except: return 'Presets must be valid json'
+
+        if (error := verify_engine_presets(presets)):
+            return error
+
+    # Private Engines are cloned using a token kept in Config/credentials.<name>
+    if request.POST['private'] == 'TRUE' and not read_git_credentials(name):
+        return 'Private Engines require a Config/credentials.%s file' % (name.replace(' ', '').lower())
+
+    return None
+
+def engine_fields(request):
+
+    # Presets are only offered when editing. A new Engine starts off blank
+    blank   = { x : { 'default' : {} } for x in PRESET_TYPES }
+    presets = json.loads(request.POST['presets']) if 'presets' in request.POST else blank
+
+    return {
+        'private'         : request.POST['private'] == 'TRUE',
+        'enabled'         : request.POST['enabled'] == 'TRUE',
+        'nps'             : int(request.POST['nps']),
+        'source'          : request.POST['source'],
+        'build_path'      : request.POST['build_path'],
+        'build_compilers' : request.POST['build_compilers'],
+        'build_cpuflags'  : request.POST['build_cpuflags'],
+        'build_systems'   : request.POST['build_systems'],
+        'presets'         : presets,
+    }
+
+def engine_create(request, name):
+
+    # Rejecct Engines with strange characters, or names too long for the column
+    if not re.match(r'^[a-zA-Z0-9_.-]{1,64}$', name):
+        return OpenBench.views.redirect(request, '/manage/engines/', error='Valid names are 1-64 of [a-zA-Z0-9_.-]')
+
+    # Don't allow duplicates, as Workloads refer to Engines by name
+    if EngineConfig.objects.filter(name=name).exists():
+        error = 'An Engine already exists with the name %s' % (name)
+        return OpenBench.views.redirect(request, '/manage/engines/', error=error)
+
+    if (error := engine_verify(request, name)):
+        return OpenBench.views.redirect(request, '/manage/engines/', error=error)
+
+    # The only place an Engine's name is ever set
+    EngineConfig.objects.create(name=name, **engine_fields(request))
+
+    return OpenBench.views.redirect(request, '/manage/engines/', status='Created Engine %s' % (name))
+
+def engine_edit(request, config):
+
+    if (error := engine_verify(request, config.name)):
+        return OpenBench.views.redirect(request, '/manage/engines/%s/' % (config.name), error=error)
+
+    # The name is never changed, since Workloads refer to Engines by name
+    for field, value in engine_fields(request).items():
+        setattr(config, field, value)
+    config.save()
+
+    return OpenBench.views.redirect(request, '/manage/engines/', status='Updated Engine %s' % (config.name))
+
+def engine_delete(request, config):
+
+    # Workloads refer to Engines by name, so any Engine in use has to be kept.
+    # Only checked here, to keep the cost off of every view of the Engine list.
+    if Test.objects.filter(Q(dev_engine=config.name) | Q(base_engine=config.name)).exists():
+        error = 'Cannot delete %s, as it is still used by existing Workloads' % (config.name)
+        return OpenBench.views.redirect(request, '/manage/engines/', error=error)
+
+    config.delete()
+    return OpenBench.views.redirect(request, '/manage/engines/', status='Deleted Engine %s' % (config.name))
 
 
 def update_test(request, machine):

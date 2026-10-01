@@ -1,0 +1,153 @@
+{% extends "OpenBench/manage.html" %}
+
+{% load mytags %}
+
+{% block scripts %}
+
+    <script>
+
+        document.addEventListener(
+            'DOMContentLoaded', function () {
+
+                var form = document.getElementById("engine-form");
+                if (!form) return; // Only Managers are served the form
+
+                form.addEventListener("submit", function(event) {
+
+                    event.preventDefault(); // Stop event from hitting the wrong URL
+
+                    // Adjust the Form endpoint based on the new Engine's name
+                    var engine_name = encodeURIComponent(document.getElementById("engine-name").value);
+
+                    // OpenBench Endpoint: manage/engines/name/create/
+                    form.action = '/manage/engines/' + engine_name + '/create/'
+                    form.submit()
+                });
+            }, false
+        );
+
+    </script>
+
+{% endblock %}
+
+{% block manage %}
+
+    <div class="panel directory-panel">
+    <div class="table-scroll">
+    <table class="hoverable directory-table manage-table" aria-label="Engines">
+        <thead>
+
+        <tr class="table-header">
+            <th scope="col">Name</th>
+            <th scope="col">Source</th>
+            <th scope="col">Status</th>
+            <th scope="col">Settings</th>
+            <th scope="col">Delete</th>
+        </tr>
+
+        </thead>
+        <tbody>
+        {% for config in configs %}
+            <tr>
+                <td>{{config.name}}</td>
+                <td><a href="{{config.source}}">{{config.source|removePrefix:"https://github.com/"}}</a></td>
+
+                <td style="text-align: center">
+                    {% if config.enabled %}
+                        <span class="badge badge-green">Enabled</span>
+                    {% else %}
+                        <span class="badge badge-deleted">Disabled</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    <a class="icon-button" aria-label="Settings for {{config.name}}" href="/manage/engines/{{config.name}}/">
+                        <i class="fa-solid fa-pen-to-square" style="color: grey;"></i>
+                    </a>
+                </td>
+
+                <td>
+                    {% if can_manage %}
+                        <form method="POST" action="/manage/engines/{{config.name}}/delete/">
+                            {% csrf_token %}
+                            <button type="submit" onclick="return confirm('Permanently delete this engine?')" class="icon-button" aria-label="Delete {{config.name}}"><i class="fa-solid fa-trash-can" aria-hidden="true"></i></button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+    </table>
+    </div>
+    </div>
+
+    {% if can_manage %}
+        <form method="POST" id="engine-form" class="form-page mt-4">
+            {% csrf_token %}
+            <div class="form">
+                <div class="col-full">
+
+                    <h3> New Engine </h3>
+
+                    <div class="row">
+                        <label for="engine-name"> Name </label>
+                        <input id="engine-name" required pattern="[a-zA-Z0-9_.-]{1,64}">
+                    </div>
+
+                    <div class="row">
+                        <label for="source"> Source </label>
+                        <input id="source" name="source" value="https://github.com/">
+                    </div>
+
+                    <div class="row">
+                        <label for="nps"> NPS </label>
+                        <input id="nps" name="nps">
+                    </div>
+
+                    <div class="row">
+                        <label for="private"> Private </label>
+                        <select id="private" name="private">
+                            <option value="TRUE"> True </option>
+                            <option selected value="FALSE"> False </option>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <label for="enabled"> Enabled </label>
+                        <select id="enabled" name="enabled">
+                            <option selected value="TRUE"> True </option>
+                            <option value="FALSE"> False </option>
+                        </select>
+                    </div>
+
+                    <h3> Build Settings </h3>
+
+                    <div class="row">
+                        <label for="build_path"> Path </label>
+                        <input id="build_path" name="build_path">
+                    </div>
+
+                    <div class="row">
+                        <label for="build_compilers"> Compilers </label>
+                        <input id="build_compilers" name="build_compilers" placeholder="Separated By Spaces">
+                    </div>
+
+                    <div class="row">
+                        <label for="build_cpuflags"> Cpu Flags </label>
+                        <input id="build_cpuflags" name="build_cpuflags" placeholder="Separated By Spaces">
+                    </div>
+
+                    <div class="row">
+                        <label for="build_systems"> Systems </label>
+                        <input id="build_systems" name="build_systems" placeholder="Separated By Spaces">
+                    </div>
+
+                    <input type="submit" class="anchorbutton btn-blue w-100" value="Create Engine">
+
+                </div>
+            </div>
+        </form>
+    {% endif %}
+
+{% endblock %}
