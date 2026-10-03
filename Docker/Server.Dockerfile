@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /Verdict
 
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt gunicorn==26.2.0
+RUN pip install --no-cache-dir -r requirements.txt gunicorn==26.2.0 "psycopg[binary]==3.3.6"
 
 COPY OpenBench ./OpenBench
 COPY OpenSite ./OpenSite
