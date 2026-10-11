@@ -545,9 +545,6 @@ def update_test(request, machine):
     losses, draws, wins = map(int, request.POST['trinomial'].split())
     games = losses + draws + wins
 
-    try: elapsed = float(request.POST.get('elapsed', 0))
-    except (TypeError, ValueError): elapsed = 0
-
     # Pentanomial Implementation
     LL, LD, DD, DW, WW = map(int, request.POST['pentanomial'].split())
 
@@ -589,15 +586,6 @@ def update_test(request, machine):
         test.DW     += DW
         test.WW     += WW
         test.games  += games  # Overall
-
-        if games > 0 and math.isfinite(elapsed) and elapsed > 0:
-            from OpenBench.workloads.get_workload import game_distribution
-            distribution = game_distribution(test, machine)
-            threads = max(int(extract_option(test.dev_options, 'Threads')),
-                          int(extract_option(test.base_options, 'Threads')))
-            slots = distribution['runner-count'] * distribution['concurrency-per']
-            test.eta_games        += games
-            test.eta_core_seconds += elapsed * slots * threads
 
         # Consider only Crashes or Illegal moves as real errors
         test.error = bool(test.error or crashes or illegals)

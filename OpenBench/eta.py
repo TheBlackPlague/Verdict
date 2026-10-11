@@ -90,24 +90,21 @@ def player_seconds(control):
 
 def remaining_core_hours(test):
 
+
     from OpenBench.utils import extract_option
 
     games = remaining_games(test)
     if games == 0:
         return 0.0
-    if games is None:
-        return None
-    if test.eta_games > 0 and math.isfinite(test.eta_core_seconds) and test.eta_core_seconds > 0:
-        return games * test.eta_core_seconds / test.eta_games / 3600
-
     dev_seconds = player_seconds(test.dev_time_control)
     base_seconds = player_seconds(test.base_time_control)
-    if dev_seconds is None or base_seconds is None:
+    if games is None or dev_seconds is None or base_seconds is None:
         return None
+
 
     threads = max(int(extract_option(test.dev_options, 'Threads') or 1),
                   int(extract_option(test.base_options, 'Threads') or 1))
-    return 2 * games * (dev_seconds + base_seconds) * threads / 3600
+    return games * (dev_seconds + base_seconds) * threads / 3600
 
 
 def format_hours(hours):
@@ -125,23 +122,13 @@ def format_hours(hours):
 
 def queue_eta(tests, machines):
 
-    from OpenBench.utils import extract_option
-    from OpenBench.workloads.get_workload import game_distribution
 
     tests = [test for test in tests if test.approved and not test.finished and not test.deleted]
     if not tests:
         return {'label': 'Queue empty', 'hours': 0, 'detail': 'No approved workloads remain.'}
 
-    workloads = {test.id: test for test in tests}
-    threads = 0
-    for machine in machines:
-        if machine.workload not in workloads:
-            continue
-        test = workloads[machine.workload]
-        distribution = game_distribution(test, machine)
-        game_threads = max(int(extract_option(test.dev_options, 'Threads')),
-                           int(extract_option(test.base_options, 'Threads')))
-        threads += distribution['runner-count'] * distribution['concurrency-per'] * game_threads
+    ids = {test.id for test in tests}
+    threads = sum(machine.info.get('concurrency', 0) for machine in machines if machine.workload in ids)
     if threads <= 0:
         return {'label': 'No workers', 'hours': None,
                 'detail': 'An estimate will appear when workers are connected to the approved queue.'}
@@ -151,9 +138,6 @@ def queue_eta(tests, machines):
         return {'label': 'Unavailable', 'hours': None,
                 'detail': 'Some queued workloads cannot be estimated from their time controls or test settings.'}
 
-    hours = sum(work) / threads
+    hours = sum(work) / (threads * 0.5)
     return {'label': format_hours(hours), 'hours': hours,
-            'detail': 'Approximate time to clear all approved workloads using observed core-seconds per game and current capacity. '
-                      'Until timing is available, time controls assume half the reference speed. '
-                      'SPRT estimates use the current LLR and observed drift; results and worker speeds can change the estimate. '
-                      'Excludes workloads awaiting approval.'}
+            'detail': 'Estimated completion time of all workloads.'}

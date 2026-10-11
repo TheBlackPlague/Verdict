@@ -61,7 +61,7 @@ from client import try_forever
 
 ## Basic configuration of the Client. These timeouts can be changed at will
 
-CLIENT_VERSION   = 52 # Client version to send to the Server
+CLIENT_VERSION   = 51 # Client version to send to the Server
 TIMEOUT_HTTP     = 30 # Timeout in seconds for HTTP requests
 TIMEOUT_ERROR    = 60 # Timeout in seconds when any errors are thrown
 TIMEOUT_WORKLOAD = 60 # Timeout in seconds between workload requests
@@ -317,13 +317,12 @@ class ServerReporter:
         return ServerReporter.report(config, 'clientBenchError', payload)
 
     @staticmethod
-    def report_results(config, batches, elapsed):
+    def report_results(config, batches):
 
         payload = {
 
             'test_id'      : config.workload['test']['id'],
             'result_id'    : config.workload['result']['id'],
-            'elapsed'      : elapsed,
 
             'trinomial'    : [0, 0, 0],       # LDW
             'pentanomial'  : [0, 0, 0, 0, 0], # LL DL DD DW WW
@@ -644,12 +643,11 @@ class ResultsReporter(object):
     ## workers place results into. Once finished, this class can be used to collect
     ## all of the errors in the PGN, and send htem back to the server.
 
-    def __init__(self, config, tasks, results_queue, abort_flag, started):
+    def __init__(self, config, tasks, results_queue, abort_flag):
         self.config        = config
         self.tasks         = tasks
         self.results_queue = results_queue
         self.abort_flag    = abort_flag
-        self.last_results  = started
 
     def process_until_finished(self):
 
@@ -705,10 +703,7 @@ class ResultsReporter(object):
                 self.last_report = time.time()
 
             else: # Send all of the queued Results at once
-                sampled = time.monotonic()
-                elapsed = sampled - self.last_results
-                response = ServerReporter.report_results(self.config, self.pending, elapsed).json()
-                self.last_results = sampled
+                response = ServerReporter.report_results(self.config, self.pending).json()
                 self.last_report = time.time()
                 self.pending = []
 
@@ -1141,7 +1136,6 @@ def complete_workload(config):
         results    = multiprocessing.Queue()
         abort_flag = threading.Event()
 
-        started = time.monotonic()
         tasks = [] # Create each of the match runner workers
         for x in range(runner_cnt):
             cmd = build_runner_command(config, dev_name, base_name, scale_factor, timestamp, x)
@@ -1149,7 +1143,7 @@ def complete_workload(config):
 
         # Process the Queue until we exit, finish, or are told to stop by the server
         try:
-            rr = ResultsReporter(config, tasks, results, abort_flag, started)
+            rr = ResultsReporter(config, tasks, results, abort_flag)
             rr.process_until_finished()
             rr.send_errors(timestamp, runner_cnt)
             MatchRunner.kill_everything(dev_name, base_name)
