@@ -252,6 +252,9 @@ class Test(Model):
     DW     = IntegerField(default=0) # Pentanomial
     WW     = IntegerField(default=0) # Pentanomial
 
+    eta_games        = BigIntegerField(default=0)
+    eta_core_seconds = FloatField(default=0.0)
+
     # Switching all future tests to Pentanomial
     use_tri   = BooleanField(default=False)
     use_penta = BooleanField(default=True)
