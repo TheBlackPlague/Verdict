@@ -42,7 +42,7 @@
 #content .search-form br,#content .search-form hr{display:none}
 #content .search-form .status-filters{grid-column:1/-1;margin:6px 0 12px}
 #content .search-form input[type="submit"]{grid-column:1/-1;width:auto;justify-self:start}
-#test-mode-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+#test-mode-buttons{margin-top:20px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 #test-mode-buttons .preset-group{min-width:0;display:flex;flex-direction:column;gap:6px}
 #content #test-mode-buttons h3{margin:0 0 2px;overflow-wrap:anywhere}
 #test-mode-buttons button{width:100%;overflow-wrap:anywhere}
