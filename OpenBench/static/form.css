@@ -42,14 +42,20 @@
 #content .search-form br,#content .search-form hr{display:none}
 #content .search-form .status-filters{grid-column:1/-1;margin:6px 0 12px}
 #content .search-form input[type="submit"]{grid-column:1/-1;width:auto;justify-self:start}
+#test-mode-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+#test-mode-buttons .preset-group{min-width:0;display:flex;flex-direction:column;gap:6px}
+#content #test-mode-buttons h3{margin:0 0 2px;overflow-wrap:anywhere}
+#test-mode-buttons button{width:100%;overflow-wrap:anywhere}
 @media(max-width:1050px){
     #content .form .col{width:100%}
     #content .form .col-half{width:50%}
 }
 @media(max-width:700px){
+    #test-mode-buttons{grid-template-columns:repeat(2,minmax(0,1fr))}
     #content .search-form .form>.col{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:600px){
+    #test-mode-buttons{grid-template-columns:1fr}
     #content .form .row{flex-direction:column;align-items:stretch;gap:4px}
     #content .row label{width:auto}
     #content .row input:not([type="checkbox"]):not([type="radio"]),#content .row select,#content .row textarea{flex:none;font-size:16px;min-height:44px}

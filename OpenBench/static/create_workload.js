@@ -48,39 +48,50 @@ function create_preset_buttons(engine, workload_type) {
                   : workload_type == 'TUNE'    ? engines[engine].tune_presets
                   : workload_type == 'DATAGEN' ? engines[engine].datagen_presets : {};
 
-    var index = 0;
-    for (let mode in presets) {
-
-        // Don't include the global defaults
+    // Keep each time control and purpose together, with SMP variants below it.
+    const groups = new Map();
+    for (const mode of Object.keys(presets)) {
         if (mode == 'default')
             continue;
 
-        // Create a new button for the test mode
-        var btn       = document.createElement('button')
-        btn.innerHTML = mode;
-        btn.onclick   = function() { apply_preset(mode, workload_type); };
+        const group = mode.replace(/\s+\[SMP \d+T\]$/, '');
+        if (!groups.has(group))
+            groups.set(group, []);
+        groups.get(group).push(mode);
+    }
 
-        // Apply all of our CSS bootstrapping
-        btn.classList.add('anchorbutton');
-        btn.classList.add('btn-preset');
-        btn.classList.add('mt-1');
-        btn.classList.add('w-100');
+    const time_controls = ['STC', 'LTC', 'VLTC'];
+    const names = Array.from(groups.keys()).sort((a, b) => {
+        const [time_a, ...purpose_a] = a.split(' ');
+        const [time_b, ...purpose_b] = b.split(' ');
+        if (time_controls.includes(time_a) && time_controls.includes(time_b))
+            return purpose_a.join(' ').localeCompare(purpose_b.join(' '))
+                || time_controls.indexOf(time_a) - time_controls.indexOf(time_b);
+        return Number(time_controls.includes(time_b)) - Number(time_controls.includes(time_a))
+            || a.localeCompare(b, undefined, {numeric: true});
+    });
 
-        // Put the button in a div, so we can handle padding
-        var div = document.createElement('div')
-        div.appendChild(btn)
-        div.classList.add('col-half');
+    for (const name of names) {
+        const group = document.createElement('section');
+        group.classList.add('preset-group');
 
-        // Left pad everything but the first
-        if ((index % 4) != 0)
-            div.classList.add('pl-half');
+        const heading = document.createElement('h3');
+        heading.textContent = name;
+        group.appendChild(heading);
 
-        // Right pad everything but the last
-        if ((index % 4) != 3)
-            div.classList.add('pr-half');
+        const modes = groups.get(name).sort((a, b) =>
+            a.localeCompare(b, undefined, {numeric: true}));
 
-        button_div.append(div);
-        index++;
+        for (const mode of modes) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = mode;
+            btn.onclick = function() { apply_preset(mode, workload_type); };
+            btn.classList.add('anchorbutton', 'btn-preset');
+            group.appendChild(btn);
+        }
+
+        button_div.appendChild(group);
     }
 }
 
