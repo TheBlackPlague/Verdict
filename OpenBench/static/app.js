@@ -230,6 +230,7 @@
   if (presetHost && form && window.engines && hasRepo(['apply_preset', 'create_preset_buttons', 'change_engine', 'set_test_type'])) {
     const RE = /^(\S+)(?: ([^\[].*?))?(?: \[((?:SMP )?(\d+)T)\])?$/;
     const goalName = g => g || 'Standard';
+    const tcOf = k => k.split(' ')[0], tcRank = k => { const m = tcOf(k).match(/^(V*)([SL])TC$/); return m ? (m[2] === 'S' ? 0 : 1 + m[1].length) : Infinity; };
     const PRESETS = { TUNE: 'tune_presets', DATAGEN: 'datagen_presets' };
     const presetsOf = (eng, type) => window.engines[eng][PRESETS[type] || 'test_presets'] || {};
     const segHTML = (name, label, items, on) => `<div class="frow"><span class="flabel" id="pl-${name}">${label}</span><div class="fctl"><div class="seg seg-content seg-fill" role="radiogroup" aria-labelledby="pl-${name}">${items.map(([v, l]) => `<label><input type="radio" form="sheet-ui" name="${name}" value="${escH(v)}"${v === on ? ' checked' : ''}><span>${escH(l)}</span></label>`).join('')}</div></div></div>`;
@@ -272,7 +273,7 @@
     };
     window.create_preset_buttons = function (eng, type) {
       markApplied = null; presetHost.onchange = null;
-      drawPresets(Object.keys(presetsOf(eng, type)).filter(k => k !== 'default'), type);
+      drawPresets(Object.keys(presetsOf(eng, type)).filter(k => k !== 'default').sort((a, b) => tcRank(a) - tcRank(b) || tcOf(a).localeCompare(tcOf(b), undefined, { numeric: true })), type);
       setTimeout(after);
     };
 
