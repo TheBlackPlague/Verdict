@@ -12,7 +12,7 @@
 {% else %}{% if mode == 'SPRT' %}
         <div class="c-llr" role="meter" aria-label="{{ r.llr }}" aria-valuemin="{{ test.lowerllr|floatformat:4 }}" aria-valuemax="{{ test.upperllr|floatformat:4 }}" aria-valuenow="{{ test|bounded_llr|floatformat:4 }}" aria-valuetext="{{ test.currentllr|floatformat:2 }}">
           <div class="c-top"><b class="num">{{ r.llr_figure }}</b></div>
-          <div class="track track-llr dir-{% if key == 'yellow' %}warn{% elif test.currentllr > 0.004 %}up{% elif test.currentllr < -0.004 %}down{% else %}flat{% endif %}" style="--at:{{ test|llr_position }}%;--zero:{{ test|llr_zero }}%"><i class="zone zf"></i><i class="zone zp"></i><i class="mid"></i><i class="fill"></i><i class="knob"></i></div>
+          <div class="track track-llr dir-{% if key == 'yellow' %}warn{% elif test.currentllr > 0.004 %}up{% elif test.currentllr < -0.004 %}down{% else %}flat{% endif %}" style="--at:{{ test|llr_position }}%;--zero:{{ test|llr_zero }}%"><i class="mid"></i><i class="fill"></i><i class="knob"></i></div>
         </div>
 {% else %}
         <div class="c-llr" role="meter" aria-label="{% if mode == 'DATAGEN' %}{{ r.generated }}{% else %}{{ r.elo }}{% endif %}" aria-valuemin="0" aria-valuemax="{{ test.max_games }}" aria-valuenow="{{ test.games }}" aria-valuetext="{{ test.games }}/{{ test.max_games }}">
@@ -26,12 +26,11 @@
         </div>{% endwith %}{% else %}
         <div class="c-elo is-empty" title="{{ r.elo }}"><div class="c-top"><b class="num">—</b></div><div class="ci"><i class="zero"></i></div></div>{% endif %}
         <div class="c-games" title="{{ r.games }}">
-          <div class="c-top"><b class="num">{{ test.games|insertCommas }}</b>{% if test.games %}<span class="c-aside num wl" aria-label="{{ r.wld }}"><span class="w">{{ test.wins|insertCommas }}</span> <span class="l">{{ test.losses|insertCommas }}</span> <span class="d">{{ test.draws|insertCommas }}</span></span>{% endif %}</div>
-          <div class="wdl" role="img" aria-label="{{ r.wld }}">{% if test.games %}{% with p=test|wdl_widths %}<i class="w" style="width:{{ p.w }}%"></i><i class="d" style="width:{{ p.d }}%"></i><i class="l" style="width:{{ p.l }}%"></i>{% endwith %}{% endif %}</div>
+          <div class="c-top"><b class="num">{{ test.games|insertCommas }}</b></div>
+          <div class="wdl" role="img" aria-label="{{ r.wld }}">{% if test.games %}{% with p=test|wdl_widths %}<i class="w" style="width:{{ p.w }}%"></i><i class="d" style="width:{{ p.d }}%"></i><i class="l" style="width:{{ p.l }}%"></i>{% endwith %}{% endif %}</div>{% if test.games %}
+          <span class="wl num" aria-label="{{ r.wld }}"><span class="w">{{ test.wins|insertCommas }}</span> <span class="d">{{ test.draws|insertCommas }}</span> <span class="l">{{ test.losses|insertCommas }}</span></span>{% endif %}
         </div>
-{% endif %}{% if mode == 'SPSA' or not test.use_penta %}
-        <div class="c-penta is-empty" aria-hidden="true"></div>{% else %}{% with h=test|penta_heights %}
-        <div class="c-penta{% if 100.0 not in h %} is-empty{% endif %}" role="img" aria-label="{{ r.penta }}" title="{{ r.penta }}">{% for height in h %}<i class="p{{ forloop.counter0 }}" style="height:{{ height }}%"></i>{% endfor %}</div>{% endwith %}{% endif %}
+{% endif %}
         <p class="c-note{% if not test.info %} is-nil{% endif %}"{% if test.info %} title="{{ test.info }}"{% endif %}>{{ test.info|default:'—' }}</p>
         <a class="c-cmp icon-btn" href="{{ test|gitDiffLink }}" aria-label="Compare revisions for workload {{ test.id }}" title="Compare revisions">{% icon "compare" %}</a>
       </li>{% endwith %}

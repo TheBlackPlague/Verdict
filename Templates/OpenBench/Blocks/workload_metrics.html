@@ -51,10 +51,10 @@
           </div>
         </section>
         <section class="card metric" aria-labelledby="m-games">
-          <h3 id="m-games" class="m-k">Wins / losses / draws</h3>
+          <h3 id="m-games" class="m-k">Wins / draws / losses</h3>
           <p class="m-v"><b class="num">{{ workload.games|insertCommas }}</b><span>{% if mode == 'DATAGEN' %}games generated{% else %}games{% if mode == 'SPRT' and workload.max_games %} / {{ workload.max_games|insertCommas }} target{% endif %}{% endif %}</span></p>
           <div class="wdl wdl-lg" role="img" aria-label="{{ workload.wins|insertCommas }} / {{ workload.losses|insertCommas }} / {{ workload.draws|insertCommas }}">{% if workload.games %}{% with p=workload|wdl_widths %}<i class="w" style="width:{{ p.w }}%"></i><i class="d" style="width:{{ p.d }}%"></i><i class="l" style="width:{{ p.l }}%"></i>{% endwith %}{% endif %}</div>
-          <p class="wld num"><span class="w">{{ workload.wins|insertCommas }}</span> / <span class="l">{{ workload.losses|insertCommas }}</span> / <span class="d">{{ workload.draws|insertCommas }}</span></p>
+          <p class="wld num"><span class="w">{{ workload.wins|insertCommas }}</span> <span class="d">{{ workload.draws|insertCommas }}</span> <span class="l">{{ workload.losses|insertCommas }}</span></p>
         </section>{% if workload.use_penta %}{% with p=workload.as_penta h=workload|penta_heights %}
         <section class="card metric" aria-labelledby="m-penta">
           <h3 id="m-penta" class="m-k">Pentanomial</h3>

@@ -5,16 +5,8 @@
   const hasRepo = names => names.every(f => typeof window[f] === 'function');
   const anchored = CSS.supports('anchor-name: --a');
 
-  const edge = () => {
-    root.toggleAttribute('data-scrolled', scrollY > 2);
-    const cols = $('.cols');
-    if (cols && getComputedStyle(cols).display !== 'none') {
-      const top = parseFloat(getComputedStyle(cols).top);
-      root.toggleAttribute('data-pinned', scrollY > 2 && cols.getBoundingClientRect().top <= top + .5);
-    } else root.removeAttribute('data-pinned');
-  };
+  const edge = () => root.toggleAttribute('data-scrolled', scrollY > 2);
   addEventListener('scroll', edge, { passive: true }); addEventListener('resize', edge); edge();
-  document.addEventListener('verdict:updated', edge);
 
   function segSync(seg, instant) {
     if (!seg) return;

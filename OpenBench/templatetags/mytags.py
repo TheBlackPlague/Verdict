@@ -518,7 +518,6 @@ def row_readings(workload):
         elo='Elo: %0.2f +- %0.2f (95%%)' % (elo, interval),
         games='Games: %d W: %d L: %d D: %d' % nwld,
         wld='W: %d L: %d D: %d' % nwld[1:],
-        penta='Ptnml(0-2): %d, %d, %d, %d, %d' % workload.as_penta(),
         generated='Generated %d/%d Games' % (workload.games, workload.max_games),
     )
     if workload.test_mode in ('GAMES', 'DATAGEN'):
