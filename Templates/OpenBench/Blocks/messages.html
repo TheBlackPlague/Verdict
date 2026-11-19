@@ -1,0 +1,3 @@
+{% if request.session.error_message %}<div class="error-message" role="alert"><pre>{{ request.session.error_message }}</pre></div>{% endif %}
+{% if request.session.warning_message %}<div class="warning-message" role="status"><pre>{{ request.session.warning_message }}</pre></div>{% endif %}
+{% if request.session.status_message %}<div class="status-message" role="status"><pre>{{ request.session.status_message }}</pre></div>{% endif %}

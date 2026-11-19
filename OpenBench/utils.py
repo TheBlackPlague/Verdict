@@ -182,18 +182,18 @@ def get_pending_tests():
     t = Test.objects.select_related('dev', 'base', 'spsa_run').filter(approved=False)
     t = t.exclude(finished=True)
     t = t.exclude(deleted=True)
-    return t.order_by('-creation')
+    return t.order_by('-creation', '-id')
 
 def get_active_tests():
     t = Test.objects.select_related('dev', 'base', 'spsa_run').filter(approved=True)
     t = t.exclude(finished=True)
     t = t.exclude(deleted=True)
-    return t.order_by('-priority', '-currentllr')
+    return t.order_by('-priority', '-currentllr', '-id')
 
 def get_completed_tests():
     t = Test.objects.select_related('dev', 'base', 'spsa_run').filter(finished=True)
     t = t.exclude(deleted=True)
-    return t.order_by('-updated')
+    return t.order_by('-updated', '-id')
 
 def group_active_tests_by_priority(active):
     grouped = []

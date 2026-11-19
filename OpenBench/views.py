@@ -274,7 +274,7 @@ def profile_config(request):
 #                               TEST LIST VIEWS                               #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-def index(request, page=1):
+def index_context(page=1):
 
     from OpenBench.eta import queue_eta
 
@@ -284,7 +284,7 @@ def index(request, page=1):
 
     start, end, paging = OpenBench.utils.getPaging(completed, int(page), 'index')
 
-    data = {
+    return {
         'pending'   : pending,
         'active'    : OpenBench.utils.group_active_tests_by_priority(active),
         'completed' : completed[start:end],
@@ -294,7 +294,8 @@ def index(request, page=1):
         'queue_eta': queue_eta(active, OpenBench.utils.getRecentMachines().only('info', 'workload')),
     }
 
-    return render(request, 'index.html', data)
+def index(request, page=1):
+    return render(request, 'index.html', index_context(page))
 
 def user(request, username, page=1):
 
@@ -432,7 +433,7 @@ def search(request):
     if tc_value := params.get('tc-value-input', ''):
         tests = tests.filter(dev_time_control__contains=tc_value)
 
-    filtered = list(tests)
+    filtered = list(tests.order_by('-id'))
 
     # Echo the submitted values back so the form stays populated for tweaking
 
@@ -458,7 +459,7 @@ def search(request):
     }
 
     error = 'No matching tests found' if not len(filtered) else None
-    data  = { 'tests' : reversed(filtered), 'form' : form, 'books' : books }
+    data  = { 'tests' : filtered, 'form' : form, 'books' : books }
     return render(request, 'search.html', data, error=error)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -467,7 +468,7 @@ def search(request):
 
 def users(request):
 
-    data = { 'profiles' : Profile.objects.select_related('user').order_by('-games', '-tests') }
+    data = { 'profiles' : Profile.objects.select_related('user').order_by('-games', '-tests', 'id') }
     return render(request, 'users.html', data)
 
 def event(request, pk):
@@ -497,7 +498,7 @@ def events_errors(request, page=1):
 def machines(request, pk=None):
 
     if pk == None:
-        recent = list(OpenBench.utils.getRecentMachines().select_related('user'))
+        recent = list(OpenBench.utils.getRecentMachines().select_related('user').order_by('id'))
         workloads = Test.objects.filter(id__in=[m.workload for m in recent]).select_related('dev').in_bulk()
         for machine in recent:
             machine.current_workload = workloads.get(machine.workload)

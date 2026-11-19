@@ -1,4 +1,10 @@
 {% extends "OpenBench/base.html" %}
+{% block html_class %}p-index{% endblock %}
+{% block page_sub %}{% if fleet %}<span class="dot-sep" aria-hidden="true"></span><span id="overview-count-live">{% include "OpenBench/Blocks/overview_count.html" %}</span>{% endif %}{% endblock %}
+{% block page_actions %}{% if paging.url != 'greens' %}<div class="capsule glass seg seg-glass" role="group" aria-label="Show" data-lens data-lens-bezel="12" data-lens-scale="12">{% include "OpenBench/Blocks/list_filter.html" %}</div>
+    {% endif %}{% endblock %}
+{% block phone_head %}<div class="page-head phone-only"><p class="large-title" aria-hidden="true">{{ page_title }}</p><p class="sub dots"><span class="live-state live-mirror" aria-hidden="true"><i class="live-dot"></i><span data-live-mirror>Live · 10s</span></span>{% if fleet %}<span id="overview-phone-live" class="dc">{% include "OpenBench/Blocks/overview_phone.html" %}</span>{% endif %}</p></div>{% endblock %}
 {% block content %}
-<div id="overview-live">{% include "OpenBench/Blocks/overview.html" %}</div>
+{% if paging.url != 'greens' %}<div class="seg seg-content phone-only" role="group" aria-label="Show">{% include "OpenBench/Blocks/list_filter.html" %}</div>
+{% endif %}<div id="overview-live">{% include "OpenBench/Blocks/overview.html" %}</div>
 {% endblock %}

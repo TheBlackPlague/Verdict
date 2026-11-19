@@ -1,0 +1,4 @@
+{% load mytags %}{% if live_regions %}{% if part == "status" %}<span class="live-state"><i class="live-dot" aria-hidden="true"></i><span id="live-status" role="status" title="Statistics refresh every 10 seconds">Live · 10s</span></span>{% else %}<div class="capsule glass live" role="group" aria-label="Live updates" data-lens data-lens-bezel="12" data-lens-scale="12">
+      <button type="button" id="live-toggle" class="cap-btn" aria-pressed="false" aria-label="Pause live updates" title="Pause live updates"><i class="fa-solid fa-pause" aria-hidden="true"></i></button>
+      <button type="button" id="live-refresh" class="cap-btn" aria-label="Refresh statistics" title="Refresh statistics">{% icon "refresh" %}</button>
+    </div>{% endif %}{% endif %}

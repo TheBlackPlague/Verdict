@@ -9,11 +9,16 @@ from django.utils.cache import patch_vary_headers
 
 
 LIVE_REGIONS = {
-    'index.html': {'overview-live': 'Blocks/overview.html'},
+    'index.html': {
+        'overview-live': 'Blocks/overview.html',
+        'overview-count-live': 'Blocks/overview_count.html',
+        'overview-phone-live': 'Blocks/overview_phone.html',
+    },
     'machines.html': {'machines-live': 'Blocks/machines.html'},
     'workload.html': {
         'workload-metrics-live': 'Blocks/workload_metrics.html',
         'workload-actions-live': 'Blocks/workload_actions.html',
+        'workload-menu-live': 'Blocks/workload_menu.html',
         'workload-statblock-live': 'Blocks/workload_statblock.html',
     },
 }
@@ -46,15 +51,21 @@ def is_live_request(request):
 
 def presentation_context(template, data):
     section, title = PAGE_TITLES.get(template, ('Testing', 'Verdict'))
+    extra = {}
     if template == 'index.html':
         url = data.get('paging', {}).get('url', '')
         if url == 'greens':
             title = 'Passed tests'
         elif url.startswith('user/'):
             title = url.split('/', 1)[1] + '’s workloads'
+        extra['elo_range'] = tests_list_elo_range(data)
     elif template == 'create_workload.html':
-        title = {'TEST': 'Create a test', 'TUNE': 'Create a tune',
-                 'DATAGEN': 'Generate data'}.get(data.get('workload'), 'Create a workload')
+        from OpenBench.views import index_context
+        extra = index_context()
+        extra['elo_range'] = tests_list_elo_range(extra)
+        extra['sheet_title'] = {'TEST': 'Create a test', 'TUNE': 'Create a tune',
+                                'DATAGEN': 'Generate data'}.get(data.get('workload'), 'Create a workload')
+        title = PAGE_TITLES['index.html'][1]
     elif template == 'workload.html':
         workload = data['workload']
         title = workload.dev.name
@@ -62,7 +73,15 @@ def presentation_context(template, data):
     elif template == 'machine.html':
         title = data['machine'].info.get('machine_name') or 'Machine details'
     return {'page_section': section, 'page_title': title,
-            'live_regions': list(LIVE_REGIONS.get(template, {}))}
+            'live_regions': list(LIVE_REGIONS.get(template, {})), **extra}
+
+
+def tests_list_elo_range(data):
+    from OpenBench.templatetags.mytags import list_elo_range
+    rows = list(data['completed'])
+    if data['paging']['page'] == 1:
+        rows += [*data.get('pending', []), *(test for group in data.get('active', []) for test in group['tests'])]
+    return list_elo_range(rows)
 
 
 def live_response(request, template, data):
@@ -73,6 +92,7 @@ def live_response(request, template, data):
                         for key, partial in regions.items()}}
     etag = '"' + hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest() + '"'
     response = HttpResponse(status=304) if request.headers.get('If-None-Match') == etag else JsonResponse(body)
+    response.minify_response = False
     response['ETag'] = etag
     response['Cache-Control'] = 'private, no-cache'
     patch_vary_headers(response, ['Cookie', 'X-Verdict-Live'])

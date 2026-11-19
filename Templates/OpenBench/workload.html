@@ -1,210 +1,124 @@
 {% extends "OpenBench/base.html" %}
+{% load mytags static %}
 
 {% block title %}{{ workload }}{% endblock %}
-
-{% load mytags %}
-{% load static %}
+{% block html_class %}p-test mode-{{ workload.test_mode|lower }}{% endblock %}
 
 {% block scripts %}
-
     <script src="{% static 'workload_utils.js' %}?{{ static_version }}"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            start_workload_updates({{workload.id}});
+            start_workload_updates({{ workload.id }});
         });
     </script>
-
 {% endblock %}
+
+{% block page_lead %}<a class="capsule glass round back" href="/index/" aria-label="Back to tests" title="Back to tests" data-lens data-lens-bezel="12" data-lens-scale="12">{% icon "back" %}</a>{% endblock %}
+{% block page_sub %}<span class="dot-sep" aria-hidden="true"></span><span class="num">#{{ workload.id }}</span><span class="hide-sm sub-more"><span class="dot-sep" aria-hidden="true"></span><a href="/user/{{ workload.author }}/">{{ workload.author }}</a><span class="dot-sep" aria-hidden="true"></span><span>{{ workload.dev_engine }}</span><span class="dot-sep" aria-hidden="true"></span><span class="num">{{ workload.dev_time_control }}</span></span>{% endblock %}
+{% block page_actions %}<div class="capsule glass acts" id="workload-actions-live" role="group" aria-label="Moderation" data-lens data-lens-bezel="12" data-lens-scale="12">{% include "OpenBench/Blocks/workload_actions.html" %}</div>
+    {% endblock %}
+{% block page_trailing %}<button class="capsule glass round more-btn" type="button" popovertarget="test-menu" aria-haspopup="menu" aria-label="More actions" title="More actions" data-lens data-lens-bezel="12" data-lens-scale="12">{% icon "more" %}</button>{% endblock %}
+{% block phone_head %}<div class="page-head phone-only test-head"><p class="large-title" aria-hidden="true">{{ page_title }}</p><p class="sub dots"><span class="live-state live-mirror" aria-hidden="true"><i class="live-dot"></i><span data-live-mirror>Live · 10s</span></span><span class="num">#{{ workload.id }}</span><span>{{ workload.author }}</span><span>{{ workload.dev_engine }}</span><span class="num">{{ workload.dev_time_control }}</span></p></div>{% endblock %}
 
 {% block content %}
-    <div id="workload-metrics-live">{% include "OpenBench/Blocks/workload_metrics.html" %}</div>
-
-    <div class="workload-container" data-workload-id="{{ workload.id }}">
-
-    <section id="config" aria-label="Workload configuration">
-        <div class="panel-heading"><h2>Configuration</h2><span class="panel-meta"><a href="/user/{{workload.author}}/">{{workload.author}}</a> · <span class="timestamp">{{workload.creation|date:'U'}}</span></span></div>
-        <div class="table-scroll">
-        <table class="test-config engine-comparison">
-            <thead><tr><th scope="col">Setting</th><th scope="col">{{dev_text|default:"Engine"}}{% if type != "TUNE" %}</th><th scope="col">Base{% endif %}</th></tr></thead>
+      <div id="workload-metrics-live">{% include "OpenBench/Blocks/workload_metrics.html" %}</div>
+{% if workload.test_mode == "SPRT" %}
+      <section class="card chart-card" id="llr-history" aria-labelledby="llr-h" data-lower="{{ workload.lowerllr }}" data-upper="{{ workload.upperllr }}">
+        <header class="card-head"><h2 id="llr-h">LLR history</h2><span class="meta" id="llr-history-caption">Loading recorded results…</span></header>
+        <div class="chart" id="llr-history-chart"></div>
+        <p class="chart-readout" id="llr-history-readout" aria-live="off"></p>
+      </section>
+{% endif %}
+      <div class="split">
+        <section class="card cfg" aria-labelledby="cfg-h">
+          <header class="card-head"><h2 id="cfg-h">Configuration</h2><span class="meta"><a href="/user/{{ workload.author }}/">{{ workload.author }}</a> · <span class="timestamp">{{ workload.creation|date:'U' }}</span></span></header>
+          {% if type != "TUNE" %}{% with dev=workload.dev base=workload.base %}
+          <table class="dtable cmp-table">
+            <thead><tr><th scope="col"><span class="sr-only">Setting</span></th><th scope="col"><span class="side side-dev">{{ dev_text }}</span></th><th scope="col"><span class="side side-base">Base</span></th></tr></thead>
             <tbody>
-            <tr><th scope="row">Engine</th><td >{{workload.dev_engine}}</td>{% if type != "TUNE" %}<td >{{workload.base_engine}}</td>{% endif %}</tr>
-            <tr><th scope="row">Source</th><td ><a href="{{workload.dev_repo}}">{{workload.dev_repo}}</a></td>{% if type != "TUNE" %}<td ><a href="{{workload.base_repo}}">{{workload.base_repo}}</a></td>{% endif %}</tr>
-            <tr><th scope="row">Revision</th><td class="revision">{{workload.dev.sha}}</td>{% if type != "TUNE" %}<td class="revision">{{workload.base.sha}}</td>{% endif %}</tr>
-            <tr><th scope="row">Branch</th><td class="branch_name">{{workload.dev.name|prettyName}}</td>{% if type != "TUNE" %}<td class="branch_name">{{workload.base.name|prettyName}}</td>{% endif %}</tr>
-            <tr><th scope="row">Bench</th><td >{{workload.dev.bench|default_if_none:"Unconfirmed"}}</td>{% if type != "TUNE" %}<td >{{workload.base.bench|default_if_none:"Unconfirmed"}}</td>{% endif %}</tr>
-            <tr><th scope="row">Network</th><td >{% if workload.dev_netname %}<a href="{{workload|network_download_link:'dev'}}">{{workload.dev_netname}}</a>{% else %}—{% endif %}</td>{% if type != "TUNE" %}<td >{% if workload.base_netname %}<a href="{{workload|network_download_link:'base'}}">{{workload.base_netname}}</a>{% else %}—{% endif %}</td>{% endif %}</tr>
-            <tr><th scope="row">Options</th><td class="engine-options">{{workload.dev_options}}</td>{% if type != "TUNE" %}<td class="engine-options">{{workload.base_options}}</td>{% endif %}</tr>
-            <tr><th scope="row">Time control</th><td >{{workload.dev_time_control}}</td>{% if type != "TUNE" %}<td >{{workload.base_time_control}}</td>{% endif %}</tr>
-            <tr><th scope="row" class="td-label">Opening book</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{% if workload|book_download_link %}<a href="{{workload|book_download_link}}">{{workload.book_name}}</a>{% else %}{{workload.book_name}}{% endif %}</td></tr>
-            <tr><th scope="row" class="td-label">Upload PGNs</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.upload_pgns}}</td></tr>
-            <tr><th scope="row" class="td-label">Scaling</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.scale_method}} {{workload.scale_nps}} NPS</td></tr>
-            <tr><th scope="row" class="td-label">Syzygy WDL</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.syzygy_wdl}}</td></tr>
-            <tr><th scope="row" class="td-label">Syzygy ADJ.</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.syzygy_adj}}</td></tr>
-            <tr><th scope="row" class="td-label">Win ADJ.</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.win_adj}}</td></tr>
-            <tr><th scope="row" class="td-label">Draw ADJ.</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.draw_adj}}</td></tr>
-            {% if type == "TUNE" %}
-            <tr><th scope="row" class="td-label">Alpha</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.spsa_run.alpha}}</td></tr>
-            <tr><th scope="row" class="td-label">Gamma</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.spsa_run.gamma}}</td></tr>
-            <tr><th scope="row" class="td-label">A-Ratio</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.spsa_run.a_ratio}}</td></tr>
-            <tr><th scope="row" class="td-label">Pairs per point</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.workload_size}}</td></tr>
-            <tr><th scope="row" class="td-label">Reporting</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.spsa_run.reporting_type}}</td></tr>
-            <tr><th scope="row" class="td-label">Distribution</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.spsa_run.distribution_type}}</td></tr>
-            {% elif type == "DATAGEN" %}
-            <tr><th scope="row" class="td-label">Genfens args</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.genfens_args}}</td></tr>
-            <tr><th scope="row" class="td-label">Play reverses</th><td colspan="{% if type == 'TUNE' %}1{% else %}2{% endif %}">{{workload.play_reverses}}</td></tr>
-            {% endif %}
-        </tbody></table>
-        </div>
-    </section>
-
-    <div id="actions">
-
-        <!-- Dev vs Base [Git Diff Link] -->
-        <h4><a href="{{workload|gitDiffLink}}">{{workload|git_diff_text}}</a></h4>
-
-        <div id="workload-actions-live">{% include "OpenBench/Blocks/workload_actions.html" %}</div>
-
-        <div class="workload-utilities">
-        <!-- Copy Button: Copy the current results statblock -->
-        {% if type == "TEST" or type == "DATAGEN" %}
-            <div>
-                <a class="anchorbutton" onclick="copy_text_from_element('long-statblock', true)">Copy Stat Block</a>
-            </div>
-        {% endif %}
-
-        <!-- PGN Download Button -->
-        {% if workload.upload_pgns != "FALSE" %}
-            <div>
-                <a class="anchorbutton" href="/api/pgns/{{workload.id}}/">Download PGN Archive</a>
-            </div>
-        {% endif %}
-
-        <!-- Copies Raw SPSA Input from /api/spsa/{{workload.id}}/inputs/ -->
-        {% if type == "TUNE" %}
-            <div>
-                <a class="anchorbutton" onclick="copy_spsa_inputs({{workload.id}})">Copy SPSA Inputs</a>
-            </div>
-        {% endif %}
-
-        <!-- Copies Optimal Values from /api/spsa/{{workload.id}}/outputs/ -->
-        {% if type == "TUNE" %}
-            <div>
-                <a class="anchorbutton" onclick="copy_spsa_outputs({{workload.id}})">Copy SPSA Outputs</a>
-            </div>
-        {% endif %}
-
-        </div>
-        <div id="workload-statblock-live">{% include "OpenBench/Blocks/workload_statblock.html" %}</div>
-
-
-    {% if workload.test_mode == "SPRT" %}
-    <section id="llr-history" class="llr-history" aria-labelledby="llr-heading" data-lower="{{ workload.lowerllr }}" data-upper="{{ workload.upperllr }}">
-        <div class="panel-heading"><h2 id="llr-heading">LLR history</h2><span id="llr-history-caption" class="panel-meta">Loading recorded results…</span></div>
-        <div id="llr-history-chart"></div>
-        <p id="llr-history-readout" class="chart-readout" aria-live="off"></p>
-    </section>
-    {% endif %}
-
-        <!-- Forum to modify the Priority, Throughput, or (Tests only) Workload Size -->
-        <form class="workload-edit" method="POST" action="/{{type|lower}}/{{workload.id}}/MODIFY/">
-            {% csrf_token %}
-            <div class="form">
-                <div class="col-full">
-
-                    <div class="row workflow-edit notes-field">
-                        <label for="info">Notes</label>
-                        <textarea id="info" name="info" rows="2">{{workload.info}}</textarea>
-                    </div>
-
-                    <div class="row workflow-edit">
-                        <label for="priority">Priority</label>
-                        <input value="{{workload.priority}}" id="priority" name="priority">
-                    </div>
-
-                    <div class="row workflow-edit">
-                        <label for="throughput">Throughput</label>
-                        <input value="{{workload.throughput}}" id="throughput" name="throughput">
-                    </div>
-
-                    {% if type == "TEST" or type == "DATAGEN" %}
-                        <div class="row workflow-edit">
-                            <label for="workload_size">Workload Size</label>
-                            <input value="{{workload.workload_size}}" id="workload_size" name="workload_size">
-                        </div>
-                    {% endif %}
-
-                    <!-- Edit Button: For Approvers or Test Authors -->
-                    {% if profile.approver or profile.user.username == workload.author %}
-                        <input class="anchorbutton btn-blue w-100" type="submit" name="submit" value="Modify">
-                    {% else %}
-                        <input class="anchorbutton btn-disabled w-100" disabled type="submit" name="submit" value="Modify">
-                    {% endif %}
-                </div>
-            </div>
-        </form>
-
-
-    </div>
-
-    <!-- SPSA Paramater Summary, for Tunes -->
-    {% if type == "TUNE" %}
-        <div id="parameters" class="w-100">
-            <div class="table-scroll">
-            <table class="stripes wrappable">
-                <thead>
-                    <tr class="table-header">
-                        <th>Name</th>
-                        <th>Curr</th>
-                        <th>Start</th>
-                        <th>Min</th>
-                        <th>Max</th>
-                        <th>C</th>
-                        <th>C_end</th>
-                        <th>R</th>
-                        <th>R_end</th>
-                    </tr>
-                </thead>
-                <tbody id="spsa-digest-button-container">
-                    <tr>
-                        <td colspan="9" style="padding: 0;">
-                            <button class="w-100 anchorbutton btn-blue" type="submit" onclick="fetch_spsa_digest({{workload.id}})">Show SPSA Digest</button>
-                        </td>
-                    </tr>
-                </tbody>
-                <tbody id="spsa-digest-body-container" style="display: none;">
-                    <!-- Dynamically created -->
-                </tbody>
-            </table>
-            </div>
-        </div>
-    {% endif %}
-
-    <!-- Aggregate pentanomial summary; fetched automatically on page load -->
-    <section class="result-summary"><div class="panel-heading"><h2>Results by contributor, CPU & ISA</h2></div><div id="summary-container" class="w-100"></div></section>
-
-    <div id="results" class="w-100">
-        <div class="panel-heading"><h2>Individual machine results</h2><button class="button" type="button" onclick="fetch_results({{workload.id}})">Fetch results</button></div>
-        <div class="table-scroll">
-        <table class="stripes wrappable">
-            <tr class="table-header">
-                <th>#</th>
-                <th>User</th>
-                <th style="width: 45px">Games</th>
-                <th>Penta</th>
-                <th style="width: 45px">Pairs</th>
-                <th style="width: 45px">Time</th>
-                <th style="width: 45px">Crash</th>
-            </tr>
-
-            <tbody id="results-container">
-                <!-- Dynamically created -->
+              {% if dev.name != base.name %}<tr class="differs"><th scope="row">Branch</th><td><b>{{ dev.name|prettyName }}</b></td><td>{{ base.name|prettyName }}</td></tr>{% else %}<tr><th scope="row">Branch</th><td colspan="2"><b>{{ dev.name|prettyName }}</b></td></tr>{% endif %}
+              {% if dev.sha != base.sha %}<tr class="differs"><th scope="row">Revision</th><td><a class="sha" href="{{ workload|commit_link:'dev' }}" title="{{ dev.sha }}">{{ dev.sha|slice:":8" }}</a></td><td><a class="sha" href="{{ workload|commit_link:'base' }}" title="{{ base.sha }}">{{ base.sha|slice:":8" }}</a></td></tr>{% else %}<tr><th scope="row">Revision</th><td colspan="2"><a class="sha" href="{{ workload|commit_link:'dev' }}" title="{{ dev.sha }}">{{ dev.sha|slice:":8" }}</a></td></tr>{% endif %}
+              {% if dev.bench != base.bench %}<tr class="differs"><th scope="row">Bench</th><td class="num">{% if dev.bench is None %}Unconfirmed{% else %}{{ dev.bench|insertCommas }}{% endif %}</td><td class="num">{% if base.bench is None %}Unconfirmed{% else %}{{ base.bench|insertCommas }}{% endif %}</td></tr>{% else %}<tr><th scope="row">Bench</th><td colspan="2" class="num">{% if dev.bench is None %}Unconfirmed{% else %}{{ dev.bench|insertCommas }}{% endif %}</td></tr>{% endif %}
+              {% if workload.dev_engine != workload.base_engine %}<tr><th scope="row">Engine</th><td>{{ workload.dev_engine }}</td><td>{{ workload.base_engine }}</td></tr>{% else %}<tr><th scope="row">Engine</th><td colspan="2">{{ workload.dev_engine }}</td></tr>{% endif %}
+              {% if workload.dev_repo != workload.base_repo %}<tr><th scope="row">Source</th><td><a href="{{ workload.dev_repo }}">{{ workload.dev_repo|cut:"https://" }}</a></td><td><a href="{{ workload.base_repo }}">{{ workload.base_repo|cut:"https://" }}</a></td></tr>{% else %}<tr><th scope="row">Source</th><td colspan="2"><a href="{{ workload.dev_repo }}">{{ workload.dev_repo|cut:"https://" }}</a></td></tr>{% endif %}
+              {% if workload.dev_network != workload.base_network %}<tr><th scope="row">Network</th><td>{% if workload.dev_netname %}<a href="{{ workload|network_download_link:'dev' }}">{{ workload.dev_netname }}</a>{% else %}<span class="dim">—</span>{% endif %}</td><td>{% if workload.base_netname %}<a href="{{ workload|network_download_link:'base' }}">{{ workload.base_netname }}</a>{% else %}<span class="dim">—</span>{% endif %}</td></tr>{% else %}<tr><th scope="row">Network</th><td colspan="2">{% if workload.dev_netname %}<a href="{{ workload|network_download_link:'dev' }}">{{ workload.dev_netname }}</a>{% else %}<span class="dim">—</span>{% endif %}</td></tr>{% endif %}
+              {% if workload.dev_options != workload.base_options %}<tr><th scope="row">Options</th><td>{{ workload.dev_options }}</td><td>{{ workload.base_options }}</td></tr>{% else %}<tr><th scope="row">Options</th><td colspan="2">{{ workload.dev_options }}</td></tr>{% endif %}
+              {% if workload.dev_time_control != workload.base_time_control %}<tr><th scope="row">Time control</th><td class="num">{{ workload.dev_time_control }}</td><td class="num">{{ workload.base_time_control }}</td></tr>{% else %}<tr><th scope="row">Time control</th><td colspan="2" class="num">{{ workload.dev_time_control }}</td></tr>{% endif %}
             </tbody>
-        </table>
+          </table>{% endwith %}{% else %}{% with dev=workload.dev %}
+          <table class="dtable cmp-table">
+            <thead><tr><th scope="col"><span class="sr-only">Setting</span></th><th scope="col"><span class="sr-only">Engine</span></th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Branch</th><td><b>{{ dev.name|prettyName }}</b></td></tr>
+              <tr><th scope="row">Revision</th><td><a class="sha" href="{{ workload|commit_link:'dev' }}" title="{{ dev.sha }}">{{ dev.sha|slice:":8" }}</a></td></tr>
+              <tr><th scope="row">Bench</th><td class="num">{% if dev.bench is None %}Unconfirmed{% else %}{{ dev.bench|insertCommas }}{% endif %}</td></tr>
+              <tr><th scope="row">Engine</th><td>{{ workload.dev_engine }}</td></tr>
+              <tr><th scope="row">Source</th><td><a href="{{ workload.dev_repo }}">{{ workload.dev_repo|cut:"https://" }}</a></td></tr>
+              <tr><th scope="row">Network</th><td>{% if workload.dev_netname %}<a href="{{ workload|network_download_link:'dev' }}">{{ workload.dev_netname }}</a>{% else %}<span class="dim">—</span>{% endif %}</td></tr>
+              <tr><th scope="row">Options</th><td>{{ workload.dev_options }}</td></tr>
+              <tr><th scope="row">Time control</th><td class="num">{{ workload.dev_time_control }}</td></tr>
+            </tbody>
+          </table>{% endwith %}{% endif %}
+          <dl class="kv">
+            <div><dt>Opening book</dt><dd>{% if workload|book_download_link %}<a href="{{ workload|book_download_link }}">{{ workload.book_name }}</a>{% else %}{{ workload.book_name }}{% endif %}</dd></div>
+            <div><dt>Upload PGNs</dt><dd>{{ workload.upload_pgns }}</dd></div>
+            <div><dt>Scaling</dt><dd>{{ workload.scale_method }} <span class="num">{{ workload.scale_nps }}</span> NPS</dd></div>
+            <div><dt>Syzygy WDL</dt><dd>{{ workload.syzygy_wdl }}</dd></div>
+            <div><dt>Syzygy ADJ.</dt><dd>{{ workload.syzygy_adj }}</dd></div>
+            <div><dt>Win ADJ.</dt><dd>{{ workload.win_adj }}</dd></div>
+            <div><dt>Draw ADJ.</dt><dd>{{ workload.draw_adj }}</dd></div>{% if type == "TUNE" %}
+            <div><dt>Alpha</dt><dd>{{ workload.spsa_run.alpha }}</dd></div>
+            <div><dt>Gamma</dt><dd>{{ workload.spsa_run.gamma }}</dd></div>
+            <div><dt>A-Ratio</dt><dd>{{ workload.spsa_run.a_ratio }}</dd></div>
+            <div><dt>Pairs per point</dt><dd>{{ workload.workload_size }}</dd></div>
+            <div><dt>Reporting</dt><dd>{{ workload.spsa_run.reporting_type }}</dd></div>
+            <div><dt>Distribution</dt><dd>{{ workload.spsa_run.distribution_type }}</dd></div>{% elif type == "DATAGEN" %}
+            <div><dt>Genfens args</dt><dd>{{ workload.genfens_args }}</dd></div>
+            <div><dt>Play reverses</dt><dd>{{ workload.play_reverses }}</dd></div>{% endif %}
+          </dl>
+        </section>
+        <div class="split-side">
+          <form class="card edit" method="POST" action="/{{ type|lower }}/{{ workload.id }}/MODIFY/" aria-labelledby="edit-h">
+            {% csrf_token %}
+            <header class="card-head"><h2 id="edit-h">Workload</h2></header>
+            <div class="fields">
+              <label class="field field-wide" for="info"><span>Notes</span><textarea id="info" name="info" rows="2">{{ workload.info }}</textarea></label>
+              <label class="field" for="priority"><span>Priority</span><input value="{{ workload.priority }}" id="priority" name="priority"></label>
+              <label class="field" for="throughput"><span>Throughput</span><input value="{{ workload.throughput }}" id="throughput" name="throughput"></label>{% if type == "TEST" or type == "DATAGEN" %}
+              <label class="field" for="workload_size"><span>Workload Size</span><input value="{{ workload.workload_size }}" id="workload_size" name="workload_size"></label>{% endif %}
+            </div>
+            <div class="edit-foot">{% if profile.approver or profile.user.username == workload.author %}<button class="btn" type="submit" name="submit" value="Modify">Modify</button>{% else %}<button class="btn btn-disabled" type="submit" name="submit" value="Modify" disabled>Modify</button>{% endif %}</div>
+          </form>
+          <section class="card statblock" id="workload-statblock-live" aria-labelledby="sb-h">{% include "OpenBench/Blocks/workload_statblock.html" %}</section>
         </div>
+      </div>
+{% if type == "TUNE" %}
+      <section class="card spsa" id="parameters">
+        <div class="table-scroll"><table class="dtable spsa-table">
+          <thead><tr><th scope="col">Name</th><th scope="col" class="r">Curr</th><th scope="col" class="r">Start</th><th scope="col" class="r">Min</th><th scope="col" class="r">Max</th><th scope="col" class="r">C</th><th scope="col" class="r">C_end</th><th scope="col" class="r">R</th><th scope="col" class="r">R_end</th></tr></thead>
+          <tbody id="spsa-digest-button-container"><tr><td colspan="9"><button class="btn btn-quiet btn-wide" type="button" onclick="fetch_spsa_digest({{ workload.id }})">Show SPSA Digest</button></td></tr></tbody>
+          <tbody id="spsa-digest-body-container" style="display: none;"></tbody>
+        </table></div>
+      </section>
+{% endif %}
+      <section class="card sum" aria-labelledby="sum-h">
+        <header class="card-head"><h2 id="sum-h">Results by contributor, CPU &amp; ISA</h2>
+          <div class="seg seg-content seg-sm" role="tablist" aria-label="Group results by">
+            <button type="button" role="tab" aria-selected="true" aria-controls="sum-user" data-sum="user">User</button>
+            <button type="button" role="tab" aria-selected="false" aria-controls="sum-cpu" data-sum="cpu">CPU</button>
+            <button type="button" role="tab" aria-selected="false" aria-controls="sum-isa" data-sum="isa">ISA</button>
+          </div>
+        </header>
+        <div id="summary-container"></div>
+      </section>
 
-    </div>
-
-    </div>
-
+      <section class="card mach" id="results" aria-labelledby="mach-h">
+        <header class="card-head"><h2 id="mach-h">Individual machine results</h2><button class="btn btn-quiet" type="button" onclick="fetch_results({{ workload.id }})">Fetch results</button></header>
+        <table class="dtable">
+          <thead><tr><th scope="col">#</th><th scope="col">User</th><th scope="col" class="r">Games</th><th scope="col" class="hide-sm">Penta</th><th scope="col" class="r hide-sm">Pairs</th><th scope="col" class="r">Time</th><th scope="col" class="r">Crash</th></tr></thead>
+          <tbody id="results-container"></tbody>
+        </table>
+      </section>
 {% endblock %}
+
+{% block page_menus %}<div class="menu glass" id="test-menu" popover role="menu" aria-label="More actions" data-lens data-lens-bezel="14" data-lens-scale="14" data-lens-frost="16"><div id="workload-menu-live" class="menu-live" role="none">{% include "OpenBench/Blocks/workload_menu.html" %}</div></div>{% endblock %}
