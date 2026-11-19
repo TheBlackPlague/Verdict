@@ -70,7 +70,7 @@
                     {% if can_manage %}
                         <form method="POST" action="/manage/engines/{{config.name}}/delete/">
                             {% csrf_token %}
-                            <button type="submit" onclick="return confirm('Permanently delete this engine?')" class="icon-button" aria-label="Delete {{config.name}}"><i class="fa-solid fa-trash-can" aria-hidden="true"></i></button>
+                            <button type="submit" onclick="return confirm('Permanently delete this engine?')" class="icon-button danger" aria-label="Delete {{config.name}}"><i class="fa-solid fa-trash-can" aria-hidden="true"></i></button>
                         </form>
                     {% endif %}
                 </td>

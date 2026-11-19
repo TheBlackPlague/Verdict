@@ -70,7 +70,7 @@
                     {% if can_manage %}
                         <form method="POST" action="/manage/books/{{book.name}}/delete/">
                             {% csrf_token %}
-                            <button type="submit" onclick="return confirm('Permanently delete this book?')" class="icon-button" aria-label="Delete {{book.name}}"><i class="fa-solid fa-trash-can" aria-hidden="true"></i></button>
+                            <button type="submit" onclick="return confirm('Permanently delete this book?')" class="icon-button danger" aria-label="Delete {{book.name}}"><i class="fa-solid fa-trash-can" aria-hidden="true"></i></button>
                         </form>
                     {% endif %}
                 </td>

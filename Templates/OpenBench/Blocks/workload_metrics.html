@@ -2,25 +2,24 @@
       <div class="hero tone-{{ tone }}" aria-hidden="true"></div>
       <section class="verdict is-{{ key }}{% if mode != 'SPRT' %} v-progress{% endif %} v-tone-{{ tone }}" aria-labelledby="verdict-h">
         <p class="v-eyebrow">{% include "OpenBench/Blocks/workload_badge.html" with decorative=True %}<span class="v-state">{{ key|status_word }}</span><span class="dot-sep" aria-hidden="true"></span><span>{% if mode == 'GAMES' %}Fixed{% elif mode == 'SPSA' %}Tune{% elif mode == 'DATAGEN' %}Datagen{% else %}SPRT{% endif %}</span></p>
-{% if mode == 'SPRT' %}{% with r=workload|row_readings ticks=workload|llr_ticks %}{% with lower=ticks|first upper=ticks|last %}
+{% if mode == 'SPRT' %}{% with r=workload|row_readings ticks=workload|llr_ticks %}
         <h2 id="verdict-h" class="v-title">LLR <em class="to-{{ tone }} num">{{ r.llr_figure }}</em></h2>
-        <div class="gauge" role="meter" aria-label="Log-likelihood ratio" aria-valuemin="{{ workload.lowerllr|floatformat:4 }}" aria-valuemax="{{ workload.upperllr|floatformat:4 }}" aria-valuenow="{{ workload|bounded_llr|floatformat:4 }}" aria-valuetext="{{ workload.currentllr|floatformat:2 }}" style="--at:{{ workload|llr_position }}%;--zero:{{ workload|llr_zero }}%">
-          <div class="g-ends"><span class="g-fail"><span class="g-b">{% icon "close" "ico-xs" %}Fail <b class="num">{{ lower.label }}</b></span></span><span class="g-pass"><span class="g-b">Pass <b class="num">{{ upper.label }}</b>{% icon "check" "ico-xs" %}</span></span></div>
+        <div class="gauge{% if tone == 'neutral' %} dir-{% if workload.currentllr > 0.004 %}up{% elif workload.currentllr < -0.004 %}down{% else %}flat{% endif %}{% endif %}" role="meter" aria-label="Log-likelihood ratio" aria-valuemin="{{ workload.lowerllr|floatformat:4 }}" aria-valuemax="{{ workload.upperllr|floatformat:4 }}" aria-valuenow="{{ workload|bounded_llr|floatformat:4 }}" aria-valuetext="{{ workload.currentllr|floatformat:2 }}" style="--at:{{ workload|llr_position }}%;--zero:{{ workload|llr_zero }}%">
           <div class="g-track">
             <i class="g-fill"></i>
             {% for tick in ticks %}{% if not tick.bound %}<i class="g-tick{% if tick.value == 0 %} g-zero{% endif %}" style="left:{{ tick.pos }}%"></i>{% endif %}{% endfor %}
-            <span class="g-knob num">{{ r.llr_figure }}</span>
+            <span class="g-knob num" style="--n:{{ r.llr_figure|length }}">{{ r.llr_figure }}</span>
           </div>
           <div class="g-scale" aria-hidden="true">{% for tick in ticks %}<span style="left:{{ tick.pos }}%">{{ tick.label }}</span>{% endfor %}</div>
         </div>
-{% endwith %}{% endwith %}{% else %}{% with progress=workload|workload_progress target=workload|workload_target %}
+{% endwith %}{% else %}{% with progress=workload|workload_progress target=workload|workload_target %}
         <h2 id="verdict-h" class="v-title">Progress <em class="to-{{ tone }} num">{{ progress }}%</em></h2>
         <div class="gauge" role="meter" aria-label="Progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress }}" aria-valuetext="{{ progress }}%" style="--at:{{ progress }}%">
           <div class="g-ends"><span class="g-start"><b class="num">{{ workload.games|insertCommas }}</b> {% if mode == 'DATAGEN' %}games generated{% else %}games{% endif %}</span><span class="g-target"><b class="num">{{ target|insertCommas }}</b> target</span></div>
           <div class="g-track">
             <i class="g-fill"></i>
             <i class="g-tick" style="left:25%"></i><i class="g-tick" style="left:50%"></i><i class="g-tick" style="left:75%"></i>
-            <span class="g-knob num">{{ progress }}%</span>
+            <span class="g-knob num" style="--n:{{ progress|length|add:1 }}">{{ progress }}%</span>
           </div>
           <div class="g-scale" aria-hidden="true"><span style="left:0%">0%</span><span style="left:25%">25%</span><span style="left:50%">50%</span><span style="left:75%">75%</span><span style="left:100%">100%</span></div>
         </div>
@@ -53,7 +52,7 @@
         <section class="card metric" aria-labelledby="m-games">
           <h3 id="m-games" class="m-k">Wins / draws / losses</h3>
           <p class="m-v"><b class="num">{{ workload.games|insertCommas }}</b><span>{% if mode == 'DATAGEN' %}games generated{% else %}games{% if mode == 'SPRT' and workload.max_games %} / {{ workload.max_games|insertCommas }} target{% endif %}{% endif %}</span></p>
-          <div class="wdl wdl-lg" role="img" aria-label="{{ workload.wins|insertCommas }} / {{ workload.losses|insertCommas }} / {{ workload.draws|insertCommas }}">{% if workload.games %}{% with p=workload|wdl_widths %}<i class="w" style="width:{{ p.w }}%"></i><i class="d" style="width:{{ p.d }}%"></i><i class="l" style="width:{{ p.l }}%"></i>{% endwith %}{% endif %}</div>
+          <div class="wdl wdl-lg" role="img" aria-label="{{ workload.wins|insertCommas }} / {{ workload.draws|insertCommas }} / {{ workload.losses|insertCommas }}">{% if workload.games %}{% with p=workload|wdl_widths %}<i class="w" style="width:{{ p.w }}%"></i><i class="d" style="width:{{ p.d }}%"></i><i class="l" style="width:{{ p.l }}%"></i>{% endwith %}{% endif %}</div>
           <p class="wld num"><span class="w">{{ workload.wins|insertCommas }}</span> <span class="d">{{ workload.draws|insertCommas }}</span> <span class="l">{{ workload.losses|insertCommas }}</span></p>
         </section>{% if workload.use_penta %}{% with p=workload.as_penta h=workload|penta_heights %}
         <section class="card metric" aria-labelledby="m-penta">

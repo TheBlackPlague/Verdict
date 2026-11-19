@@ -59,6 +59,9 @@ def presentation_context(template, data):
         elif url.startswith('user/'):
             title = url.split('/', 1)[1] + '’s workloads'
         extra['elo_range'] = tests_list_elo_range(data)
+    elif template == 'search.html':
+        from OpenBench.templatetags.mytags import list_elo_range
+        extra['elo_range'] = list_elo_range(data.get('tests', []))
     elif template == 'create_workload.html':
         from OpenBench.views import index_context
         extra = index_context()
@@ -67,8 +70,9 @@ def presentation_context(template, data):
                                 'DATAGEN': 'Generate data'}.get(data.get('workload'), 'Create a workload')
         title = PAGE_TITLES['index.html'][1]
     elif template == 'workload.html':
+        from OpenBench.templatetags.mytags import prettyDevName
         workload = data['workload']
-        title = workload.dev.name
+        title = prettyDevName(workload)
         section = '%s / #%s' % (workload.workload_type_str().capitalize(), workload.id)
     elif template == 'machine.html':
         title = data['machine'].info.get('machine_name') or 'Machine details'

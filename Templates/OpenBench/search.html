@@ -1,5 +1,4 @@
 {% extends "OpenBench/base.html" %}
-{% load mytags %}
 
 {% block scripts %}
 
@@ -158,22 +157,6 @@
             </div>
         </form>
 
-    {% if form %}<div class="search-results-spacer"></div>{% endif %}
-
-    <div class="panel table-scroll results-panel"><table role="table" class="test-list stripes hoverable"><thead><tr><th>Created</th><th>Workload</th><th>Status</th><th>Engine / TC</th><th>Result</th><th>Games / W–L–D / Pentanomial</th><th>Notes</th><th>Compare</th></tr></thead><tbody role="rowgroup">
-        {% for test in tests %}
-            <tr role="row" class="test-row">
-                <td role="cell" class="datestamp">{{test.creation|date:"U"}}</td>
-                {% with stats=test|compact_stat_blocks %}
-                <td role="cell" class="test-identity"><a class="test-name" href="{{ test|workload_url }}">{{ test|prettyDevName }}</a><div class="test-subtitle"><span>#{{ test.id }}</span><a href="/user/{{ test.author }}/">{{ test.author }}</a><span>{{ test.test_mode }}</span></div></td>
-                <td role="cell" class="test-status">{% if test.deleted %}<span class="badge badge-deleted">Deleted</span>{% elif test.passed %}<span class="badge badge-{{ test|testResultColour }}">Passed</span>{% elif test.failed %}<span class="badge badge-{{ test|testResultColour }}">Failed</span>{% elif test.finished %}<span class="badge">{{ test|finished_label }}</span>{% elif not test.approved %}<span class="badge badge-pending">Pending</span>{% else %}<span class="badge badge-running">Active</span>{% endif %}</td>
-                <td role="cell" class="test-engine"><span>{{ test.dev_engine }}</span>{% if test.error %} <span class="redlink" title="Crash or illegal move" aria-label="Crash or illegal move">!</span>{% endif %}{% if test|test_is_fischer %} <span class="badge" title="Fischer random chess">FRC</span>{% endif %}<div class="test-subtitle">{{ test.dev_time_control }}</div>{% if test|test_is_time_odds %} <span class="badge badge-yellow" title="Time odds">Time odds</span>{% endif %}{% if test|test_is_smp_odds %} <span class="badge badge-yellow" title="Thread odds">Thread odds</span>{% endif %}</td>
-                <td role="cell" class="statblock test-result statblock-{{ test|testResultColour }}">{{ stats.result|linebreaksbr }}</td>
-                <td role="cell" class="statblock game-counts test-games">{{ stats.games|linebreaksbr }}</td>
-                <td role="cell" class="test-info"><div>{{ test.info|default:'—' }}</div></td>
-                <td role="cell" class="test-compare"><a href="{{ test|gitDiffLink }}" class="icon-button" aria-label="Compare revisions for workload {{ test.id }}" title="Compare revisions"><i class="fa-solid fa-code-compare" aria-hidden="true"></i></a></td>
-                {% endwith %}
-            </tr>
-        {% endfor %}
-    </tbody></table></div>
+    {% if tests %}<ul class="tlist" role="list">{% for test in tests %}{% include "OpenBench/Blocks/testsummary.html" %}{% endfor %}
+    </ul>{% endif %}
 {% endblock %}

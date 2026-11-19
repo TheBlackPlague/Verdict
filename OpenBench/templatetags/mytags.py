@@ -342,7 +342,7 @@ def _interface_elo(workload):
 def elo_estimate(workload):
     if not workload.games:
         return '—'
-    return '%+.2f' % _interface_elo(workload)[1]
+    return _signed(_interface_elo(workload)[1], '%.2f')
 
 
 @register.filter
@@ -517,7 +517,7 @@ def row_readings(workload):
             workload.currentllr, workload.lowerllr, workload.upperllr, workload.elolower, workload.eloupper),
         elo='Elo: %0.2f +- %0.2f (95%%)' % (elo, interval),
         games='Games: %d W: %d L: %d D: %d' % nwld,
-        wld='W: %d L: %d D: %d' % nwld[1:],
+        wld='W: %d D: %d L: %d' % (nwld[1], nwld[3], nwld[2]),
         generated='Generated %d/%d Games' % (workload.games, workload.max_games),
     )
     if workload.test_mode in ('GAMES', 'DATAGEN'):
@@ -568,8 +568,6 @@ def band_tone(workload):
     status = status_key(workload)
     if status in ('passed', 'failed', 'yellow'):
         return { 'passed' : 'pass', 'failed' : 'fail', 'yellow' : 'warn' }[status]
-    if status == 'running' and workload.test_mode == 'SPRT' and workload.games and workload.currentllr:
-        return 'fail' if workload.currentllr < 0 else 'pass'
     return 'neutral'
 
 
