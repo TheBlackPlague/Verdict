@@ -6,7 +6,7 @@
 
     <div class="panel directory-panel">
     <div class="table-scroll">
-    <table class="hoverable directory-table errors-table" aria-label="Errors">
+    <table data-stack class="hoverable directory-table errors-table" aria-label="Errors">
         <thead>
 
         <tr class="table-header">
@@ -22,12 +22,12 @@
 
         {% for event in events %}
             <tr>
-                <td class="timestamp">{{event.created|date:'U'}}</td>
-                <td><a href="/machines/{{event.machine_id}}">{{event.machine_id}}</a></td>
-                <td>{{event.author}}</td>
-                <td><a href="{{event.test_id|workload_url}}">{{event.test_id|testIdToPrettyName}}</a></td>
-                <td>{{event.summary}}</td>
-                <td>{% if event.log_file %}<a class="button log-link" href='/event/{{event.id}}' aria-label="View log for event {{event.id}}">View log</a>{% endif %}</td>
+                <td data-label="Date" class="timestamp">{{event.created|date:'U'}}</td>
+                <td data-label="Machine"><a href="/machines/{{event.machine_id}}">{{event.machine_id}}</a></td>
+                <td data-label="User">{{event.author}}</td>
+                <td data-label="Test"><a href="{{event.test_id|workload_url}}">{{event.test_id|testIdToPrettyName}}</a></td>
+                <td data-label="Summary">{{event.summary}}</td>
+                <td data-label="Logs">{% if event.log_file %}<a class="button log-link" href='/event/{{event.id}}' aria-label="View log for event {{event.id}}">View log</a>{% endif %}</td>
             </tr>
         {% empty %}<tr><td colspan="6"><div class="empty-state"><strong>No errors to display</strong></div></td></tr>{% endfor %}
 

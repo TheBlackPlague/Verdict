@@ -53,11 +53,11 @@
           <h3 id="m-games" class="m-k">Wins / draws / losses</h3>
           <p class="m-v"><b class="num">{{ workload.games|insertCommas }}</b><span>{% if mode == 'DATAGEN' %}games generated{% else %}games{% if mode == 'SPRT' and workload.max_games %} / {{ workload.max_games|insertCommas }} target{% endif %}{% endif %}</span></p>
           <div class="wdl wdl-lg" role="img" aria-label="{{ workload.wins|insertCommas }} / {{ workload.draws|insertCommas }} / {{ workload.losses|insertCommas }}">{% if workload.games %}{% with p=workload|wdl_widths %}<i class="w" style="width:{{ p.w }}%"></i><i class="d" style="width:{{ p.d }}%"></i><i class="l" style="width:{{ p.l }}%"></i>{% endwith %}{% endif %}</div>
-          <p class="wld num"><span class="w">{{ workload.wins|insertCommas }}</span> <span class="d">{{ workload.draws|insertCommas }}</span> <span class="l">{{ workload.losses|insertCommas }}</span></p>
+          <p class="wld num{% if not workload.games %} is-empty{% endif %}"><span class="w">{{ workload.wins|insertCommas }}</span> <span class="d">{{ workload.draws|insertCommas }}</span> <span class="l">{{ workload.losses|insertCommas }}</span></p>
         </section>{% if workload.use_penta %}{% with p=workload.as_penta h=workload|penta_heights %}
         <section class="card metric" aria-labelledby="m-penta">
           <h3 id="m-penta" class="m-k">Pentanomial</h3>
-          <div class="penta-lg" role="img" aria-label="Ptnml(0-2): {{ p.0 }}, {{ p.1 }}, {{ p.2 }}, {{ p.3 }}, {{ p.4 }}">
+          <div class="penta-lg{% if not workload.games %} is-empty{% endif %}" role="img" aria-label="Ptnml(0-2): {{ p.0 }}, {{ p.1 }}, {{ p.2 }}, {{ p.3 }}, {{ p.4 }}">
             <div class="pcol"><span class="pv num">{{ p.0|insertCommas }}</span><i class="p0" style="height:{{ h.0 }}%"></i><span class="pl">0</span></div>
             <div class="pcol"><span class="pv num">{{ p.1|insertCommas }}</span><i class="p1" style="height:{{ h.1 }}%"></i><span class="pl">½</span></div>
             <div class="pcol"><span class="pv num">{{ p.2|insertCommas }}</span><i class="p2" style="height:{{ h.2 }}%"></i><span class="pl">1</span></div>

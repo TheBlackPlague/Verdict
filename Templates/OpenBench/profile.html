@@ -27,14 +27,14 @@
                 </div>
 
                 <div class="row">
-                    <label for="password1">New Password</label>
+                    <label for="password1">New password</label>
                     <input id="password1" type="password" name="password1">
                 </div>
                 <div class="row">
-                    <label for="password2">Confirm New Password</label>
+                    <label for="password2">Confirm new password</label>
                     <input id="password2" type="password" name="password2">
                 </div>
-                <input class="anchorbutton btn-blue w-100" type="submit" value="Update Profile">
+                <input class="anchorbutton btn-blue w-100" type="submit" value="Update profile">
             </div>
         </div>
     </form>
@@ -66,7 +66,7 @@
                 <div class="row">
                     <label> <!-- CSS Hack -->
                         <select name="new-engine-name" id="new-engine-name">
-                            <option selected disabled hidden>New Engine</option>
+                            <option selected disabled hidden>New engine</option>
                             {% for engine in engines %}
                                 {% if engine.name not in profile.repos %}
                                     <option value="{{ engine.name }}">{{ engine.name }}</option>
@@ -78,7 +78,7 @@
                 </div>
 
                 <input type="hidden" name="deleted-repos" id="deleted-repos" value="[]">
-                <input class="anchorbutton btn-blue w-100" type="submit" name="add-engine" value="Save Configuration">
+                <input class="anchorbutton btn-blue w-100" type="submit" name="add-engine" value="Save configuration">
             </div>
         </div>
     </form>

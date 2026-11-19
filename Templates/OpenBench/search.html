@@ -65,15 +65,15 @@
 
                     <div class="row">
                         <label for="keywords">Keywords</label>
-                        <input id="keywords" name="keywords" value="{{form.keywords}}" placeholder="Separated By Spaces (Case-Insensitive)"><br>
+                        <input id="keywords" name="keywords" value="{{form.keywords}}" placeholder="Separated by spaces (case-insensitive)"><br>
                     </div>
                     <div class="row">
                         <label for="info-contains">Info</label>
-                        <input id="info-contains" name="info-contains" value="{{form.info}}" placeholder="Substring Match (Case-Insensitive)"><br>
+                        <input id="info-contains" name="info-contains" value="{{form.info}}" placeholder="Substring match (case-insensitive)"><br>
                     </div>
                     <div class="row">
                         <label for="authors">Authors</label>
-                        <input id="authors" name="authors" value="{{form.authors}}" placeholder="Separated By Spaces (Case-Insensitive)"><br>
+                        <input id="authors" name="authors" value="{{form.authors}}" placeholder="Separated by spaces (case-insensitive)"><br>
                     </div>
 
                     <hr>
@@ -81,22 +81,22 @@
                     <div class="row">
                         <label for="dev-engine">Dev</label>
                         <select id="dev-engine" name="dev-engine" class="mw-20 mr-2">
-                            <option value="" {% if not form.dev_engine %}selected{% endif %}>All Engines</option>
+                            <option value="" {% if not form.dev_engine %}selected{% endif %}>All engines</option>
                             {% for engine in engines %}
                                 <option value="{{engine.name}}" {% if form.dev_engine == engine.name %}selected{% endif %}>{{engine.name}}</option>
                             {% endfor %}
                         </select>
-                        <input id="dev-network" name="dev-network" value="{{form.dev_network}}" placeholder="Network Name (Case-Insensitive)"><br>
+                        <input id="dev-network" name="dev-network" value="{{form.dev_network}}" placeholder="Network name (case-insensitive)"><br>
                     </div>
                     <div class="row">
                         <label for="base-engine">Base</label>
                         <select id="base-engine" name="base-engine" class="mw-20 mr-2">
-                            <option value="" {% if not form.base_engine %}selected{% endif %}>All Engines</option>
+                            <option value="" {% if not form.base_engine %}selected{% endif %}>All engines</option>
                             {% for engine in engines %}
                                 <option value="{{engine.name}}" {% if form.base_engine == engine.name %}selected{% endif %}>{{engine.name}}</option>
                             {% endfor %}
                         </select>
-                        <input id="base-network" name="base-network" value="{{form.base_network}}" placeholder="Network Name (Case-Insensitive)"><br>
+                        <input id="base-network" name="base-network" value="{{form.base_network}}" placeholder="Network name (case-insensitive)"><br>
                     </div>
 
                     <hr>
@@ -104,17 +104,17 @@
                     <div class="row">
                         <label for="workload-type">Type</label>
                         <select id="workload-type" name="workload-type">
-                            <option value="" {% if not form.workload_type %}selected{% endif %}>All Workload Types</option>
+                            <option value="" {% if not form.workload_type %}selected{% endif %}>All workload types</option>
                             <option value="SPRT" {% if form.workload_type == "SPRT" %}selected{% endif %}>SPRT</option>
-                            <option value="GAMES" {% if form.workload_type == "GAMES" %}selected{% endif %}>Fixed # of Games</option>
-                            <option value="SPSA" {% if form.workload_type == "SPSA" %}selected{% endif %}>SPSA Tuning Session</option>
-                            <option value="DATAGEN" {% if form.workload_type == "DATAGEN" %}selected{% endif %}>Data Generation</option>
+                            <option value="GAMES" {% if form.workload_type == "GAMES" %}selected{% endif %}>Fixed # of games</option>
+                            <option value="SPSA" {% if form.workload_type == "SPSA" %}selected{% endif %}>SPSA tuning session</option>
+                            <option value="DATAGEN" {% if form.workload_type == "DATAGEN" %}selected{% endif %}>Data generation</option>
                         </select><br>
                     </div>
                     <div class="row">
                         <label for="opening-book">Book</label>
                         <select id="opening-book" name="opening-book">
-                            <option value="" {% if not form.book %}selected{% endif %}>All Books</option>
+                            <option value="" {% if not form.book %}selected{% endif %}>All books</option>
                             {% for book in books %}
                                 <option value="{{book.name}}" {% if form.book == book.name %}selected{% endif %}>{{book.name}}</option>
                             {% endfor %}
@@ -123,10 +123,10 @@
                     <div class="row">
                         <label for="tc-type">Time</label>
                         <select id="tc-type" name="tc-type" onchange="changed_timecontrol()" class="mw-20 mr-2">
-                            <option value="" {% if not form.tc_type %}selected{% endif %}>All Controls</option>
-                            <option value="FIXED-DEPTH" {% if form.tc_type == "FIXED-DEPTH" %}selected{% endif %}>Fixed Depth</option>
-                            <option value="FIXED-NODES" {% if form.tc_type == "FIXED-NODES" %}selected{% endif %}>Fixed Nodes</option>
-                            <option value="FIXED-TIME" {% if form.tc_type == "FIXED-TIME" %}selected{% endif %}>Fixed Time</option>
+                            <option value="" {% if not form.tc_type %}selected{% endif %}>All controls</option>
+                            <option value="FIXED-DEPTH" {% if form.tc_type == "FIXED-DEPTH" %}selected{% endif %}>Fixed depth</option>
+                            <option value="FIXED-NODES" {% if form.tc_type == "FIXED-NODES" %}selected{% endif %}>Fixed nodes</option>
+                            <option value="FIXED-TIME" {% if form.tc_type == "FIXED-TIME" %}selected{% endif %}>Fixed time</option>
                             <option value="FISCHER" {% if form.tc_type == "FISCHER" %}selected{% endif %}>Fischer</option>
                             <option value="CYCLIC" {% if form.tc_type == "CYCLIC" %}selected{% endif %}>Cyclic</option>
                         </select>
@@ -135,9 +135,9 @@
                     <div class="row">
                         <label for="threads">Threads</label>
                         <select id="threads" name="threads">
-                            <option value="" {% if not form.threads %}selected{% endif %}>All Thread Counts</option>
-                            <option value="single" {% if form.threads == "single" %}selected{% endif %}>Single-Threaded</option>
-                            <option value="multi" {% if form.threads == "multi" %}selected{% endif %}>Multi-Threaded</option>
+                            <option value="" {% if not form.threads %}selected{% endif %}>All thread counts</option>
+                            <option value="single" {% if form.threads == "single" %}selected{% endif %}>Single-threaded</option>
+                            <option value="multi" {% if form.threads == "multi" %}selected{% endif %}>Multi-threaded</option>
                         </select><br>
                     </div>
 
@@ -151,7 +151,7 @@
                         <label for="show-stopped"><input type="checkbox" id="show-stopped" {% if not form.hide_stopped %}checked{% endif %}> Stopped</label>
                         <label for="show-deleted"><input type="checkbox" id="show-deleted" {% if form.show_deleted %}checked{% endif %}> Deleted</label>
                     </div>
-                    <input type="submit" class="anchorbutton btn-blue w-100" value="Search Tests">
+                    <input type="submit" class="anchorbutton btn-blue w-100" value="Search tests">
                 </div>
 
             </div>

@@ -13,24 +13,24 @@
         <table class="test-config left-align wrappable" style="table-layout: auto; width: 100%;">
 
             <tr><td class="td-label">User</td><td>{{machine.user.username}}</td></tr>
-            <tr><td class="td-label">Machine Name</td><td>{{machine.info.machine_name}}</td></tr>
-            <tr><td class="td-label">Last Seen</td><td class="timestamp">{{machine.updated|date:'U'}}</td></tr>
+            <tr><td class="td-label">Machine name</td><td>{{machine.info.machine_name}}</td></tr>
+            <tr><td class="td-label">Last seen</td><td class="timestamp">{{machine.updated|date:'U'}}</td></tr>
             <tr class="table-spacer"><td class="td-label"></td><td><br></td></tr>
 
-            <tr><td class="td-label">Client Version</td><td>{{machine.info.client_ver}}</td></tr>
-            <tr><td class="td-label">Fastchess Version</td><td>{{machine.info.fastchess_ver}}</td></tr>
-            <tr><td class="td-label">Python Version</td><td>{{machine.info.python_ver}}</td></tr>
-            <tr><td class="td-label">System Version</td><td>{{machine.info.os_name}} {{machine.info.os_ver}}</td></tr>
+            <tr><td class="td-label">Client version</td><td>{{machine.info.client_ver}}</td></tr>
+            <tr><td class="td-label">Fastchess version</td><td>{{machine.info.fastchess_ver}}</td></tr>
+            <tr><td class="td-label">Python version</td><td>{{machine.info.python_ver}}</td></tr>
+            <tr><td class="td-label">System version</td><td>{{machine.info.os_name}} {{machine.info.os_ver}}</td></tr>
             <tr class="table-spacer"><td class="td-label"></td><td><br></td></tr>
 
-            <tr><td class="td-label">ISA Name</td><td>{{machine.info.isa_name}}</td></tr>
-            <tr><td class="td-label">CPU Name</td><td>{{machine.info.cpu_name}}</td></tr>
-            <tr><td class="td-label">CPU Flags</td><td><pre>{{machine|cpuflagsBlock}}</pre></td></tr>
-            <tr><td class="td-label">Logical Cores</td><td>{{machine.info.logical_cores}}</td></tr>
-            <tr><td class="td-label">Physical Cores</td><td>{{machine.info.physical_cores}}</td></tr>
-            <tr><td class="td-label">Total RAM (MB)</td><td>{{machine.info.ram_total_mb}}</td></tr>
-            <tr><td class="td-label">Syzygy WDL</td><td>{{machine.info.syzygy_max}}-Man</td></tr>
-            <tr><td class="td-label">CLI Options</td><td>{{machine.info.cli_options}}</td></tr>
+            <tr><td class="td-label">ISA name</td><td>{{machine.info.isa_name}}</td></tr>
+            <tr><td class="td-label">CPU name</td><td>{{machine.info.cpu_name}}</td></tr>
+            <tr><td class="td-label">CPU flags</td><td><pre>{{machine|cpuflagsBlock}}</pre></td></tr>
+            <tr><td class="td-label">Logical cores</td><td>{{ machine.info.logical_cores|floatformat:"0g"|default:machine.info.logical_cores }}</td></tr>
+            <tr><td class="td-label">Physical cores</td><td>{{ machine.info.physical_cores|floatformat:"0g"|default:machine.info.physical_cores }}</td></tr>
+            <tr><td class="td-label">Total RAM (MB)</td><td>{{ machine.info.ram_total_mb|floatformat:"0g"|default:machine.info.ram_total_mb }}</td></tr>
+            <tr><td class="td-label">Syzygy WDL</td><td>{{machine.info.syzygy_max}}-man</td></tr>
+            <tr><td class="td-label">CLI options</td><td>{{machine.info.cli_options}}</td></tr>
 
             <tr class="table-spacer"><td class="td-label"></td><td><br></td></tr>
 

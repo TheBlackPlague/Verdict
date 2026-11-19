@@ -6,7 +6,7 @@
 
     <div class="panel directory-panel">
     <div class="table-scroll">
-    <table class="hoverable directory-table events-table" aria-label="Activity">
+    <table data-stack class="hoverable directory-table events-table" aria-label="Activity">
         <thead>
 
         <tr class="table-header">
@@ -21,11 +21,11 @@
 
         {% for event in events %}
             <tr>
-                <td class="timestamp">{{event.created|date:'U'}}</td>
-                <td>{{event.author}}</td>
-                <td><a href="{{event.test_id|workload_url}}">{{event.test_id|testIdToPrettyName}}</a></td>
-                <td>{{event.test_id|testIdToTimeControl}}</td>
-                <td>{{event.summary}}</td>
+                <td data-label="Date" class="timestamp">{{event.created|date:'U'}}</td>
+                <td data-label="User">{{event.author}}</td>
+                <td data-label="Test"><a href="{{event.test_id|workload_url}}">{{event.test_id|testIdToPrettyName}}</a></td>
+                <td data-label="TC">{{event.test_id|testIdToTimeControl}}</td>
+                <td data-label="Summary">{{event.summary}}</td>
             </tr>
         {% empty %}<tr><td colspan="5"><div class="empty-state"><strong>No activity to display</strong></div></td></tr>{% endfor %}
 

@@ -4,19 +4,19 @@
         <div class="c-id"><div class="t-head"><a class="t-name" href="{{ test|workload_url }}" title="{{ test|prettyDevName }}">{{ test|prettyDevName }}</a>{% if test.error %}<span class="tbadge err" role="img" title="Crash or illegal move" aria-label="Crash or illegal move">!</span>{% endif %}{% if test|test_is_fischer %}<span class="tbadge" title="Fischer random chess">FRC</span>{% endif %}{% if test|test_is_time_odds %}<span class="tbadge odds" title="Time odds">Time odds</span>{% endif %}{% if test|test_is_smp_odds %}<span class="tbadge odds" title="Thread odds">Thread odds</span>{% endif %}</div><div class="t-meta dots"><span class="num">#{{ test.id }}</span><a href="/user/{{ test.author }}/">{{ test.author }}</a><span>{{ test.dev_engine }}</span><span class="num">{{ test.dev_time_control }}</span>{% if mode != 'SPRT' %}<span>{{ mode }}</span>{% endif %}</div>{% if test.info %}<p class="t-note-inline" aria-hidden="true">{{ test.info }}</p>{% endif %}</div>
 {% if mode == 'SPSA' %}
         <div class="c-llr" role="meter" aria-label="Iterations" aria-valuemin="0" aria-valuemax="{{ test.spsa_run.iterations }}" aria-valuenow="{{ test|tuning_iterations }}" aria-valuetext="{{ r.iterations }}">
-          <div class="c-top"><b class="num">{{ test|tuning_iterations|insertCommas }} / {{ test.spsa_run.iterations|insertCommas }}</b><span class="c-aside c-word">Iterations</span></div>
+          <div class="c-top"><b class="num">{{ test|tuning_iterations|insertCommas }} / {{ test.spsa_run.iterations|insertCommas }}</b><span class="c-aside c-word">iterations</span></div>
           <div class="track track-progress"><i class="fill" style="width:{{ test|workload_progress }}%"></i></div>
         </div>
         <div class="c-elo is-empty"><div class="c-top"><span class="c-aside c-word">{{ r.tuning }}</span></div><div class="ci"><i class="zero"></i></div></div>
         <div class="c-games" title="{{ r.played }}"><div class="c-top"><b class="num">{{ test.games|insertCommas }} / {{ test|workload_target|insertCommas }}</b></div><div class="wdl"><i class="g" style="width:{{ test|workload_progress }}%"></i></div></div>
 {% else %}{% if mode == 'SPRT' %}
-        <div class="c-llr" role="meter" aria-label="{{ r.llr }}" aria-valuemin="{{ test.lowerllr|floatformat:4 }}" aria-valuemax="{{ test.upperllr|floatformat:4 }}" aria-valuenow="{{ test|bounded_llr|floatformat:4 }}" aria-valuetext="{{ test.currentllr|floatformat:2 }}">
+        <div class="c-llr{% if not test.games %} is-empty{% endif %}" role="meter" aria-label="{{ r.llr }}" aria-valuemin="{{ test.lowerllr|floatformat:4 }}" aria-valuemax="{{ test.upperllr|floatformat:4 }}" aria-valuenow="{{ test|bounded_llr|floatformat:4 }}" aria-valuetext="{{ test.currentllr|floatformat:2 }}">
           <div class="c-top"><b class="num">{{ r.llr_figure }}</b></div>
           <div class="track track-llr dir-{% if key == 'yellow' %}warn{% elif test.currentllr > 0.004 %}up{% elif test.currentllr < -0.004 %}down{% else %}flat{% endif %}" style="--at:{{ test|llr_position }}%;--zero:{{ test|llr_zero }}%"><i class="mid"></i><i class="fill"></i><i class="knob"></i></div>
         </div>
 {% else %}
         <div class="c-llr" role="meter" aria-label="{% if mode == 'DATAGEN' %}{{ r.generated }}{% else %}{{ r.elo }}{% endif %}" aria-valuemin="0" aria-valuemax="{{ test.max_games }}" aria-valuenow="{{ test.games }}" aria-valuetext="{{ test.games }}/{{ test.max_games }}">
-          <div class="c-top"><b class="num">{{ test.games|insertCommas }} / {{ test.max_games|insertCommas }}</b>{% if mode == 'DATAGEN' %}<span class="c-aside c-word">Generated</span>{% endif %}</div>
+          <div class="c-top"><b class="num">{{ test.games|insertCommas }} / {{ test.max_games|insertCommas }}</b>{% if mode == 'DATAGEN' %}<span class="c-aside c-word">generated</span>{% endif %}</div>
           <div class="track track-progress"><i class="fill" style="width:{{ test|workload_progress }}%"></i></div>
         </div>
 {% endif %}{% if test.games %}{% with m=test|ci_marks:elo_range %}
@@ -28,7 +28,7 @@
         <div class="c-games" title="{{ r.games }}">
           <div class="c-top"><b class="num">{{ test.games|insertCommas }}</b></div>
           <div class="wdl" role="img" aria-label="{{ r.wld }}">{% if test.games %}{% with p=test|wdl_widths %}<i class="w" style="width:{{ p.w }}%"></i><i class="d" style="width:{{ p.d }}%"></i><i class="l" style="width:{{ p.l }}%"></i>{% endwith %}{% endif %}</div>{% if test.games %}
-          <span class="wl num" aria-label="{{ r.wld }}"><span class="w">{{ test.wins|insertCommas }}</span> <span class="d">{{ test.draws|insertCommas }}</span> <span class="l">{{ test.losses|insertCommas }}</span></span>{% endif %}
+          <span class="wl num{% if r.counts_long %} is-long{% endif %}" aria-label="{{ r.wld }}" style="--ns:{{ r.count_side }};--nd:{{ r.count_draws }}"><span class="w">{{ r.counts.0 }}</span> <span class="d">{{ r.counts.1 }}</span> <span class="l">{{ r.counts.2 }}</span></span>{% endif %}
         </div>
 {% endif %}
         <p class="c-note{% if not test.info %} is-nil{% endif %}"{% if test.info %} title="{{ test.info }}"{% endif %}>{{ test.info|default:'—' }}</p>

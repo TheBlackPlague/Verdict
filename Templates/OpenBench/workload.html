@@ -61,14 +61,14 @@
           <dl class="kv">
             <div><dt>Opening book</dt><dd>{% if workload|book_download_link %}<a href="{{ workload|book_download_link }}">{{ workload.book_name }}</a>{% else %}{{ workload.book_name }}{% endif %}</dd></div>
             <div><dt>Upload PGNs</dt><dd>{{ workload.upload_pgns }}</dd></div>
-            <div><dt>Scaling</dt><dd>{{ workload.scale_method }} <span class="num">{{ workload.scale_nps }}</span> NPS</dd></div>
+            <div><dt>Scaling</dt><dd>{{ workload.scale_method }} <span class="num">{{ workload.scale_nps|insertCommas }}</span> NPS</dd></div>
             <div><dt>Syzygy WDL</dt><dd>{{ workload.syzygy_wdl }}</dd></div>
-            <div><dt>Syzygy ADJ.</dt><dd>{{ workload.syzygy_adj }}</dd></div>
-            <div><dt>Win ADJ.</dt><dd>{{ workload.win_adj }}</dd></div>
-            <div><dt>Draw ADJ.</dt><dd>{{ workload.draw_adj }}</dd></div>{% if type == "TUNE" %}
+            <div><dt>Syzygy adj.</dt><dd>{{ workload.syzygy_adj }}</dd></div>
+            <div><dt>Win adj.</dt><dd>{{ workload.win_adj }}</dd></div>
+            <div><dt>Draw adj.</dt><dd>{{ workload.draw_adj }}</dd></div>{% if type == "TUNE" %}
             <div><dt>Alpha</dt><dd>{{ workload.spsa_run.alpha }}</dd></div>
             <div><dt>Gamma</dt><dd>{{ workload.spsa_run.gamma }}</dd></div>
-            <div><dt>A-Ratio</dt><dd>{{ workload.spsa_run.a_ratio }}</dd></div>
+            <div><dt>A-ratio</dt><dd>{{ workload.spsa_run.a_ratio }}</dd></div>
             <div><dt>Pairs per point</dt><dd>{{ workload.workload_size }}</dd></div>
             <div><dt>Reporting</dt><dd>{{ workload.spsa_run.reporting_type }}</dd></div>
             <div><dt>Distribution</dt><dd>{{ workload.spsa_run.distribution_type }}</dd></div>{% elif type == "DATAGEN" %}
@@ -84,7 +84,7 @@
               <label class="field field-wide" for="info"><span>Notes</span><textarea id="info" name="info" rows="2">{{ workload.info }}</textarea></label>
               <label class="field" for="priority"><span>Priority</span><input value="{{ workload.priority }}" id="priority" name="priority"></label>
               <label class="field" for="throughput"><span>Throughput</span><input value="{{ workload.throughput }}" id="throughput" name="throughput"></label>{% if type == "TEST" or type == "DATAGEN" %}
-              <label class="field" for="workload_size"><span>Workload Size</span><input value="{{ workload.workload_size }}" id="workload_size" name="workload_size"></label>{% endif %}
+              <label class="field" for="workload_size"><span>Workload size</span><input value="{{ workload.workload_size }}" id="workload_size" name="workload_size"></label>{% endif %}
             </div>
             <div class="edit-foot">{% if profile.approver or profile.user.username == workload.author %}<button class="btn" type="submit" name="submit" value="Modify">Modify</button>{% else %}<button class="btn btn-disabled" type="submit" name="submit" value="Modify" disabled>Modify</button>{% endif %}</div>
           </form>
@@ -95,7 +95,7 @@
       <section class="card spsa" id="parameters">
         <div class="table-scroll"><table class="dtable spsa-table">
           <thead><tr><th scope="col">Name</th><th scope="col" class="r">Curr</th><th scope="col" class="r">Start</th><th scope="col" class="r">Min</th><th scope="col" class="r">Max</th><th scope="col" class="r">C</th><th scope="col" class="r">C_end</th><th scope="col" class="r">R</th><th scope="col" class="r">R_end</th></tr></thead>
-          <tbody id="spsa-digest-button-container"><tr><td colspan="9"><button class="btn btn-quiet btn-wide" type="button" onclick="fetch_spsa_digest({{ workload.id }})">Show SPSA Digest</button></td></tr></tbody>
+          <tbody id="spsa-digest-button-container"><tr><td colspan="9"><button class="btn btn-quiet btn-wide" type="button" onclick="fetch_spsa_digest({{ workload.id }})">Show SPSA digest</button></td></tr></tbody>
           <tbody id="spsa-digest-body-container" style="display: none;"></tbody>
         </table></div>
       </section>
@@ -113,7 +113,7 @@
 
       <section class="card mach" id="results" aria-labelledby="mach-h">
         <header class="card-head"><h2 id="mach-h">Individual machine results</h2><button class="btn btn-quiet" type="button" onclick="fetch_results({{ workload.id }})">Fetch results</button></header>
-        <table class="dtable">
+        <table data-stack class="dtable">
           <thead><tr><th scope="col">#</th><th scope="col">User</th><th scope="col" class="r">Games</th><th scope="col" class="hide-sm">Penta</th><th scope="col" class="r hide-sm">Pairs</th><th scope="col" class="r">Time</th><th scope="col" class="r">Crash</th></tr></thead>
           <tbody id="results-container"></tbody>
         </table>

@@ -64,9 +64,9 @@
           <div id="test-mode-buttons" data-workload="{{workload}}"></div>
           {% if workload == "TEST" %}
           <div class="frow row-sprt"><label class="flabel" for="test_bounds">Bounds</label><div class="fctl"><input id="test_bounds" name="test_bounds"></div></div>
-          <div class="frow row-games"><label class="flabel" for="test_max_games">Max Games</label><div class="fctl"><input id="test_max_games" name="test_max_games" inputmode="numeric"></div></div>
+          <div class="frow row-games"><label class="flabel" for="test_max_games">Max games</label><div class="fctl"><input id="test_max_games" name="test_max_games" inputmode="numeric"></div></div>
           {% elif workload == "DATAGEN" %}
-          <div class="frow"><label class="flabel" for="datagen_max_games">Max Games</label><div class="fctl"><input id="datagen_max_games" name="datagen_max_games" inputmode="numeric"></div></div>
+          <div class="frow"><label class="flabel" for="datagen_max_games">Max games</label><div class="fctl"><input id="datagen_max_games" name="datagen_max_games" inputmode="numeric"></div></div>
           {% endif %}
         </div>
       </section>
@@ -77,12 +77,12 @@
         <div class="fgroup pairs">
           <div class="prow prow-wide"><label class="plabel" for="dev_branch">Branch</label><div class="pcell"><input id="dev_branch" name="dev_branch" autofocus></div></div>
           <div class="prow prow-wide"><label class="plabel" for="info">Info</label><div class="pcell"><textarea id="info" name="info" rows="2"></textarea></div></div>
-          <div class="prow prow-wide"><label class="plabel" for="spsa_inputs">SPSA Input</label><div class="pcell"><textarea aria-label="SPSA input" id="spsa_inputs" name="spsa_inputs" rows="5"></textarea></div></div>
+          <div class="prow prow-wide"><label class="plabel" for="spsa_inputs">SPSA input</label><div class="pcell"><textarea aria-label="SPSA input" id="spsa_inputs" name="spsa_inputs" rows="5"></textarea></div></div>
         </div>
         {% else %}
         <h2 id="s-patch" class="h-legend"><span>Patch</span><span class="legend" aria-hidden="true"><span class="side side-dev">Dev</span><span class="side side-base">Base</span></span></h2>
         <div class="fgroup pairs">
-          <div class="prow"><span class="plabel">Branch</span><div class="pcell" data-side="Dev"><input id="dev_branch" name="dev_branch" aria-label="{{dev_text}} Branch" autofocus></div><div class="pcell" data-side="Base"><input id="base_branch" name="base_branch" aria-label="Base Branch"></div></div>
+          <div class="prow"><span class="plabel">Branch</span><div class="pcell" data-side="Dev"><input id="dev_branch" name="dev_branch" aria-label="{{dev_text}} branch" autofocus></div><div class="pcell" data-side="Base"><input id="base_branch" name="base_branch" aria-label="Base branch"></div></div>
           <div class="prow prow-wide"><label class="plabel" for="info">Info</label><div class="pcell"><textarea id="info" name="info" rows="2"></textarea></div></div>
         </div>
         {% endif %}
@@ -109,46 +109,46 @@
             <div class="disc-body pairs">
               <div class="prow phead"><span class="plabel"></span><span class="side side-dev">Dev</span><span class="side side-base">Base</span></div>
               <div class="prow"><span class="plabel">Engine</span>
-                <div class="pcell" data-side="Dev"><select id="dev_engine" name="dev_engine" aria-label="{{dev_text}} Engine" onchange="change_engine(value, 'dev', '{{workload}}');">{% for engine in engines %}
+                <div class="pcell" data-side="Dev"><select id="dev_engine" name="dev_engine" aria-label="{{dev_text}} engine" onchange="change_engine(value, 'dev', '{{workload}}');">{% for engine in engines %}
                   <option value="{{ engine.name }}">{{ engine.name }}</option>{% endfor %}
                 </select></div>
-                <div class="pcell" data-side="Base"><select id="base_engine" name="base_engine" aria-label="Base Engine" onchange="change_engine(value, 'base', '{{workload}}');">{% for engine in engines %}
+                <div class="pcell" data-side="Base"><select id="base_engine" name="base_engine" aria-label="Base engine" onchange="change_engine(value, 'base', '{{workload}}');">{% for engine in engines %}
                   <option value="{{ engine.name }}">{{ engine.name }}</option>{% endfor %}
                 </select></div></div>
-              <div class="prow stack"><span class="plabel">Source</span><div class="pcell" data-side="Dev"><input id="dev_repo" name="dev_repo" aria-label="{{dev_text}} Source"></div><div class="pcell" data-side="Base"><input id="base_repo" name="base_repo" aria-label="Base Source"></div></div>
-              <div class="prow"><span class="plabel">Bench</span><div class="pcell" data-side="Dev"><input value="Autofill" id="dev_bench" name="dev_bench" aria-label="{{dev_text}} Bench"></div><div class="pcell" data-side="Base"><input value="Autofill" id="base_bench" name="base_bench" aria-label="Base Bench"></div></div>
-              <div class="prow"><span class="plabel">Network</span><div class="pcell" data-side="Dev"><select id="dev_network" name="dev_network" aria-label="{{dev_text}} Network"></select></div><div class="pcell" data-side="Base"><select id="base_network" name="base_network" aria-label="Base Network"></select></div></div>
-              <div class="prow"><span class="plabel">Options</span><div class="pcell" data-side="Dev"><input id="dev_options" name="dev_options" aria-label="{{dev_text}} Options"></div><div class="pcell" data-side="Base"><input id="base_options" name="base_options" aria-label="Base Options"></div></div>
-              <div class="prow"><span class="plabel">Time</span><div class="pcell" data-side="Dev"><input id="dev_time_control" name="dev_time_control" aria-label="{{dev_text}} Time"></div><div class="pcell" data-side="Base"><input id="base_time_control" name="base_time_control" aria-label="Base Time"></div></div>
+              <div class="prow stack"><span class="plabel">Source</span><div class="pcell" data-side="Dev"><input id="dev_repo" name="dev_repo" aria-label="{{dev_text}} source"></div><div class="pcell" data-side="Base"><input id="base_repo" name="base_repo" aria-label="Base source"></div></div>
+              <div class="prow"><span class="plabel">Bench</span><div class="pcell" data-side="Dev"><input value="Autofill" id="dev_bench" name="dev_bench" aria-label="{{dev_text}} bench"></div><div class="pcell" data-side="Base"><input value="Autofill" id="base_bench" name="base_bench" aria-label="Base bench"></div></div>
+              <div class="prow"><span class="plabel">Network</span><div class="pcell" data-side="Dev"><select id="dev_network" name="dev_network" aria-label="{{dev_text}} network"></select></div><div class="pcell" data-side="Base"><select id="base_network" name="base_network" aria-label="Base network"></select></div></div>
+              <div class="prow"><span class="plabel">Options</span><div class="pcell" data-side="Dev"><input id="dev_options" name="dev_options" aria-label="{{dev_text}} options"></div><div class="pcell" data-side="Base"><input id="base_options" name="base_options" aria-label="Base options"></div></div>
+              <div class="prow"><span class="plabel">Time</span><div class="pcell" data-side="Dev"><input id="dev_time_control" name="dev_time_control" aria-label="{{dev_text}} time"></div><div class="pcell" data-side="Base"><input id="base_time_control" name="base_time_control" aria-label="Base time"></div></div>
             </div>
             {% endif %}
           </details>
 
           {% if workload == "TEST" %}
           <details class="disc" data-disc="test">
-            <summary><span class="disc-k">Test Settings</span>{% icon "chev" "ico-xs disc-chev" %}</summary>
+            <summary><span class="disc-k">Test settings</span>{% icon "chev" "ico-xs disc-chev" %}</summary>
             <div class="disc-body">
-              <div class="frow"><span class="flabel">Test Mode</span><div class="fctl"><div class="seg seg-content seg-fill" role="radiogroup" aria-label="Test Mode"><label><input type="radio" form="sheet-ui" name="test_mode_ui" value="SPRT" checked><span>SPRT</span></label><label><input type="radio" form="sheet-ui" name="test_mode_ui" value="GAMES"><span>Fixed Games</span></label></div>
+              <div class="frow"><span class="flabel">Test mode</span><div class="fctl"><div class="seg seg-content seg-fill" role="radiogroup" aria-label="Test mode"><label><input type="radio" form="sheet-ui" name="test_mode_ui" value="SPRT" checked><span>SPRT</span></label><label><input type="radio" form="sheet-ui" name="test_mode_ui" value="GAMES"><span>Fixed Games</span></label></div>
                 <select onchange='set_test_type()' id="test_mode" name="test_mode" class="ui-proxy" tabindex="-1" aria-hidden="true">
                   <option selected value="SPRT"> SPRT</option>
-                  <option value="GAMES"> Fixed Games</option>
+                  <option value="GAMES"> Fixed games</option>
                 </select></div></div>
               <div class="frow"><label class="flabel" for="test_confidence">Confidence</label><div class="fctl"><input id="test_confidence" name="test_confidence"></div></div>
             </div>
           </details>
           {% elif workload == "TUNE" %}
           <details class="disc" data-disc="spsa">
-            <summary><span class="disc-k">SPSA Settings</span>{% icon "chev" "ico-xs disc-chev" %}</summary>
+            <summary><span class="disc-k">SPSA settings</span>{% icon "chev" "ico-xs disc-chev" %}</summary>
             <div class="disc-body">
               <div class="frow"><label class="flabel" for="spsa_alpha">Alpha</label><div class="fctl"><input value="0.602" id="spsa_alpha" name="spsa_alpha"></div></div>
               <div class="frow"><label class="flabel" for="spsa_gamma">Gamma</label><div class="fctl"><input value="0.101" id="spsa_gamma" name="spsa_gamma"></div></div>
-              <div class="frow"><label class="flabel" for="spsa_A_ratio">A-Ratio</label><div class="fctl"><input value="0.1" id="spsa_A_ratio" name="spsa_A_ratio"></div></div>
+              <div class="frow"><label class="flabel" for="spsa_A_ratio">A-ratio</label><div class="fctl"><input value="0.1" id="spsa_A_ratio" name="spsa_A_ratio"></div></div>
               <div class="frow"><label class="flabel" for="spsa_iterations">Iterations</label><div class="fctl"><input value="25000" id="spsa_iterations" name="spsa_iterations" inputmode="numeric"></div></div>
-              <div class="frow"><label class="flabel" for="spsa_pairs_per">Pairs-Per</label><div class="fctl"><input value="8" id="spsa_pairs_per" name="spsa_pairs_per" inputmode="numeric"></div></div>
+              <div class="frow"><label class="flabel" for="spsa_pairs_per">Pairs-per</label><div class="fctl"><input value="8" id="spsa_pairs_per" name="spsa_pairs_per" inputmode="numeric"></div></div>
             </div>
           </details>
           <details class="disc" data-disc="methods">
-            <summary><span class="disc-k">SPSA Methodologies</span>{% icon "chev" "ico-xs disc-chev" %}</summary>
+            <summary><span class="disc-k">SPSA methodologies</span>{% icon "chev" "ico-xs disc-chev" %}</summary>
             <div class="disc-body">
               <div class="frow"><label class="flabel" for="spsa_reporting_type">Reporting</label><div class="fctl"><select id="spsa_reporting_type" name="spsa_reporting_type">
                 <option selected value="BATCHED"> Batched </option>
@@ -162,10 +162,10 @@
           </details>
           {% elif workload == "DATAGEN" %}
           <details class="disc" data-disc="datagen">
-            <summary><span class="disc-k">Datagen Settings</span>{% icon "chev" "ico-xs disc-chev" %}</summary>
+            <summary><span class="disc-k">Datagen settings</span>{% icon "chev" "ico-xs disc-chev" %}</summary>
             <div class="disc-body">
-              <div class="frow"><label class="flabel" for="datagen_custom_genfens">Genfens Args</label><div class="fctl"><input id="datagen_custom_genfens" name="datagen_custom_genfens"></div></div>
-              <div class="frow"><label class="flabel" for="datagen_play_reverses">Play Reverses</label><div class="fctl"><select id="datagen_play_reverses" name="datagen_play_reverses">
+              <div class="frow"><label class="flabel" for="datagen_custom_genfens">Genfens args</label><div class="fctl"><input id="datagen_custom_genfens" name="datagen_custom_genfens"></div></div>
+              <div class="frow"><label class="flabel" for="datagen_play_reverses">Play reverses</label><div class="fctl"><select id="datagen_play_reverses" name="datagen_play_reverses">
                 <option value="YES"> Yes </option>
                 <option selected value="NO"> No </option>
               </select></div></div>
@@ -174,9 +174,9 @@
           {% endif %}
 
           <details class="disc" data-disc="general">
-            <summary><span class="disc-k">General Settings</span>{% icon "chev" "ico-xs disc-chev" %}</summary>
+            <summary><span class="disc-k">General settings</span>{% icon "chev" "ico-xs disc-chev" %}</summary>
             <div class="disc-body">
-              <div class="frow"><label class="flabel" for="book_name">Opening Book</label><div class="fctl"><select id="book_name" name="book_name">
+              <div class="frow"><label class="flabel" for="book_name">Opening book</label><div class="fctl"><select id="book_name" name="book_name">
                 <option selected value="NONE"> None </option>{% for book in books %}
                 <option value="{{ book.name }}">{{ book.name }}</option>{% endfor %}
               </select></div></div>
@@ -191,44 +191,44 @@
               <div class="frow"><label class="flabel" for="priority">Priority</label><div class="fctl"><input value="0" id="priority" name="priority"></div></div>
               <div class="frow"><label class="flabel" for="throughput">Throughput</label><div class="fctl"><input value="1000" id="throughput" name="throughput" inputmode="numeric"></div></div>
               {% if workload == "TEST" or workload == "DATAGEN" %}
-              <div class="frow"><label class="flabel" for="workload_size">Workload Size</label><div class="fctl"><input id="workload_size" name="workload_size" inputmode="numeric"></div></div>
+              <div class="frow"><label class="flabel" for="workload_size">Workload size</label><div class="fctl"><input id="workload_size" name="workload_size" inputmode="numeric"></div></div>
               {% endif %}
               <div class="frow"><label class="flabel" for="syzygy_wdl">Syzygy WDL</label><div class="fctl"><select id="syzygy_wdl" name="syzygy_wdl">
                 <option selected value="DISABLED"> Disabled </option>
                 <option value="OPTIONAL"> Optional </option>
-                <option value="7-MAN"> 7-Man </option>
-                <option value="6-MAN"> 6-Man </option>
-                <option value="5-MAN"> 5-Man </option>
-                <option value="4-MAN"> 4-Man </option>
-                <option value="3-MAN"> 3-Man </option>
+                <option value="7-MAN"> 7-man </option>
+                <option value="6-MAN"> 6-man </option>
+                <option value="5-MAN"> 5-man </option>
+                <option value="4-MAN"> 4-man </option>
+                <option value="3-MAN"> 3-man </option>
               </select></div></div>
             </div>
           </details>
 
           <details class="disc" data-disc="adj">
-            <summary><span class="disc-k">Adjudication Settings</span>{% icon "chev" "ico-xs disc-chev" %}</summary>
+            <summary><span class="disc-k">Adjudication settings</span>{% icon "chev" "ico-xs disc-chev" %}</summary>
             <div class="disc-body">
-              <div class="frow"><label class="flabel" for="syzygy_adj">Syzygy ADJ.</label><div class="fctl"><select id="syzygy_adj" name="syzygy_adj">
+              <div class="frow"><label class="flabel" for="syzygy_adj">Syzygy adj.</label><div class="fctl"><select id="syzygy_adj" name="syzygy_adj">
                 <option value="DISABLED"> Disabled </option>
                 <option selected value="OPTIONAL"> Optional </option>
-                <option value="7-MAN"> 7-Man </option>
-                <option value="6-MAN"> 6-Man </option>
-                <option value="5-MAN"> 5-Man </option>
-                <option value="4-MAN"> 4-Man </option>
-                <option value="3-MAN"> 3-Man </option>
+                <option value="7-MAN"> 7-man </option>
+                <option value="6-MAN"> 6-man </option>
+                <option value="5-MAN"> 5-man </option>
+                <option value="4-MAN"> 4-man </option>
+                <option value="3-MAN"> 3-man </option>
               </select></div></div>
-              <div class="frow"><label class="flabel" for="win_adj">Win ADJ.</label><div class="fctl"><input id="win_adj" name="win_adj"></div></div>
-              <div class="frow"><label class="flabel" for="draw_adj">Draw ADJ.</label><div class="fctl"><input id="draw_adj" name="draw_adj"></div></div>
+              <div class="frow"><label class="flabel" for="win_adj">Win adj.</label><div class="fctl"><input id="win_adj" name="win_adj"></div></div>
+              <div class="frow"><label class="flabel" for="draw_adj">Draw adj.</label><div class="fctl"><input id="draw_adj" name="draw_adj"></div></div>
             </div>
           </details>
 
           <details class="disc" data-disc="scaling">
-            <summary><span class="disc-k">Scaling Settings</span>{% icon "chev" "ico-xs disc-chev" %}</summary>
+            <summary><span class="disc-k">Scaling settings</span>{% icon "chev" "ico-xs disc-chev" %}</summary>
             <div class="disc-body">
-              <div class="frow"><label class="flabel" for="scale_method">Scale Method</label><div class="fctl"><select id="scale_method" name="scale_method">{% if workload == "TEST" or workload == "DATAGEN" %}
-                <option value="DEV"> Dev Engine </option>
-                <option value="BASE"> Base Engine </option>
-                <option value="BOTH"> Both Engines </option>{% else %}
+              <div class="frow"><label class="flabel" for="scale_method">Scale method</label><div class="fctl"><select id="scale_method" name="scale_method">{% if workload == "TEST" or workload == "DATAGEN" %}
+                <option value="DEV"> Dev engine </option>
+                <option value="BASE"> Base engine </option>
+                <option value="BOTH"> Both engines </option>{% else %}
                 <option selected value="DEV"> Engine </option>{% endif %}
               </select></div></div>
               <div class="frow"><label class="flabel" for="scale_nps">Expected NPS</label><div class="fctl"><input id="scale_nps" name="scale_nps" inputmode="numeric"></div></div>

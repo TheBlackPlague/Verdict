@@ -6,7 +6,7 @@
 
     <div class="panel directory-panel">
     <div class="table-scroll">
-    <table class="hoverable directory-table users-table" aria-label="Contributors">
+    <table data-stack class="hoverable directory-table users-table" aria-label="Contributors">
         <thead>
 
         <tr class="table-header">
@@ -22,11 +22,11 @@
         {% for profile in profiles %}
             {% if profile.games or profile.tests or profile.approver %}
                 <tr>
-                    <td><a href="/user/{{profile.user.username}}">{{profile.user.username}}</a></td>
-                    <td class="numeric">{{profile.games|insertCommas}}</td>
-                    <td class="numeric">{{profile.tests|insertCommas}}</td>
-                    <td>{{profile.engine}}</td>
-                    <td class="timestamp">{{profile.user.date_joined|date:'U'}}</td>
+                    <td data-label="Username"><a href="/user/{{profile.user.username}}">{{profile.user.username}}</a></td>
+                    <td data-label="Games" class="numeric">{{profile.games|insertCommas}}</td>
+                    <td data-label="Tests" class="numeric">{{profile.tests|insertCommas}}</td>
+                    <td data-label="Engine">{{profile.engine}}</td>
+                    <td data-label="Created" class="timestamp">{{profile.user.date_joined|date:'U'}}</td>
                 </tr>
             {% endif %}
         {% endfor %}

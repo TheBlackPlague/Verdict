@@ -1,7 +1,7 @@
 {% load mytags %}
 <section class="panel"><div class="panel-heading"><h2>Connected machines <span class="count-badge">{{ machines|length }}</span></h2><span class="panel-meta">Active in the last 2 minutes</span></div><div class="table-scroll">
 
-    <table class="hoverable">
+    <table data-stack class="hoverable">
 
         <tr class="table-header">
             <th class="numeric">#</th>
@@ -16,12 +16,12 @@
 
         {% for machine in machines %}
             <tr>
-                <td class="numeric"><a href="/machines/{{machine.id}}/">{{machine.id}}</a></td>
-                <td>{{machine.user.username}}</td>
-                <td>{{machine.info.machine_name}}</td>
-                <td>{{machine.info.os_name}}</td>
-                <td>{{machine.info.isa_name}}</td>
-                <td>
+                <td data-label="#" class="numeric"><a href="/machines/{{machine.id}}/">{{machine.id}}</a></td>
+                <td data-label="User">{{machine.user.username}}</td>
+                <td data-label="Name">{{machine.info.machine_name}}</td>
+                <td data-label="System">{{machine.info.os_name}}</td>
+                <td data-label="ISA">{{machine.info.isa_name}}</td>
+                <td data-label="Workload">
                     {% if machine.current_workload %}
                         <a href="{{machine.current_workload|workload_url}}">
                             {{machine.current_workload|workload_pretty_name}}
@@ -30,8 +30,8 @@
                         None
                     {% endif %}
                 </td>
-                <td class="numeric">{{machine.info.concurrency}}</td>
-                <td class="numeric">{{machine.dev_mnps|twoDigitPrecision}}M / {{machine.base_mnps|twoDigitPrecision}}M</td>
+                <td data-label="Threads" class="numeric">{{machine.info.concurrency}}</td>
+                <td data-label="NPS" class="numeric">{{machine.dev_mnps|twoDigitPrecision}}M / {{machine.base_mnps|twoDigitPrecision}}M</td>
             </tr>
         {% empty %}<tr><td colspan="8"><div class="empty-state"><strong>No machines connected</strong><p>Workers appear here when they connect to this server.</p></div></td></tr>{% endfor %}
 

@@ -48,7 +48,7 @@
                     </select>
                 </div>
 
-                <h3> Build Settings </h3>
+                <h3> Build settings </h3>
 
                 <div class="row">
                     <label for="build_path"> Path </label>
@@ -61,7 +61,7 @@
                 </div>
 
                 <div class="row">
-                    <label for="build_cpuflags"> Cpu Flags </label>
+                    <label for="build_cpuflags"> CPU flags </label>
                     <input id="build_cpuflags" name="build_cpuflags" value="{{engine_config.build_cpuflags}}" {% if not can_manage %}readonly{% endif %}>
                 </div>
 
@@ -77,7 +77,7 @@
                 </div>
 
                 {% if can_manage %}
-                    <input class="anchorbutton btn-blue w-100" type="submit" value="Update Engine">
+                    <input class="anchorbutton btn-blue w-100" type="submit" value="Update engine">
                 {% endif %}
 
             </div>

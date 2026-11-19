@@ -4,9 +4,8 @@
     {% with axis=active|fleet_axis %}<div class="fl-strip" aria-hidden="true"><i class="fl-axis"></i>{% if axis.zero is not None %}<i class="fl-zero" style="left:{{ axis.zero }}%"></i>{% endif %}{% for dot in axis.dots %}<i class="fl-dot {% if dot.neg %}neg{% else %}pos{% endif %}" style="left:{{ dot.pos }}%"></i>{% endfor %}</div>{% endwith %}
   </div>
   <div class="fl"><span class="fl-k">Awaiting approval</span><span class="fl-v num">{{ pending|length }}</span></div>
-  <a class="fl" href="/machines/" title="Machines connected in the last 2 minutes"><span class="fl-k">Machines online</span><span class="fl-v num">{{ fleet.machines|insertCommas }}<small>{{ fleet.threads|insertCommas }} threads</small></span></a>
-  <div class="fl" title="Concurrency × benchmark speed"><span class="fl-k" aria-hidden="true"></span><span class="fl-v num">{{ fleet.mnps|floatformat:1 }}<small>MNPS</small></span></div>
-  {% if queue_eta %}<div class="fl" title="{{ queue_eta.detail }}" tabindex="0" aria-label="Estimated Time Remaining: {{ queue_eta.label }}. {{ queue_eta.detail }}"><span class="fl-k">Estimated Time Remaining</span><span class="fl-v num">{{ queue_eta.label }}</span></div>{% endif %}
+  <a class="fl fl-mach" href="/machines/" title="Machines connected in the last 2 minutes"><span class="fl-k">Machines online</span><span class="fl-v num">{{ fleet.machines|insertCommas }}<small>{{ fleet.threads|insertCommas }} threads</small><span class="dot-sep" aria-hidden="true"></span><small title="Concurrency × benchmark speed">{{ fleet.mnps|floatformat:1 }} MNPS</small></span></a>
+  {% if queue_eta %}<div class="fl fl-eta" title="{{ queue_eta.detail }}" tabindex="0" aria-label="Estimated time remaining: {{ queue_eta.label }}. {{ queue_eta.detail }}"><span class="fl-k">Estimated time remaining</span><span class="fl-v num">{{ queue_eta.label }}</span></div>{% endif %}
 </section>
 {% endif %}
 <div class="tgroups" data-tests>
@@ -18,7 +17,7 @@
   </section>
 {% endif %}
   <section class="tgroup" data-group="active" aria-labelledby="g-active">
-    <header class="tgroup-head"><h2 id="g-active">Active workloads</h2><span class="count num">{{ active_count }}</span><span class="tgroup-note">{% if active|length == 1 %}Priority {{ active.0.priority }}{% else %}Ordered by priority{% endif %}</span></header>
+    <header class="tgroup-head"><h2 id="g-active">Active workloads</h2><span class="count num">{{ active_count }}</span><span class="tgroup-note">{% if active|length == 1 %}Priority {{ active.0.priority }}{% elif active|length > 1 %}Ordered by priority{% endif %}</span></header>
     {% if active %}<ul class="tlist" role="list">{% for group in active %}{% if active|length > 1 %}
       <li class="tsub"><span>Priority {{ group.priority }}</span></li>{% endif %}{% for test in group.tests %}{% include "OpenBench/Blocks/testsummary.html" %}{% endfor %}{% endfor %}
     </ul>{% else %}<p class="tempty">No active workloads. <a href="/test/new/">Create a test</a> to get started.</p>{% endif %}

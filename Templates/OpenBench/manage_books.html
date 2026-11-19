@@ -34,7 +34,7 @@
 
     <div class="panel directory-panel">
     <div class="table-scroll">
-    <table class="hoverable directory-table manage-table" aria-label="Opening books">
+    <table data-stack class="hoverable directory-table manage-table" aria-label="Opening books">
         <thead>
 
         <tr class="table-header">
@@ -49,10 +49,10 @@
         <tbody>
         {% for book in books %}
             <tr>
-                <td>{{book.name}}</td>
-                <td><a href="{{book.source}}">{{book.source|removePrefix:"https://raw.githubusercontent.com/"}}</a></td>
+                <td data-label="Name">{{book.name}}</td>
+                <td data-label="Source"><a href="{{book.source}}">{{book.source|removePrefix:"https://raw.githubusercontent.com/"}}</a></td>
 
-                <td style="text-align: center">
+                <td data-label="Status">
                     {% if book.enabled %}
                         <span class="badge badge-green">Enabled</span>
                     {% else %}
@@ -60,13 +60,13 @@
                     {% endif %}
                 </td>
 
-                <td>
+                <td data-label="Settings">
                     <a class="icon-button" aria-label="Settings for {{book.name}}" href="/manage/books/{{book.name}}/">
                         <i class="fa-solid fa-pen-to-square" style="color: grey;"></i>
                     </a>
                 </td>
 
-                <td>
+                <td{% if can_manage %} data-label="Delete"{% endif %}>
                     {% if can_manage %}
                         <form method="POST" action="/manage/books/{{book.name}}/delete/">
                             {% csrf_token %}
@@ -88,7 +88,7 @@
             <div class="form">
                 <div class="col-full">
 
-                    <h3> New Book </h3>
+                    <h3> New book </h3>
 
                     <div class="row">
                         <label for="book-name"> Name </label>
@@ -113,7 +113,7 @@
                         </select>
                     </div>
 
-                    <input type="submit" class="anchorbutton btn-blue w-100" value="Create Book">
+                    <input type="submit" class="anchorbutton btn-blue w-100" value="Create book">
 
                 </div>
             </div>

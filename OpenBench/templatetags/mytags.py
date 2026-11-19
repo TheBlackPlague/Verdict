@@ -524,13 +524,17 @@ def row_readings(workload):
         lines['elo'] += ' [N=%d]' % workload.max_games
     if workload.test_mode == 'SPSA':
         spsa_run = workload.spsa_run
-        lines['tuning'] = 'Tuning %d Parameters' % spsa_run.parameters.count()
+        lines['tuning'] = 'Tuning %d parameters' % spsa_run.parameters.count()
         lines['iterations'] = '%d/%d Iterations' % (workload.games / (2 * spsa_run.pairs_per), spsa_run.iterations)
         lines['played'] = '%d/%d Games Played' % (workload.games, 2 * spsa_run.iterations * spsa_run.pairs_per)
 
+    counts = [insertCommas(n) for n in (workload.wins, workload.draws, workload.losses)]
+    side = max(len(counts[0]), len(counts[2]))
+    lines.update(counts=counts, count_side=side, count_draws=len(counts[1]), counts_long=2 * side + len(counts[1]) > 21)
+
     llr = workload.currentllr if workload.games else 0.0
     lines.update(
-        llr_figure=_signed(llr, '%.2f'), elo_figure=_signed(elo, '%.2f'),
+        llr_figure=_signed(llr, '%.2f') if workload.games else '—', elo_figure=_signed(elo, '%.2f'),
         interval_figure='%.2f' % interval,
         elo_tone='pos' if elo - interval > 0 else 'neg' if elo + interval < 0 else '',
     )

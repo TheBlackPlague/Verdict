@@ -102,13 +102,19 @@
     if (m.matches('[role="menu"]')) requestAnimationFrame(() => { const first = menuItems(m)[0]; if (!first && !m.hasAttribute('tabindex')) m.tabIndex = -1; (first || m).focus({ preventScroll: true }); });
   }, true);
 
+  $$('input[data-timestamp]').forEach(i => {
+    const d = new Date(+i.dataset.timestamp * 1000); if (Number.isNaN(d.getTime())) return;
+    i.value = d.toLocaleString(undefined, { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    i.title = d.toLocaleString();
+  });
+
   document.addEventListener('click', e => {
     const b = e.target.closest('[data-copy]'); if (!b || !hasRepo(['copy_text_from_element'])) return;
     window.copy_text_from_element(b.dataset.copy, true); b.dataset.done = ''; setTimeout(() => delete b.dataset.done, 1400);
   });
 
   if (hasRepo(['start_workload_updates', 'section_request', 'workload_request', 'section_busy', 'format_cpu_name', 'llr_display_points'])) {
-    const sg = v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2);
+    const sg = v => { const t = Math.abs(v).toFixed(2); return (+t ? (v > 0 ? '+' : '−') : '') + t; };
     const n = v => Math.round(v).toLocaleString('en-US');
     const pct = v => +v.toFixed(2) + '%';
     const busy = el => window.section_busy(el);
@@ -168,7 +174,7 @@
         sel = Math.max(0, Math.min(pts.length - 1, i)); const [g, v] = pts[sel];
         hov.setAttribute('opacity', show ? '1' : '0');
         hovLine.setAttribute('x1', X(g)); hovLine.setAttribute('x2', X(g)); hovDot.setAttribute('cx', X(g)); hovDot.setAttribute('cy', Y(v));
-        readout.textContent = `${g.toLocaleString()} games · LLR ${v.toFixed(3)}` +
+        readout.textContent = `${g.toLocaleString()} games · LLR ${sg(v)}` +
           (pts.length === 1 ? (data.finished ? ' · Earlier history was not recorded.' : ' · Waiting for the next recorded result.') : ' · Hover or use ← → to inspect.');
       };
       svg.addEventListener('pointermove', e => { const r = svg.getBoundingClientRect(), g = ((e.clientX - r.left) * W / r.width - m.l) / (W - m.l - m.r) * gx;
@@ -191,17 +197,17 @@
         const box = document.getElementById('summary-container'); if (busy(box)) return;
         const on = $('[data-sum][aria-selected="true"]')?.dataset.sum || 'user';
         const panel = (rows, label, key, fmt = s => s) => { const nps = rows.some(r => r.dev_nps > 0); return `<div class="sum-panel" id="sum-${key}" role="tabpanel"${key === on ? '' : ' hidden'}>
-          <table class="dtable">
+          <table data-stack class="dtable">
             <thead><tr><th scope="col">${label}</th><th scope="col" class="w-share">%</th><th scope="col" class="r">Pairs</th><th scope="col">Elo</th><th scope="col">Penta</th>${nps ? '<th scope="col" class="r">KNPS</th><th scope="col" class="r">Scaled KNPS</th>' : ''}</tr></thead>
             <tbody>${rows.map(r => {
               const [e, c] = String(r.elo).split('±').map(parseFloat), p = String(r.penta).replace(/[()]/g, '').split(',').map(Number);
               return `
-              <tr><th scope="row">${escH(fmt(r.key))}</th>
-                <td><div class="share"><i style="width:${+r.percent}%"></i></div><span class="num share-n">${escH(r.percent)}%</span></td>
-                <td class="r num">${n(r.pairs)}</td>
-                <td><div class="elo-inline"><span class="num">${sg(e)} <span class="dim">± ${c.toFixed(2)}</span></span><div class="ci"><i class="zero"></i><i class="bar" style="--lo:${pct(eloAt(e - c))};--hi:${pct(eloAt(e + c))}"></i><i class="dot" style="left:${pct(eloAt(e))}"></i></div></div></td>
-                <td>${pentaRow(p)}</td>${nps ? `
-                <td class="r num">${knps(r.dev_nps)} / ${knps(r.base_nps)}</td><td class="r num">${knps(r.dev_nps_scaled)} / ${knps(r.base_nps_scaled)}</td>` : ''}</tr>`;
+              <tr><th scope="row" data-label="${label}">${escH(fmt(r.key))}</th>
+                <td data-label="%"><div class="share"><i style="width:${+r.percent}%"></i></div><span class="num share-n">${escH(r.percent)}%</span></td>
+                <td class="r num" data-label="Pairs">${n(r.pairs)}</td>
+                <td data-label="Elo"><div class="elo-inline"><span class="num">${sg(e)} <span class="dim">± ${c.toFixed(2)}</span></span><div class="ci"><i class="zero"></i><i class="bar" style="--lo:${pct(eloAt(e - c))};--hi:${pct(eloAt(e + c))}"></i><i class="dot" style="left:${pct(eloAt(e))}"></i></div></div></td>
+                <td data-label="Penta">${pentaRow(p)}</td>${nps ? `
+                <td class="r num" data-label="KNPS">${knps(r.dev_nps)} / ${knps(r.base_nps)}</td><td class="r num" data-label="Scaled KNPS">${knps(r.dev_nps_scaled)} / ${knps(r.base_nps_scaled)}</td>` : ''}</tr>`;
             }).join('')}
             </tbody>
           </table>
@@ -214,9 +220,9 @@
       const body = document.getElementById('results-container'); if (!body || busy(body)) return;
       body.innerHTML = [...res].sort((a, b) => b.games - a.games).map(m => { const p = [m.LL, m.LD, m.DD, m.DW, m.WW];
         return `
-            <tr${m.active ? ' class="active-highlight"' : ''}><th scope="row"><a href="/machines/${+m.machine__id}/" class="mach-id"><span class="num">${+m.machine__id}</span></a></th><td>${escH(m.machine__user__username)}</td><td class="r num">${n(m.games)}</td>
-              <td class="hide-sm">${pentaRow(p)}</td>
-              <td class="r num hide-sm">${n(p.reduce((a, b) => a + b, 0))}</td><td class="r num${m.timeloss ? ' warn' : ' dim'}">${m.timeloss}</td><td class="r num dim">${m.crashes}</td></tr>`; }).join('');
+            <tr${m.active ? ' class="active-highlight"' : ''}><th scope="row" data-label="#"><a href="/machines/${+m.machine__id}/" class="mach-id"><span class="num">${+m.machine__id}</span></a></th><td data-label="User">${escH(m.machine__user__username)}</td><td class="r num" data-label="Games">${n(m.games)}</td>
+              <td class="hide-sm" data-label="Penta">${pentaRow(p)}</td>
+              <td class="r num hide-sm" data-label="Pairs">${n(p.reduce((a, b) => a + b, 0))}</td><td class="r num${m.timeloss ? ' warn' : ' dim'}" data-label="Time">${m.timeloss}</td><td class="r num dim" data-label="Crash">${m.crashes}</td></tr>`; }).join('');
     };
   }
 

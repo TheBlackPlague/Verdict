@@ -26,7 +26,7 @@
 
                 <div class="row">
                     <label for="created"> Created </label>
-                    <input id="created" readonly value="{{network.created}}">
+                    <input id="created" readonly value="{{ network.created|date:'M d, Y, H:i:s' }}" data-timestamp="{{ network.created|date:'U' }}">
                 </div>
 
                 <div class="row">
@@ -48,7 +48,7 @@
                 </div>
 
                 <div class="row">
-                    <label for="was_default"> Was Default </label>
+                    <label for="was_default"> Was default </label>
                     <select id="was_default" name="was_default">
                         {% if network.was_default %}
                             <option selected value="TRUE"> True </option>
@@ -60,7 +60,7 @@
                     </select>
                 </div>
 
-                <input class="anchorbutton btn-blue w-100" type="submit" value="Update Network">
+                <input class="anchorbutton btn-blue w-100" type="submit" value="Update network">
             </div>
         </div>
     </form>

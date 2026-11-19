@@ -34,7 +34,7 @@
 
     <div class="panel directory-panel">
     <div class="table-scroll">
-    <table class="hoverable directory-table manage-table" aria-label="Engines">
+    <table data-stack class="hoverable directory-table manage-table" aria-label="Engines">
         <thead>
 
         <tr class="table-header">
@@ -49,10 +49,10 @@
         <tbody>
         {% for config in configs %}
             <tr>
-                <td>{{config.name}}</td>
-                <td><a href="{{config.source}}">{{config.source|removePrefix:"https://github.com/"}}</a></td>
+                <td data-label="Name">{{config.name}}</td>
+                <td data-label="Source"><a href="{{config.source}}">{{config.source|removePrefix:"https://github.com/"}}</a></td>
 
-                <td style="text-align: center">
+                <td data-label="Status">
                     {% if config.enabled %}
                         <span class="badge badge-green">Enabled</span>
                     {% else %}
@@ -60,13 +60,13 @@
                     {% endif %}
                 </td>
 
-                <td>
+                <td data-label="Settings">
                     <a class="icon-button" aria-label="Settings for {{config.name}}" href="/manage/engines/{{config.name}}/">
                         <i class="fa-solid fa-pen-to-square" style="color: grey;"></i>
                     </a>
                 </td>
 
-                <td>
+                <td{% if can_manage %} data-label="Delete"{% endif %}>
                     {% if can_manage %}
                         <form method="POST" action="/manage/engines/{{config.name}}/delete/">
                             {% csrf_token %}
@@ -88,7 +88,7 @@
             <div class="form">
                 <div class="col-full">
 
-                    <h3> New Engine </h3>
+                    <h3> New engine </h3>
 
                     <div class="row">
                         <label for="engine-name"> Name </label>
@@ -121,7 +121,7 @@
                         </select>
                     </div>
 
-                    <h3> Build Settings </h3>
+                    <h3> Build settings </h3>
 
                     <div class="row">
                         <label for="build_path"> Path </label>
@@ -130,20 +130,20 @@
 
                     <div class="row">
                         <label for="build_compilers"> Compilers </label>
-                        <input id="build_compilers" name="build_compilers" placeholder="Separated By Spaces">
+                        <input id="build_compilers" name="build_compilers" placeholder="Separated by spaces">
                     </div>
 
                     <div class="row">
-                        <label for="build_cpuflags"> Cpu Flags </label>
-                        <input id="build_cpuflags" name="build_cpuflags" placeholder="Separated By Spaces">
+                        <label for="build_cpuflags"> CPU flags </label>
+                        <input id="build_cpuflags" name="build_cpuflags" placeholder="Separated by spaces">
                     </div>
 
                     <div class="row">
                         <label for="build_systems"> Systems </label>
-                        <input id="build_systems" name="build_systems" placeholder="Separated By Spaces">
+                        <input id="build_systems" name="build_systems" placeholder="Separated by spaces">
                     </div>
 
-                    <input type="submit" class="anchorbutton btn-blue w-100" value="Create Engine">
+                    <input type="submit" class="anchorbutton btn-blue w-100" value="Create engine">
 
                 </div>
             </div>
