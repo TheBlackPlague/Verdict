@@ -1,0 +1,23 @@
+{% load static mytags %}{% with path=request.path %}
+<header class="navbar" id="navbar">
+  <a class="brand" href="/" aria-label="Verdict home"><img src="{% static 'verdict.svg' %}?{{ static_version }}" alt="" width="26" height="26"><span>Verdict</span></a>
+  <nav class="capsule glass seg seg-glass nav-tabs" aria-label="Main navigation" data-lens data-lens-bezel="12" data-lens-scale="12">
+    <a href="/index/" data-k="tests" data-nav="index"{% if path|nav_current:"index" %} aria-current="page"{% endif %}>Tests</a>
+    <a href="/greens/" data-k="passed" data-nav="greens"{% if path|nav_current:"greens" %} aria-current="page"{% endif %}>Passed</a>
+    <a href="/search/" data-k="search" data-nav="search"{% if path|nav_current:"search" %} aria-current="page"{% endif %}>Search</a>
+    <a href="/machines/" data-k="machines" data-nav="machines"{% if path|nav_current:"machines" %} aria-current="page"{% endif %}>Machines</a>
+    <a href="/networks/" data-k="networks" data-nav="networks"{% if path|nav_current:"networks" %} aria-current="page"{% endif %}>Networks</a>
+    <a href="/users/" data-k="users" data-nav="users"{% if path|nav_current:"users" %} aria-current="page"{% endif %}>Contributors</a>
+    <a href="/events/" data-k="activity" data-nav="events"{% if path|nav_current:"events" %} aria-current="page"{% endif %}>Activity</a>
+    <a href="/errors/" data-k="errors" data-nav="errors"{% if path|nav_current:"errors" %} aria-current="page"{% endif %}>Errors</a>
+    <a href="/manage/" data-k="manage" data-nav="manage"{% if path|nav_current:"manage" %} aria-current="page"{% endif %}>Manage</a>
+    <button type="button" class="nav-more" popovertarget="more-menu" aria-haspopup="menu" aria-label="More places">More{% icon "down" "ico-xs" %}</button>
+  </nav>
+  <div class="nav-end">
+    <form class="capsule glass search" role="search" action="/search/" method="get" data-lens data-lens-bezel="12" data-lens-scale="12">{% icon "search" %}<label class="sr-only" for="bar-search">Search tests</label><input id="bar-search" type="search" name="keywords" placeholder="Search" aria-keyshortcuts="/" aria-controls="search-pop" autocomplete="off"></form>
+    <button class="capsule glass tinted new-btn" type="button" popovertarget="new-menu" aria-haspopup="menu" aria-label="New" data-lens data-lens-bezel="12" data-lens-scale="12">{% icon "plus" %}<span>New</span>{% icon "down" "ico-xs" %}</button>
+    {% if user.is_authenticated %}<button class="capsule glass nav-account" type="button" popovertarget="account-menu" aria-haspopup="menu" data-lens data-lens-bezel="12" data-lens-scale="12">{{ user.username }}</button>
+    {% else %}<a class="capsule glass nav-login" href="/login/" data-nav="login"{% if path|nav_current:"login" %} aria-current="page"{% endif %} data-lens data-lens-bezel="12" data-lens-scale="12">Log in</a><a class="capsule glass nav-login" href="/register/" data-nav="register"{% if path|nav_current:"register" %} aria-current="page"{% endif %} data-lens data-lens-bezel="12" data-lens-scale="12">Register</a>{% endif %}
+  </div>
+</header>
+{% endwith %}

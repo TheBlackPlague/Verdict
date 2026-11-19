@@ -51,10 +51,11 @@
         const toggle = document.getElementById('navigation-toggle');
         const mobile = matchMedia('(max-width: 1120px)');
         function setNavigation(open) {
+            if (!navigation || !toggle) return;
             navigation.classList.toggle('navigation-open', open);
             toggle.setAttribute('aria-expanded', String(open));
         }
-        toggle.addEventListener('click', () => setNavigation(!navigation.classList.contains('navigation-open')));
+        toggle?.addEventListener('click', () => setNavigation(!navigation.classList.contains('navigation-open')));
         mobile.addEventListener('change', () => setNavigation(false));
         document.addEventListener('click', event => {
             document.querySelectorAll('.nav-menu[open]').forEach(menu => {
@@ -65,7 +66,7 @@
             if (event.key === 'Escape') {
                 const menu = document.querySelector('.nav-menu[open]');
                 if (menu) { menu.open = false; menu.querySelector('summary').focus(); }
-                else if (navigation.classList.contains('navigation-open')) { setNavigation(false); toggle.focus(); }
+                else if (navigation?.classList.contains('navigation-open')) { setNavigation(false); toggle.focus(); }
             }
             if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('a[role="button"]')) {
                 event.preventDefault(); event.target.click();

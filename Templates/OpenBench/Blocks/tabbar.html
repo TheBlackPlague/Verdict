@@ -1,0 +1,11 @@
+{% load mytags %}{% with path=request.path %}
+<nav class="tabbar" aria-label="Main navigation (compact)">
+  <div class="tb-tabs glass" data-lens data-lens-bezel="16" data-lens-scale="18" data-lens-frost="8">
+    <a href="/index/" data-nav="index"{% if path|nav_current:"index" %} aria-current="page"{% endif %}>{% icon "tests" %}<span>Tests</span></a>
+    <a href="/greens/" data-nav="greens"{% if path|nav_current:"greens" %} aria-current="page"{% endif %}>{% icon "passed" %}<span>Passed</span></a>
+    <a href="/machines/" data-nav="machines"{% if path|nav_current:"machines" %} aria-current="page"{% endif %}>{% icon "machines" %}<span>Machines</span></a>
+    <a href="/events/" data-nav="events"{% if path|nav_current:"events" %} aria-current="page"{% endif %}>{% icon "activity" %}<span>Activity</span></a>
+  </div>
+  <a class="tb-search glass" href="/search/" data-nav="search"{% if path|nav_current:"search" %} aria-current="page"{% endif %} aria-label="Search" data-lens data-lens-bezel="14" data-lens-scale="16" data-lens-frost="8">{% icon "search" %}</a>
+</nav>
+{% endwith %}

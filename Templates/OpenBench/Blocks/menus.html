@@ -1,0 +1,37 @@
+{% load mytags %}
+<div class="menu glass" id="more-menu" popover role="menu" aria-label="More places" data-lens data-lens-bezel="14" data-lens-scale="14" data-lens-frost="16">
+  <div class="msec msec-testing"><p class="pop-label">Testing</p><a role="menuitem" data-k="search" href="/search/">{% icon "search" %}<span>Search</span></a><hr></div>
+  <div class="msec msec-fleet"><p class="pop-label">Fleet</p><a role="menuitem" data-k="networks" href="/networks/">{% icon "networks" %}<span>Networks</span></a><a role="menuitem" data-k="users" href="/users/">{% icon "users" %}<span>Contributors</span></a><hr></div>
+  <div class="msec msec-log"><p class="pop-label">Log</p><a role="menuitem" data-k="activity" href="/events/">{% icon "activity" %}<span>Activity</span></a><a role="menuitem" data-k="errors" href="/errors/">{% icon "errors" %}<span>Errors</span></a><a role="menuitem" data-k="manage" href="/manage/">{% icon "manage" %}<span>Manage</span></a></div>
+</div>
+<div class="menu glass glass-lg" id="search-pop" popover="manual" role="listbox" aria-label="Search suggestions" data-lens data-lens-bezel="14" data-lens-scale="14" data-lens-frost="16"></div>
+<div class="menu glass" id="new-menu" popover role="menu" aria-label="New" data-lens data-lens-bezel="14" data-lens-scale="14" data-lens-frost="16">
+  <a role="menuitem" href="/test/new/">{% icon "flask" %}<span>New test</span></a>
+  <a role="menuitem" href="/tune/new/">{% icon "tune" %}<span>New tune</span></a>
+  <a role="menuitem" href="/datagen/new/">{% icon "data" %}<span>Generate data</span></a>
+  <hr>
+  <a role="menuitem" href="/newNetwork/">{% icon "upload" %}<span>Upload network</span></a>
+</div>
+<div class="menu glass" id="account-menu" popover role="menu" aria-label="Account" data-lens data-lens-bezel="14" data-lens-scale="14" data-lens-frost="16">
+{% if user.is_authenticated %}
+  <div class="menu-phone">
+    <a role="menuitem" href="/networks/">{% icon "networks" %}<span>Networks</span></a>
+    <a role="menuitem" href="/users/">{% icon "users" %}<span>Contributors</span></a>
+    <a role="menuitem" href="/errors/">{% icon "errors" %}<span>Errors</span></a>
+    <a role="menuitem" href="/manage/">{% icon "manage" %}<span>Manage</span></a>
+    <hr>
+  </div>
+  <a role="menuitem" href="/profile/">{% icon "person" %}<span>{{ user.username }}</span></a>
+  <hr>
+  <a role="menuitem" href="/logout/">{% icon "logout" %}<span>Log out</span></a>
+{% else %}
+  <a role="menuitem" href="/login/">{% icon "login" %}<span>Log in</span></a>
+  <a role="menuitem" href="/register/">{% icon "person" %}<span>Register</span></a>
+  <div class="menu-phone"><hr>
+    <a role="menuitem" href="/networks/">{% icon "networks" %}<span>Networks</span></a>
+    <a role="menuitem" href="/users/">{% icon "users" %}<span>Contributors</span></a>
+    <a role="menuitem" href="/errors/">{% icon "errors" %}<span>Errors</span></a>
+    <a role="menuitem" href="/manage/">{% icon "manage" %}<span>Manage</span></a>
+  </div>
+{% endif %}
+</div>
