@@ -81,6 +81,8 @@ def fetch_results(workload):
     # Drop Results that have played nothing and are no longer active
     qs = qs.filter(Q(games__gt=0) | Q(active=True))
 
+    qs = qs.order_by('-games', 'machine__id')
+
     # Hand back the raw pentanomial buckets; the individual results table is
     # formatted client-side in OpenBench/static/workload_utils.js
     qs = qs.values(
@@ -173,7 +175,7 @@ def fetch_result_summaries(workload):
             'base_nps'        : compute_nps(nps_stats[key][3], nps_stats[key][4]),
             'base_nps_scaled' : compute_nps(nps_stats[key][3], nps_stats[key][5]),
         } for key, penta in bucket.items()]
-        return sorted(rows, key=lambda row: row['pairs'], reverse=True)
+        return sorted(rows, key=lambda row: (-row['pairs'], str(row['key'])))
 
     return {
         'user'     : summarize(by_user, nps_user),

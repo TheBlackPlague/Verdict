@@ -1,37 +1,33 @@
-{% load mytags %}
-{% if fleet %}
-<div class="fleet-strip" aria-label="Server statistics">
-    <span><strong>{{ active_count|insertCommas }}</strong> active</span>
-    <span><strong>{{ pending|length }}</strong> awaiting approval</span>
-    <a href="/machines/" title="Machines connected in the last 2 minutes"><strong>{{ fleet.machines|insertCommas }}</strong> machines online</a>
-    <span><strong>{{ fleet.threads|insertCommas }}</strong> threads</span>
-    <span title="Concurrency × benchmark speed"><strong>{{ fleet.mnps|floatformat:1 }}</strong> MNPS</span>
-    {% if queue_eta %}<span class="queue-eta" title="{{ queue_eta.detail }}" tabindex="0" aria-label="Estimated Time Remaining: {{ queue_eta.label }}. {{ queue_eta.detail }}">Estimated Time Remaining <strong>{{ queue_eta.label }}</strong></span>{% endif %}
-</div>
+{% load mytags %}{% if fleet %}
+<section class="fleet" aria-label="Server statistics">
+  <div class="fl fl-run"><span class="fl-k">Active</span><span class="fl-v num">{{ active_count|insertCommas }}</span>
+    {% with axis=active|fleet_axis %}<div class="fl-strip" aria-hidden="true"><i class="fl-axis"></i>{% if axis.zero is not None %}<i class="fl-zero" style="left:{{ axis.zero }}%"></i>{% endif %}{% for dot in axis.dots %}<i class="fl-dot {% if dot.neg %}neg{% else %}pos{% endif %}" style="left:{{ dot.pos }}%"></i>{% endfor %}<span class="fl-end f">fail</span><span class="fl-end p">pass</span></div>{% endwith %}
+  </div>
+  <div class="fl"><span class="fl-k">Awaiting approval</span><span class="fl-v num">{{ pending|length }}</span></div>
+  <a class="fl" href="/machines/" title="Machines connected in the last 2 minutes"><span class="fl-k">Machines online</span><span class="fl-v num">{{ fleet.machines|insertCommas }}<small>{{ fleet.threads|insertCommas }} threads</small></span></a>
+  <div class="fl" title="Concurrency × benchmark speed"><span class="fl-k" aria-hidden="true"></span><span class="fl-v num">{{ fleet.mnps|floatformat:1 }}<small>MNPS</small></span></div>
+  {% if queue_eta %}<div class="fl" title="{{ queue_eta.detail }}" tabindex="0" aria-label="Estimated Time Remaining: {{ queue_eta.label }}. {{ queue_eta.detail }}"><span class="fl-k">Estimated Time Remaining</span><span class="fl-v num">{{ queue_eta.label }}</span></div>{% endif %}
+</section>
+{% endif %}{% include "OpenBench/Blocks/test_columns.html" %}
+<div class="tgroups" data-tests>
+{% if paging.page == 1 and paging.url != 'greens' %}{% if pending %}
+  <section class="tgroup" data-group="pending" aria-labelledby="g-pending">
+    <header class="tgroup-head"><h2 id="g-pending">Awaiting approval</h2><span class="count num">{{ pending|length }}</span></header>
+    <ul class="tlist" role="list">{% for test in pending %}{% include "OpenBench/Blocks/testsummary.html" %}{% endfor %}
+    </ul>
+  </section>
 {% endif %}
-<div class="table-scroll workload-table">
-<table role="table" class="test-list hoverable">
-    <thead>{% include "OpenBench/Blocks/test_columns.html" %}</thead>
-    {% if paging.page == 1 and paging.url != 'greens' %}
-    {% if pending %}
-    <tbody role="rowgroup">
-        <tr class="section-row"><th colspan="7" scope="rowgroup">Awaiting approval <span class="count-badge">{{ pending|length }}</span></th></tr>
-        {% for test in pending %}<tr role="row" class="test-row">{% include "OpenBench/Blocks/testsummary.html" %}</tr>{% endfor %}
-    </tbody>
-    {% endif %}
-    <tbody role="rowgroup">
-        <tr class="section-row"><th colspan="7" scope="rowgroup"><span>Active workloads <span class="count-badge">{{ active_count }}</span></span><span class="section-note">{% if active|length == 1 %}Priority {{ active.0.priority }}{% else %}Ordered by priority{% endif %}</span></th></tr>
-        {% for group in active %}
-            {% if active|length > 1 %}<tr class="table-small-header"><th colspan="7" scope="rowgroup">Priority {{ group.priority }}</th></tr>{% endif %}
-            {% for test in group.tests %}<tr role="row" class="test-row">{% include "OpenBench/Blocks/testsummary.html" %}</tr>{% endfor %}
-        {% empty %}<tr><td colspan="7" class="empty-row">No active workloads. <a href="/test/new/">Create a test</a> to get started.</td></tr>{% endfor %}
-    </tbody>
-    {% endif %}
-    <tbody role="rowgroup">
-        <tr class="section-row"><th colspan="7" scope="rowgroup"><span>{% if paging.url == 'greens' %}Passed tests{% else %}Finished workloads{% endif %}</span><span class="section-note">Most recently updated</span></th></tr>
-        {% for test in completed %}<tr role="row" class="test-row">{% include "OpenBench/Blocks/testsummary.html" %}</tr>
-        {% empty %}<tr><td colspan="7" class="empty-row">No {% if paging.url == 'greens' %}passed tests{% else %}finished workloads{% endif %} yet.</td></tr>{% endfor %}
-    </tbody>
-</table>
+  <section class="tgroup" data-group="active" aria-labelledby="g-active">
+    <header class="tgroup-head"><h2 id="g-active">Active workloads</h2><span class="count num">{{ active_count }}</span><span class="tgroup-note">{% if active|length == 1 %}Priority {{ active.0.priority }}{% else %}Ordered by priority{% endif %}</span></header>
+    {% if active %}<ul class="tlist" role="list">{% for group in active %}{% if active|length > 1 %}
+      <li class="tsub"><span>Priority {{ group.priority }}</span></li>{% endif %}{% for test in group.tests %}{% include "OpenBench/Blocks/testsummary.html" %}{% endfor %}{% endfor %}
+    </ul>{% else %}<p class="tempty">No active workloads. <a href="/test/new/">Create a test</a> to get started.</p>{% endif %}
+  </section>
+{% endif %}
+  <section class="tgroup" data-group="finished" aria-labelledby="g-finished">
+    <header class="tgroup-head"><h2 id="g-finished">{% if paging.url == 'greens' %}Passed tests{% else %}Finished workloads{% endif %}</h2><span class="tgroup-note">Most recently updated</span></header>
+    {% if completed %}<ul class="tlist" role="list">{% for test in completed %}{% include "OpenBench/Blocks/testsummary.html" %}{% endfor %}
+    </ul>{% else %}<p class="tempty">No {% if paging.url == 'greens' %}passed tests{% else %}finished workloads{% endif %} yet.</p>{% endif %}
+  </section>
 </div>
 {% include "OpenBench/Blocks/pagebrowser.html" %}

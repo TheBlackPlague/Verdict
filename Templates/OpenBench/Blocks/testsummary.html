@@ -1,10 +1,37 @@
-{% load mytags %}
-{% with stats=test|compact_stat_blocks %}
-<td role="cell" class="test-identity"><a class="test-name" href="{{ test|workload_url }}">{{ test|prettyDevName }}</a><div class="test-subtitle"><span>#{{ test.id }}</span><a href="/user/{{ test.author }}/">{{ test.author }}</a><span>{{ test.test_mode }}</span></div></td>
-<td role="cell" class="test-status">{% include "OpenBench/Blocks/workload_badge.html" with workload=test %}</td>
-<td role="cell" class="test-engine"><span>{{ test.dev_engine }}</span>{% if test.error %} <span class="redlink" title="Crash or illegal move" aria-label="Crash or illegal move">!</span>{% endif %}{% if test|test_is_fischer %} <span class="badge" title="Fischer random chess">FRC</span>{% endif %}<div class="test-subtitle">{{ test.dev_time_control }}</div>{% if test|test_is_time_odds %} <span class="badge badge-yellow" title="Time odds">Time odds</span>{% endif %}{% if test|test_is_smp_odds %} <span class="badge badge-yellow" title="Thread odds">Thread odds</span>{% endif %}</td>
-<td role="cell" class="statblock test-result statblock-{{ test|testResultColour }}">{{ stats.result|linebreaksbr }}</td>
-<td role="cell" class="statblock game-counts test-games">{{ stats.games|linebreaksbr }}</td>
-<td role="cell" class="test-info"><div>{{ test.info|default:'—' }}</div></td>
-<td role="cell" class="test-compare"><a href="{{ test|gitDiffLink }}" class="icon-button" aria-label="Compare revisions for workload {{ test.id }}" title="Compare revisions"><i class="fa-solid fa-code-compare" aria-hidden="true"></i></a></td>
-{% endwith %}
+{% load mytags %}{% with key=test|status_key r=test|row_readings mode=test.test_mode %}
+      <li class="trow is-{{ key }}">
+        {% include "OpenBench/Blocks/workload_badge.html" with workload=test %}
+        <div class="c-id"><div class="t-head"><a class="t-name" href="{{ test|workload_url }}" title="{{ test|prettyDevName }}">{{ test|prettyDevName }}</a>{% if test.error %}<span class="tbadge err" role="img" title="Crash or illegal move" aria-label="Crash or illegal move">!</span>{% endif %}{% if test|test_is_fischer %}<span class="tbadge" title="Fischer random chess">FRC</span>{% endif %}{% if test|test_is_time_odds %}<span class="tbadge odds" title="Time odds">Time odds</span>{% endif %}{% if test|test_is_smp_odds %}<span class="tbadge odds" title="Thread odds">Thread odds</span>{% endif %}</div><div class="t-meta dots"><span class="num">#{{ test.id }}</span><a href="/user/{{ test.author }}/">{{ test.author }}</a><span>{{ test.dev_engine }}</span><span class="num">{{ test.dev_time_control }}</span>{% if mode != 'SPRT' %}<span>{{ mode }}</span>{% endif %}</div>{% if test.info %}<p class="t-note-inline" aria-hidden="true">{{ test.info }}</p>{% endif %}</div>
+{% if mode == 'SPSA' %}
+        <div class="c-llr" role="meter" aria-label="Iterations" aria-valuemin="0" aria-valuemax="{{ test.spsa_run.iterations }}" aria-valuenow="{{ test|tuning_iterations }}" aria-valuetext="{{ r.iterations }}">
+          <div class="c-top"><b class="num">{{ test|tuning_iterations|insertCommas }} / {{ test.spsa_run.iterations|insertCommas }}</b><span class="c-aside c-word">Iterations</span></div>
+          <div class="track track-progress"><i class="fill" style="width:{{ test|workload_progress }}%"></i></div>
+        </div>
+        <div class="c-elo is-empty"><div class="c-top"><span class="c-aside c-word">{{ r.tuning }}</span></div><div class="ci"><i class="zero"></i></div></div>
+        <div class="c-games" title="{{ r.played }}"><div class="c-top"><b class="num">{{ test.games|insertCommas }} / {{ test|workload_target|insertCommas }}</b></div><div class="wdl"><i class="g" style="width:{{ test|workload_progress }}%"></i></div></div>
+{% else %}{% if mode == 'SPRT' %}
+        <div class="c-llr" role="meter" aria-label="{{ r.llr }}" aria-valuemin="{{ test.lowerllr|floatformat:4 }}" aria-valuemax="{{ test.upperllr|floatformat:4 }}" aria-valuenow="{{ test|bounded_llr|floatformat:4 }}" aria-valuetext="{{ test.currentllr|floatformat:2 }}">
+          <div class="c-top"><b class="num">{{ r.llr_figure }}</b></div>
+          <div class="track track-llr dir-{% if key == 'yellow' %}warn{% elif test.currentllr > 0.004 %}up{% elif test.currentllr < -0.004 %}down{% else %}flat{% endif %}" style="--at:{{ test|llr_position }}%;--zero:{{ test|llr_zero }}%"><i class="zone zf"></i><i class="zone zp"></i><i class="mid"></i><i class="fill"></i><i class="knob"></i></div>
+        </div>
+{% else %}
+        <div class="c-llr" role="meter" aria-label="{% if mode == 'DATAGEN' %}{{ r.generated }}{% else %}{{ r.elo }}{% endif %}" aria-valuemin="0" aria-valuemax="{{ test.max_games }}" aria-valuenow="{{ test.games }}" aria-valuetext="{{ test.games }}/{{ test.max_games }}">
+          <div class="c-top"><b class="num">{{ test.games|insertCommas }} / {{ test.max_games|insertCommas }}</b>{% if mode == 'DATAGEN' %}<span class="c-aside c-word">Generated</span>{% endif %}</div>
+          <div class="track track-progress"><i class="fill" style="width:{{ test|workload_progress }}%"></i></div>
+        </div>
+{% endif %}{% if test.games %}{% with m=test|ci_marks:elo_range %}
+        <div class="c-elo" title="{{ r.elo }}">
+          <div class="c-top"><b class="num">{{ r.elo_figure }}</b><span class="c-aside num">± {{ r.interval_figure }}</span></div>
+          <div class="ci {{ r.elo_tone }}{% if m.cap_lo %} over-lo{% endif %}{% if m.cap_hi %} over-hi{% endif %}" role="img" aria-label="{{ r.elo }}" style="--lo:{{ m.lo }}%;--hi:{{ m.hi }}%"><i class="zero"></i><i class="bar"></i><i class="dot" style="left:{{ m.est }}%"></i></div>
+        </div>{% endwith %}{% else %}
+        <div class="c-elo is-empty" title="{{ r.elo }}"><div class="c-top"><b class="num">—</b></div><div class="ci"><i class="zero"></i></div></div>{% endif %}
+        <div class="c-games" title="{{ r.games }}">
+          <div class="c-top"><b class="num">{{ test.games|insertCommas }}</b>{% if test.games %}<span class="c-aside num wl" aria-label="{{ r.wld }}"><span class="w">{{ test.wins|insertCommas }}</span> <span class="l">{{ test.losses|insertCommas }}</span> <span class="d">{{ test.draws|insertCommas }}</span></span>{% endif %}</div>
+          <div class="wdl" role="img" aria-label="{{ r.wld }}">{% if test.games %}{% with p=test|wdl_widths %}<i class="w" style="width:{{ p.w }}%"></i><i class="d" style="width:{{ p.d }}%"></i><i class="l" style="width:{{ p.l }}%"></i>{% endwith %}{% endif %}</div>
+        </div>
+{% endif %}{% if mode == 'SPSA' or not test.use_penta %}
+        <div class="c-penta is-empty" aria-hidden="true"></div>{% else %}{% with h=test|penta_heights %}
+        <div class="c-penta{% if 100.0 not in h %} is-empty{% endif %}" role="img" aria-label="{{ r.penta }}" title="{{ r.penta }}">{% for height in h %}<i class="p{{ forloop.counter0 }}" style="height:{{ height }}%"></i>{% endfor %}</div>{% endwith %}{% endif %}
+        <p class="c-note{% if not test.info %} is-nil{% endif %}"{% if test.info %} title="{{ test.info }}"{% endif %}>{{ test.info|default:'—' }}</p>
+        <a class="c-cmp icon-btn" href="{{ test|gitDiffLink }}" aria-label="Compare revisions for workload {{ test.id }}" title="Compare revisions">{% icon "compare" %}</a>
+      </li>{% endwith %}
