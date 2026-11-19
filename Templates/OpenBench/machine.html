@@ -8,20 +8,20 @@
 
 {% block content %}
 
-    <div id="config" style="display: block; overflow-x: auto;">
+    <div id="config" class="panel table-scroll machine-panel" style="display: block; overflow-x: auto;">
 
         <table class="test-config left-align wrappable" style="table-layout: auto; width: 100%;">
 
             <tr><td class="td-label">User</td><td>{{machine.user.username}}</td></tr>
             <tr><td class="td-label">Machine Name</td><td>{{machine.info.machine_name}}</td></tr>
             <tr><td class="td-label">Last Seen</td><td class="timestamp">{{machine.updated|date:'U'}}</td></tr>
-            <tr><td class="td-label"></td><td><br></td></tr>
+            <tr class="table-spacer"><td class="td-label"></td><td><br></td></tr>
 
             <tr><td class="td-label">Client Version</td><td>{{machine.info.client_ver}}</td></tr>
             <tr><td class="td-label">Fastchess Version</td><td>{{machine.info.fastchess_ver}}</td></tr>
             <tr><td class="td-label">Python Version</td><td>{{machine.info.python_ver}}</td></tr>
             <tr><td class="td-label">System Version</td><td>{{machine.info.os_name}} {{machine.info.os_ver}}</td></tr>
-            <tr><td class="td-label"></td><td><br></td></tr>
+            <tr class="table-spacer"><td class="td-label"></td><td><br></td></tr>
 
             <tr><td class="td-label">ISA Name</td><td>{{machine.info.isa_name}}</td></tr>
             <tr><td class="td-label">CPU Name</td><td>{{machine.info.cpu_name}}</td></tr>
@@ -32,7 +32,7 @@
             <tr><td class="td-label">Syzygy WDL</td><td>{{machine.info.syzygy_max}}-Man</td></tr>
             <tr><td class="td-label">CLI Options</td><td>{{machine.info.cli_options}}</td></tr>
 
-            <tr><td class="td-label"></td><td><br></td></tr>
+            <tr class="table-spacer"><td class="td-label"></td><td><br></td></tr>
 
             {% if machine.info.tokens|length > 0 %}
                 <tr><td class="td-label">Tokens</td><td>{{machine.info.tokens|join:" "}}</td></tr>

@@ -4,7 +4,7 @@
 
 {% block content %}
 
-    <form method="POST" action="/networks/{{network.engine}}/EDIT/{{network.sha256}}/">
+    <form class="form-page" method="POST" action="/networks/{{network.engine}}/EDIT/{{network.sha256}}/">
         {% csrf_token %}
         <div class="form">
             <div class="col">

@@ -3,8 +3,8 @@
 {% block content %}
 
     <nav class="anchor-container mb-4" aria-label="Manage resources">
-        <a class="anchorbutton btn-start" href="/manage/books/">Books</a>
-        <a class="anchorbutton btn-start" href="/manage/engines/">Engines</a>
+        <a class="anchorbutton btn-start{% if '/manage/books/' in request.path %} is-current{% endif %}" href="/manage/books/">Books</a>
+        <a class="anchorbutton btn-start{% if '/manage/engines/' in request.path %} is-current{% endif %}" href="/manage/engines/">Engines</a>
     </nav>
 
     {% block manage %}

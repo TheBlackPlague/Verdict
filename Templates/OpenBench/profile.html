@@ -13,7 +13,7 @@
 
 {% block content %}
 
-    <form method="POST" action="/profile/">
+    <form class="form-page" method="POST" action="/profile/">
         {% csrf_token %}
         <div class="form">
             <div class="col">
@@ -41,7 +41,7 @@
 
     <br>
 
-    <form method="POST" action="/profileConfig/">
+    <form class="form-page" method="POST" action="/profileConfig/">
         {% csrf_token %}
         <div class="form">
             <div class="col" id="engines-container">
