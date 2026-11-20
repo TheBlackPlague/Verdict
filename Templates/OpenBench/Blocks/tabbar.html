@@ -1,6 +1,7 @@
 {% load mytags %}{% with path=request.path %}
 <nav class="tabbar" aria-label="Main navigation (compact)">
   <div class="tb-tabs glass" data-lens data-lens-bezel="16" data-lens-scale="18" data-lens-frost="8">
+    <span class="seg-thumb" aria-hidden="true"></span>
     <a href="/index/" data-nav="index"{% if path|nav_current:"index" %} aria-current="page"{% endif %}>{% icon "tests" %}<span>Tests</span></a>
     <a href="/greens/" data-nav="greens"{% if path|nav_current:"greens" %} aria-current="page"{% endif %}>{% icon "passed" %}<span>Passed</span></a>
     <a href="/machines/" data-nav="machines"{% if path|nav_current:"machines" %} aria-current="page"{% endif %}>{% icon "machines" %}<span>Machines</span></a>

@@ -8,20 +8,49 @@
   const edge = () => root.toggleAttribute('data-scrolled', scrollY > 2);
   addEventListener('scroll', edge, { passive: true }); addEventListener('resize', edge); edge();
 
-  function segSync(seg, instant) {
+  function place(thumb, l, r, instant) {
+    const st = thumb.style, l0 = parseFloat(st.getPropertyValue('--th-l')), r0 = parseFloat(st.getPropertyValue('--th-r'));
+    if (l === l0 && r === r0) return;
+    if (instant) st.transition = 'none'; else thumb.dataset.dir = l < l0 ? 'l' : 'r';
+    st.setProperty('--th-l', l + 'px'); st.setProperty('--th-r', r + 'px');
+    if (instant) { thumb.offsetWidth; st.transition = ''; }
+  }
+  function segSync(seg, instant, on) {
     if (!seg) return;
-    let on = seg.querySelector('[aria-pressed="true"], [aria-selected="true"], label:has(:checked), a[aria-current]');
+    on ||= seg.querySelector('[aria-pressed="true"], [aria-selected="true"], label:has(:checked), a[aria-current]');
     if (on && !on.offsetWidth && seg.querySelector('.nav-more')) on = seg.querySelector('.nav-more');
     let thumb = seg.querySelector('.seg-thumb');
     if (!thumb) { thumb = document.createElement('span'); thumb.className = 'seg-thumb'; thumb.setAttribute('aria-hidden', 'true'); seg.prepend(thumb); }
     if (!on || !on.offsetWidth) return;
-    if (instant) thumb.style.transition = 'none';
-    thumb.style.setProperty('--x', on.offsetLeft + 'px'); thumb.style.setProperty('--w', on.offsetWidth + 'px');
-    if (instant) { thumb.offsetWidth; thumb.style.transition = ''; }
+    place(thumb, on.offsetLeft, on.offsetLeft + on.offsetWidth, instant);
     seg.dataset.ready = '';
   }
-  const segAll = instant => $$('.seg').forEach(s => segSync(s, instant));
-  segAll(true); document.fonts.ready.then(() => segAll(true));
+  const segAll = instant => $$('.seg, .tb-tabs').forEach(s => segSync(s, instant));
+  const NAV_KEY = 'verdict-nav', navSeg = () => $$('.nav-tabs, .tb-tabs').find(s => s.offsetWidth);
+  const live = seg => { const th = seg.querySelector('.seg-thumb'), sr = seg.getBoundingClientRect(), tr = th.getBoundingClientRect(), l = tr.left - sr.left - seg.clientLeft; return { l, r: l + tr.width }; };
+  delete root.dataset.navFrom; root.style.removeProperty('--nav-l'); root.style.removeProperty('--nav-r');
+  const navFrom = (() => { try { const v = JSON.parse(sessionStorage.getItem(NAV_KEY)); sessionStorage.removeItem(NAV_KEY); return v; } catch { return null; } })();
+  segAll(true);
+  if (navFrom && navFrom.vw === innerWidth && Date.now() - navFrom.t < 10000) {
+    const seg = navSeg(), thumb = seg?.querySelector('.seg-thumb');
+    if (thumb && seg.dataset.ready === '') { const st = thumb.style, l = parseFloat(st.getPropertyValue('--th-l')), r = parseFloat(st.getPropertyValue('--th-r'));
+      place(thumb, navFrom.ol, navFrom.or, true); st.transitionDelay = -(Date.now() - navFrom.t) + 'ms'; place(thumb, l, r);
+      thumb.offsetWidth; st.transitionDelay = ''; }
+  }
+  document.fonts.ready.then(() => segAll(true));
+  let navStart = null;
+  document.addEventListener('click', e => {
+    const a = e.target.closest('.nav-tabs > a[href], .tb-tabs > a[href]');
+    if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target) return;
+    navStart = { ...live(a.parentElement), t: Date.now() }; segSync(a.parentElement, false, a);
+  });
+  addEventListener('pagehide', () => {
+    const seg = navSeg(); if (!seg?.querySelector('.seg-thumb')) return;
+    const now = live(seg), o = navStart || { ...now, t: Date.now() };
+    try { sessionStorage.setItem(NAV_KEY, JSON.stringify({ ...now, ol: o.l, or: o.r, t: o.t, vw: innerWidth })); } catch {}
+  });
+  addEventListener('pageshow', e => { if (e.persisted) { navStart = null; segAll(true); } });
+  document.addEventListener('touchstart', () => {}, { passive: true });
   addEventListener('resize', () => segAll(true));
 
   function setFilter(f, push) {

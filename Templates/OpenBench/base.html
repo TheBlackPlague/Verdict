@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{% static 'icons.css' %}?{{ static_version }}">
     <link rel="stylesheet" href="{% static 'verdict.css' %}?{{ static_version }}">
     <title>{% block title %}{{ page_title }} · Verdict{% endblock %}</title>
+    <script>try { const n = JSON.parse(sessionStorage.getItem('verdict-nav')), s = document.documentElement.style; if (n && n.vw === innerWidth && Date.now() - n.t < 10000) { document.documentElement.dataset.navFrom = ''; s.setProperty('--nav-l', n.l + 'px'); s.setProperty('--nav-r', n.r + 'px'); } } catch {}</script>
     <script defer src="{% static 'interface.js' %}?{{ static_version }}"></script>
     <script defer src="{% static 'glass.js' %}?{{ static_version }}"></script>
     <script defer src="{% static 'app.js' %}?{{ static_version }}"></script>

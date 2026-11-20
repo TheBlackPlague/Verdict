@@ -2,6 +2,7 @@
 <header class="navbar" id="navbar">
   <a class="brand" href="/" aria-label="Verdict home"><img src="{% static 'verdict.svg' %}?{{ static_version }}" alt="" width="26" height="26"><span>Verdict</span></a>
   <nav class="capsule glass seg seg-glass nav-tabs" aria-label="Main navigation" data-lens data-lens-bezel="12" data-lens-scale="12">
+    <span class="seg-thumb" aria-hidden="true"></span>
     <a href="/index/" data-k="tests" data-nav="index"{% if path|nav_current:"index" %} aria-current="page"{% endif %}>Tests</a>
     <a href="/greens/" data-k="passed" data-nav="greens"{% if path|nav_current:"greens" %} aria-current="page"{% endif %}>Passed</a>
     <a href="/search/" data-k="search" data-nav="search"{% if path|nav_current:"search" %} aria-current="page"{% endif %}>Search</a>
