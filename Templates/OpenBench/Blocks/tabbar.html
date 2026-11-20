@@ -7,6 +7,7 @@
     <a href="/machines/" data-nav="machines"{% if path|nav_current:"machines" %} aria-current="page"{% endif %}>{% icon "machines" %}<span>Machines</span></a>
     <a href="/events/" data-nav="events"{% if path|nav_current:"events" %} aria-current="page"{% endif %}>{% icon "activity" %}<span>Activity</span></a>
   </div>
+  <script>verdictThumb.boot(document.currentScript.previousElementSibling)</script>
   <a class="tb-search glass" href="/search/" data-nav="search"{% if path|nav_current:"search" %} aria-current="page"{% endif %} aria-label="Search" data-lens data-lens-bezel="14" data-lens-scale="16" data-lens-frost="8">{% icon "search" %}</a>
 </nav>
 {% endwith %}

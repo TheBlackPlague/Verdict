@@ -14,6 +14,7 @@
     <a href="/manage/" data-k="manage" data-nav="manage"{% if path|nav_current:"manage" %} aria-current="page"{% endif %}>Manage</a>
     <button type="button" class="nav-more" popovertarget="more-menu" aria-haspopup="menu" aria-label="More places">More{% icon "down" "ico-xs" %}</button>
   </nav>
+  <script>verdictThumb.boot(document.currentScript.previousElementSibling)</script>
   <div class="nav-end">
     <form class="capsule glass search" role="search" action="/search/" method="get" data-lens data-lens-bezel="12" data-lens-scale="12">{% icon "search" %}<label class="sr-only" for="bar-search">Search tests</label><input id="bar-search" type="search" name="keywords" placeholder="Search" aria-keyshortcuts="/" aria-controls="search-pop" autocomplete="off"></form>
     <button class="capsule glass tinted new-btn" type="button" popovertarget="new-menu" aria-haspopup="menu" aria-label="New" data-lens data-lens-bezel="12" data-lens-scale="12">{% icon "plus" %}<span>New</span>{% icon "down" "ico-xs" %}</button>

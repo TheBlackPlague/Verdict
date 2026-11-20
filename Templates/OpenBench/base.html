@@ -9,7 +9,76 @@
     <link rel="stylesheet" href="{% static 'icons.css' %}?{{ static_version }}">
     <link rel="stylesheet" href="{% static 'verdict.css' %}?{{ static_version }}">
     <title>{% block title %}{{ page_title }} · Verdict{% endblock %}</title>
-    <script>try { const n = JSON.parse(sessionStorage.getItem('verdict-nav')), s = document.documentElement.style; if (n && n.vw === innerWidth && Date.now() - n.t < 10000) { document.documentElement.dataset.navFrom = ''; s.setProperty('--nav-l', n.l + 'px'); s.setProperty('--nav-r', n.r + 'px'); } } catch {}</script>
+    <script>
+    window.verdictThumb = (() => {
+      const curve = (x1, y1, x2, y2) => t => {
+        const at = (a, b, s) => 3 * (1 - s) * (1 - s) * s * a + 3 * (1 - s) * s * s * b + s * s * s;
+        let lo = 0, hi = 1, s = t;
+        for (let i = 0; i < 24; i++) { s = (lo + hi) / 2; if (at(x1, x2, s) < t) lo = s; else hi = s; }
+        return at(y1, y2, s);
+      };
+      const LEAD = [380, curve(.3, 1.35, .55, 1)], TRAIL = [500, curve(.65, 0, .25, 1)], STEP = 8;
+      const still = matchMedia('(prefers-reduced-motion: reduce)');
+      const parts = th => { if (th.children.length !== 3) th.innerHTML = '<i></i><i></i><i></i>'; return [...th.children]; };
+      const geo = th => {
+        const cs = getComputedStyle(th), c = Math.min(parseFloat(cs.getPropertyValue('--tr')) || 0, th.offsetHeight / 2);
+        return { e: parseFloat(cs.getPropertyValue('--edge')) || 0, w: th.offsetWidth, c };
+      };
+      const frame = (g, l, r) => {
+        l = Math.max(l, g.e); r = Math.max(l + 2 * g.c, Math.min(r, g.w - g.e));
+        return [`translateX(${l}px)`, `translateX(${l + g.c}px) scaleX(${(r - l - 2 * g.c) / 100})`, `translateX(${r - g.c}px)`];
+      };
+      const pos = th => {
+        if (!th.__at) return null;
+        const p = parts(th), x = i => new DOMMatrixReadOnly(getComputedStyle(p[i]).transform).m41;
+        return { l: x(0), r: x(2) + th.__at.c };
+      };
+      const moving = th => parts(th).some(x => x.getAnimations().length);
+      function place(th, l, r, o = {}) {
+        const g = geo(th), p = parts(th), key = [l, r, g.e, g.w, g.c].join();
+        if (th.__at?.key === key) return;
+        const from = o.from || pos(th);
+        if (o.soft && !moving(th)) o = { instant: true };
+        th.__at = { ...g, key };
+        th.style.setProperty('--cw', g.c + 'px');
+        p.forEach(x => x.getAnimations().forEach(a => a.cancel()));
+        const end = frame(g, l, r);
+        p.forEach((x, i) => { x.style.transform = end[i]; });
+        if (o.instant || still.matches || !from || (from.l === l && from.r === r)) return;
+        const right = l + r > from.l + from.r, [dl, el] = right ? TRAIL : LEAD, [dr, er] = right ? LEAD : TRAIL, total = Math.max(dl, dr);
+        if ((o.elapsed || 0) >= total) return;
+        const ks = [[], [], []];
+        for (let t = 0; ; t = Math.min(total, t + STEP)) {
+          const f = frame(g, from.l + (l - from.l) * el(Math.min(1, t / dl)), from.r + (r - from.r) * er(Math.min(1, t / dr)));
+          f.forEach((v, i) => ks[i].push({ offset: t / total, transform: v }));
+          if (t === total) break;
+        }
+        const now = performance.now();
+        p.forEach((x, i) => { const a = x.animate(ks[i], { duration: total, easing: 'linear' }); if (o.elapsed) a.startTime = now - o.elapsed; });
+      }
+      const target = seg => {
+        let on = seg.querySelector('[aria-pressed="true"], [aria-selected="true"], label:has(:checked), a[aria-current]');
+        if (on && !on.offsetWidth && seg.querySelector('.nav-more')) on = seg.querySelector('.nav-more');
+        return on;
+      };
+      function sync(seg, o = {}, on) {
+        let th = seg.querySelector(':scope > .seg-thumb');
+        if (!th) { th = document.createElement('span'); th.className = 'seg-thumb'; th.setAttribute('aria-hidden', 'true'); seg.prepend(th); }
+        on ||= target(seg);
+        if (!on || !on.offsetWidth) return;
+        place(th, on.offsetLeft, on.offsetLeft + on.offsetWidth, o);
+        seg.dataset.ready = '';
+      }
+      let hand = null;
+      try { const n = JSON.parse(sessionStorage.getItem('verdict-nav')); sessionStorage.removeItem('verdict-nav'); if (n && n.vw === innerWidth && Date.now() - n.t < 10000) { hand = n; document.documentElement.dataset.navFrom = ''; } } catch {}
+      const boot = seg => {
+        if (!seg?.offsetWidth) return;
+        if (hand) { const n = hand; hand = null; sync(seg, { from: { l: n.l, r: n.r }, elapsed: n.rest ? 0 : Date.now() - n.t }); }
+        else sync(seg, { instant: true });
+      };
+      return { sync, boot, pos };
+    })();
+    </script>
     <script defer src="{% static 'interface.js' %}?{{ static_version }}"></script>
     <script defer src="{% static 'glass.js' %}?{{ static_version }}"></script>
     <script defer src="{% static 'app.js' %}?{{ static_version }}"></script>
