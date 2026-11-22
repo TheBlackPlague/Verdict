@@ -114,6 +114,16 @@ function populate_results(results) {
     if (section_busy(container)) return;
     container.replaceChildren();
 
+    if (!results.length) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 7;
+        cell.textContent = 'No machine results yet.';
+        row.appendChild(cell);
+        container.appendChild(row);
+        return;
+    }
+
     results.forEach(result => {
         const tr = document.createElement('tr');
 

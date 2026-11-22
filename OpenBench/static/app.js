@@ -225,6 +225,7 @@
 
     window.populate_results = function (res) {
       const body = document.getElementById('results-container'); if (!body || busy(body)) return;
+      if (!res.length) { body.innerHTML = '<tr class="results-empty"><td colspan="7"><div class="empty-state"><strong>No machine results yet</strong><p>Results appear here once a machine reports games for this workload.</p></div></td></tr>'; return; }
       body.innerHTML = [...res].sort((a, b) => b.games - a.games).map(m => { const p = [m.LL, m.LD, m.DD, m.DW, m.WW];
         return `
             <tr${m.active ? ' class="active-highlight"' : ''}><th scope="row" data-label="#"><a href="/machines/${+m.machine__id}/" class="mach-id"><span class="num">${+m.machine__id}</span></a></th><td data-label="User">${escH(m.machine__user__username)}</td><td class="r num" data-label="Games">${n(m.games)}</td>
