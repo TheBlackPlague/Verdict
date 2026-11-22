@@ -235,16 +235,16 @@
   }
 
   const presetHost = $('#test-mode-buttons'), form = $('form.sheet-form');
-  if (presetHost && form && window.engines && hasRepo(['apply_preset', 'create_preset_buttons', 'change_engine', 'set_test_type'])) {
+  if (presetHost && form && window.engines && hasRepo(['apply_preset', 'create_preset_buttons', 'change_engine', 'set_test_type', 'add_defaults_to_preset', 'get_dev_engine', 'set_option'])) {
     const RE = /^(\S+)(?: ([^\[].*?))?(?: \[((?:SMP )?(\d+)T)\])?$/;
     const goalName = g => g || 'Standard';
     const tcOf = k => k.split(' ')[0], tcRank = k => { const m = tcOf(k).match(/^(V*)([SL])TC$/); return m ? (m[2] === 'S' ? 0 : 1 + m[1].length) : Infinity; };
     const PRESETS = { TUNE: 'tune_presets', DATAGEN: 'datagen_presets' };
     const presetsOf = (eng, type) => window.engines[eng][PRESETS[type] || 'test_presets'] || {};
     const segHTML = (name, label, items, on) => `<div class="frow"><span class="flabel" id="pl-${name}">${label}</span><div class="fctl"><div class="seg seg-content seg-fill" role="radiogroup" aria-labelledby="pl-${name}">${items.map(([v, l]) => `<label><input type="radio" form="sheet-ui" name="${name}" value="${escH(v)}"${v === on ? ' checked' : ''}><span>${escH(l)}</span></label>`).join('')}</div></div></div>`;
-    let ownCall = false, markApplied = null;
+    let ownCall = false, markApplied = null, presetKeys = [], presetType = null, current = null;
     const repoApply = window.apply_preset;
-    window.apply_preset = function (key) { const r = repoApply.apply(this, arguments); if (!ownCall && markApplied) markApplied(key); return r; };
+    window.apply_preset = function (key) { const r = repoApply.apply(this, arguments); if (presetKeys.includes(key)) current = key; if (!ownCall && markApplied) markApplied(key); return r; };
     const applyOwn = (key, type) => { ownCall = true; try { window.apply_preset(key, type); } finally { ownCall = false; } };
     const drawPresets = (keys, type) => {
       if (!keys.length) { presetHost.innerHTML = ''; return; }
@@ -280,9 +280,27 @@
       };
     };
     window.create_preset_buttons = function (eng, type) {
-      markApplied = null; presetHost.onchange = null;
-      drawPresets(Object.keys(presetsOf(eng, type)).filter(k => k !== 'default').sort((a, b) => tcRank(a) - tcRank(b) || tcOf(a).localeCompare(tcOf(b), undefined, { numeric: true })), type);
+      markApplied = null; presetHost.onchange = null; current = null; presetType = type;
+      presetKeys = Object.keys(presetsOf(eng, type)).filter(k => k !== 'default').sort((a, b) => tcRank(a) - tcRank(b) || tcOf(a).localeCompare(tcOf(b), undefined, { numeric: true }));
+      drawPresets(presetKeys, type);
       setTimeout(after);
+    };
+
+    const repoChangeEngine = window.change_engine;
+    window.change_engine = function (engine, target, type) {
+      const keep = target === 'base' ? current : null, r = repoChangeEngine.apply(this, arguments);
+      if (keep) window.apply_preset(keep, type);
+      return r;
+    };
+
+    const repoSetTestType = window.set_test_type;
+    window.set_test_type = function () {
+      const r = repoSetTestType.apply(this, arguments);
+      if (current && $('#test_mode')?.value === 'SPRT') {
+        const settings = window.add_defaults_to_preset(window.get_dev_engine(), current, presetType);
+        for (const id of ['test_bounds', 'test_confidence']) if (settings[id]) window.set_option(id, settings[id]);
+      }
+      return r;
     };
 
     const presetSec = presetHost.closest('.fsec');
