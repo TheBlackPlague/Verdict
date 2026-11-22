@@ -60,18 +60,18 @@
           </table>{% endwith %}{% endif %}
           <dl class="kv">
             <div><dt>Opening book</dt><dd>{% if workload|book_download_link %}<a href="{{ workload|book_download_link }}">{{ workload.book_name }}</a>{% else %}{{ workload.book_name }}{% endif %}</dd></div>
-            <div><dt>Upload PGNs</dt><dd>{{ workload.upload_pgns }}</dd></div>
-            <div><dt>Scaling</dt><dd>{{ workload.scale_method }} <span class="num">{{ workload.scale_nps|insertCommas }}</span> NPS</dd></div>
-            <div><dt>Syzygy WDL</dt><dd>{{ workload.syzygy_wdl }}</dd></div>
-            <div><dt>Syzygy adj.</dt><dd>{{ workload.syzygy_adj }}</dd></div>
+            <div><dt>Upload PGNs</dt><dd>{{ workload.upload_pgns|lower|capfirst }}</dd></div>
+            <div><dt>Scaling</dt><dd>{{ workload.scale_method|lower|capfirst }} <span class="num">{{ workload.scale_nps|insertCommas }}</span> NPS</dd></div>
+            <div><dt>Syzygy WDL</dt><dd>{{ workload.syzygy_wdl|lower|capfirst }}</dd></div>
+            <div><dt>Syzygy adj.</dt><dd>{{ workload.syzygy_adj|lower|capfirst }}</dd></div>
             <div><dt>Win adj.</dt><dd>{{ workload.win_adj }}</dd></div>
             <div><dt>Draw adj.</dt><dd>{{ workload.draw_adj }}</dd></div>{% if type == "TUNE" %}
             <div><dt>Alpha</dt><dd>{{ workload.spsa_run.alpha }}</dd></div>
             <div><dt>Gamma</dt><dd>{{ workload.spsa_run.gamma }}</dd></div>
             <div><dt>A-ratio</dt><dd>{{ workload.spsa_run.a_ratio }}</dd></div>
             <div><dt>Pairs per point</dt><dd>{{ workload.workload_size }}</dd></div>
-            <div><dt>Reporting</dt><dd>{{ workload.spsa_run.reporting_type }}</dd></div>
-            <div><dt>Distribution</dt><dd>{{ workload.spsa_run.distribution_type }}</dd></div>{% elif type == "DATAGEN" %}
+            <div><dt>Reporting</dt><dd>{{ workload.spsa_run.reporting_type|lower|capfirst }}</dd></div>
+            <div><dt>Distribution</dt><dd>{{ workload.spsa_run.distribution_type|lower|capfirst }}</dd></div>{% elif type == "DATAGEN" %}
             <div><dt>Genfens args</dt><dd>{{ workload.genfens_args }}</dd></div>
             <div><dt>Play reverses</dt><dd>{{ workload.play_reverses }}</dd></div>{% endif %}
           </dl>
