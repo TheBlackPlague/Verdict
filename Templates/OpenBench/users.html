@@ -25,7 +25,7 @@
                     <td data-label="Username"><a href="/user/{{profile.user.username}}">{{profile.user.username}}</a></td>
                     <td data-label="Games" class="numeric">{{profile.games|insertCommas}}</td>
                     <td data-label="Tests" class="numeric">{{profile.tests|insertCommas}}</td>
-                    <td data-label="Engine">{{profile.engine}}</td>
+                    <td data-label="Engine">{% if profile.engine %}{{profile.engine}}{% else %}<span class="dim">—</span>{% endif %}</td>
                     <td data-label="Created" class="timestamp">{{profile.user.date_joined|date:'U'}}</td>
                 </tr>
             {% endif %}
