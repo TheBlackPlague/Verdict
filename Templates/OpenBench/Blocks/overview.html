@@ -24,7 +24,7 @@
   </section>
 {% endif %}
   <section class="tgroup" data-group="finished" aria-labelledby="g-finished">
-    <header class="tgroup-head"><h2 id="g-finished">{% if paging.url == 'greens' %}Passed tests{% else %}Finished workloads{% endif %}</h2><span class="tgroup-note">Most recently updated</span></header>
+    <header class="tgroup-head">{% if paging.url == 'greens' %}<h2 id="g-finished" class="sr-only">Passed tests</h2>{% else %}<h2 id="g-finished">Finished workloads</h2>{% endif %}<span class="tgroup-note">Most recently updated</span></header>
     {% if completed %}<ul class="tlist" role="list">{% for test in completed %}{% include "OpenBench/Blocks/testsummary.html" %}{% endfor %}
     </ul>{% else %}<p class="tempty">No {% if paging.url == 'greens' %}passed tests{% else %}finished workloads{% endif %} yet.</p>{% endif %}
   </section>
