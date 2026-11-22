@@ -115,7 +115,7 @@
         <header class="card-head"><h2 id="mach-h">Individual machine results</h2><button class="btn btn-quiet" type="button" onclick="fetch_results({{ workload.id }})">Fetch results</button></header>
         <table data-stack class="dtable">
           <thead><tr><th scope="col">#</th><th scope="col">User</th><th scope="col" class="r">Games</th><th scope="col" class="hide-sm">Penta</th><th scope="col" class="r hide-sm">Pairs</th><th scope="col" class="r">Time</th><th scope="col" class="r">Crash</th></tr></thead>
-          <tbody id="results-container"></tbody>
+          <tbody id="results-container"><tr class="results-empty"><td colspan="7"><div class="empty-state"><strong>Machine results not loaded</strong><p>Select Fetch results to list each machine's games for this workload.</p></div></td></tr></tbody>
         </table>
       </section>
 {% endblock %}
