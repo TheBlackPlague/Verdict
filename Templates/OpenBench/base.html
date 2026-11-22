@@ -61,9 +61,11 @@
         if (on && !on.offsetWidth && seg.querySelector('.nav-more')) on = seg.querySelector('.nav-more');
         return on;
       };
+      const resized = new ResizeObserver(es => es.forEach(e => e.target.isConnected ? sync(e.target, { soft: true }) : resized.unobserve(e.target)));
       function sync(seg, o = {}, on) {
         let th = seg.querySelector(':scope > .seg-thumb');
         if (!th) { th = document.createElement('span'); th.className = 'seg-thumb'; th.setAttribute('aria-hidden', 'true'); seg.prepend(th); }
+        resized.observe(seg);
         on ||= target(seg);
         if (!on || !on.offsetWidth) return;
         place(th, on.offsetLeft, on.offsetLeft + on.offsetWidth, o);
